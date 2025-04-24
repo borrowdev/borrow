@@ -40,12 +40,12 @@ function isParamsObject(obj: any): boolean {
  * - limiters: A limiter object (or array of them) where each includes a 'type' field and type-specific properties:
  *   - For 'fixed' and 'sliding' limiters:
  *     - maxRequests: The maximum number of requests allowed
- *     - interval: Either one of "minute", "hour", "day", "week", "month", or a number (treated as seconds)
+ *     - interval: Either one of "minute", "hour", "day", or a number (treated as seconds)
  *   - For 'token' limiters:
  *     - maxTokens: The maximum number of tokens allowed
  *     - tokensCost: The cost of the request in tokens
  *     - tokensPerReplenish: The number of tokens to replenish
- *     - interval: Either one of "minute", "hour", "day", "week", "month", or a number (treated as seconds)
+ *     - interval: Either one of "minute", "hour", "day", or a number (treated as seconds)
  *   - For 'borrow' limiters:
  *     - borrowAction: The action to take when borrowing
  *     - timeout: The timeout duration
@@ -211,9 +211,13 @@ export async function limiter<T extends Limiters>(
   }
 
   // Choose the correct Borrow client.
-  const borrowClient = params.options?.apiKey
-    ? new BorrowClient(params.options.apiKey)
-    : borrow;
+  const borrowClient =
+    params.options?.apiKey || params.options?.endpoint
+      ? new BorrowClient(
+          params.options.apiKey,
+          params.options.endpoint?.baseUrl
+        )
+      : borrow;
 
   try {
     // Format limiters according to API spec with 'type' field
@@ -258,14 +262,17 @@ export async function limiter<T extends Limiters>(
       }
     });
 
-    const response = await borrowClient.post("/limiter", {
-      body: JSON.stringify({
-        key: limiterKey,
-        userId: finalUserIdentifier,
-        limiters: formattedLimiters,
-        action: "check",
-      }),
-    });
+    const response = await borrowClient.post(
+      params.options?.endpoint?.path || "/limiter",
+      {
+        body: JSON.stringify({
+          key: limiterKey,
+          userId: finalUserIdentifier,
+          limiters: formattedLimiters,
+          action: "check",
+        }),
+      }
+    );
 
     const data = (await response.json()) as {
       result: "success" | "limited" | "error";
@@ -303,7 +310,7 @@ export async function limiter<T extends Limiters>(
       }
     }
 
-    if (!response.ok) {
+    if (!response.ok || data.result === "error") {
       const errorMessage = `Limiter returned an error for id: ${
         limiterKey || "[not provided]"
       } with userIdentifier: ${

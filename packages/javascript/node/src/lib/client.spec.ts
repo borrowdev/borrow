@@ -26,6 +26,12 @@ describe("BorrowClient", () => {
     expect(borrow.apiKey).toEqual(secret);
   });
 
+  test("should detect endpoint from constructor", () => {
+    const customEndpoint = "https://custom-endpoint.com/api/v1";
+    const client = new BorrowClient(undefined, customEndpoint);
+    expect(client.endpoint).toEqual(customEndpoint);
+  });
+
   test("should prioritize secret from constructor", () => {
     const constructorSecret = "constructor_secret";
     const client = new BorrowClient(constructorSecret);

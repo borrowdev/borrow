@@ -1,8 +1,8 @@
-type ApiPath = "/limiter";
+type ManagedApiPath = "/limiter";
 import process from "node:process";
 
 class BorrowClient {
-  #endpoint: string = "https://api.borrow.dev/v1";
+  endpoint: string | undefined;
 
   #apiKey: string | undefined;
   get apiKey(): string | undefined {
@@ -36,22 +36,22 @@ class BorrowClient {
     }
 
     this.apiKey = finalSecret;
-
-    // Used for testing
     if (endpoint) {
-      this.#endpoint = endpoint;
+      this.endpoint = endpoint;
+    } else {
+      this.endpoint = "https://api.borrow.dev/v1";
     }
   }
 
   #call(method: string, path: string, options: RequestInit = {}) {
-    const url = new URL(this.#endpoint + path);
+    const url = new URL(this.endpoint + path);
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
     if (!this.apiKey) {
-      throw new Error("Couldn't find secret when calling " + this.#endpoint);
+      throw new Error("Couldn't find secret when calling " + this.endpoint);
     }
     headers["X-Borrow-Api-Key"] = this.apiKey;
 
@@ -62,10 +62,10 @@ class BorrowClient {
     });
   }
 
-  async get(path: ApiPath, options: RequestInit = {}) {
+  async get(path: ManagedApiPath | string, options: RequestInit = {}) {
     return this.#call("GET", path, options);
   }
-  async post(path: ApiPath, options: RequestInit = {}) {
+  async post(path: ManagedApiPath | string, options: RequestInit = {}) {
     return this.#call("POST", path, options);
   }
 }

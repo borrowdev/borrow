@@ -3,10 +3,7 @@ import type { LiteralUnion, TaggedUnion, SimplifyDeep } from "type-fest";
 /**
  * The interval in which requests are counted. If a number, treated as seconds.
  */
-export type Interval = LiteralUnion<
-  "minute" | "hour" | "day" | "week" | "month",
-  number
->;
+export type Interval = LiteralUnion<"minute" | "hour" | "day", number>;
 
 /**
  * Configuration schema for a fixed-window limiter.
@@ -126,6 +123,23 @@ export interface CommonLimiterOptions {
    * @default process.env.BORROW_API_KEY
    */
   apiKey?: string;
+
+  /**
+   * The endpoint to use for the Borrow API.
+   * Use this option when self-hosting.
+   */
+  endpoint?: {
+    /**
+     * The base URL of the Borrow API.
+     * @example "https://api.borrow.dev/v1"
+     */
+    baseUrl: string;
+    /**
+     * The path to the specific API endpoint.
+     * @example "/limiter"
+     */
+    path?: string;
+  };
 
   /**
    * Determines what happens when the API call fails (e.g: network failure, quota reached, incorrect parameters, etc): "fail" treats it as a failed check, "bypass" treats it as a successful check.

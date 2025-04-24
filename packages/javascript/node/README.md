@@ -6,9 +6,15 @@
   <a href="https://github.com/borrowdev/borrow/blob/main/LICENSE"><img src="https://img.shields.io/github/license/borrowdev/borrow" alt="License"></a>
 </p>
 
+> [!WARNING]  
+> This package is NOT stable yet. There may be breaking changes with every minor release.
+>
+> It is recommended to wait for the 1.0.0 release before using this package in production.
+
 ## Features
 
-- **Zero dependencies** - Lightweight and secure
+- **Self-hostable** - Easily deploy on your own infrastructure
+- **Minimal dependencies** - Lightweight and secure
 - **Fully typed** - Complete TypeScript + JSDoc support
 - **Simple API** - Intuitive interfaces for all tools
 - **Serverless-first** - [Integration](https://borrow.dev/documentation/limiter/integrations/supabase) with modern cloud environments
