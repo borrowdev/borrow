@@ -1,0 +1,335 @@
+---
+title: Borrow | Limiter Quick Start
+description: Quick Start guide for the Limiter API
+---
+
+import { Tabs } from "nextra/components";
+
+# Quick Start
+
+## Authentication
+
+Follow these steps to get your API key and start using Borrow Limiter:
+
+1. [Create a Borrow account.](https://borrow.dev/sign-up)
+2. [Create a new project.](https://borrow.dev/dashboard)
+3. Inside your project, go to the Settings tab.
+4. In the Authentication section, click Show API Key.
+5. Wait for the API key to be decrypted and copy it.
+6. Set the ``BORROW_API_KEY`` environment variable in your application to the copied API key.
+
+## Installation
+
+Install the Borrow Node.js package using your preferred package manager:
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]} defaultValue="npm">
+	<Tabs.Tab value="npm">
+```bash copy
+npm install @borrowdev/node
+```	
+	</Tabs.Tab>
+	<Tabs.Tab value="pnpm">
+```bash copy
+pnpm add @borrowdev/node
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="yarn">
+```bash copy
+yarn add @borrowdev/node
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="bun">
+```bash copy
+bun add @borrowdev/node
+```
+	</Tabs.Tab>
+</Tabs>
+
+## Usage
+
+### Limiting with the fixed window algorithm
+Let's use the [fixed window](/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
+
+<Tabs items={["TypeScript", "JavaScript", "curl"]} defaultValue="TypeScript">
+	<Tabs.Tab value="TypeScript">
+```ts copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		maxRequests: 10,
+		interval: "minute",
+		type: "fixed",
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="JavaScript">
+```js copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		maxRequests: 10,
+		interval: "minute",
+		type: "fixed",
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="curl">
+```bash copy
+curl https://api.borrow.dev/v1/limiter \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "userId": "current-user-id",
+  "key": "login",
+  "limiters": [
+    {
+      "type": "fixed",
+      "maxRequests": 10,
+      "interval": "minute"
+    }
+  ]
+}'
+```
+	</Tabs.Tab>
+</Tabs>
+
+### Rate limiting with the sliding window algorithm
+Let's use the [sliding window](/limiter/algorithms#sliding-window) algorithm to rate limit our login endpoint to 10 requests per minute.
+
+<Tabs items={["TypeScript", "JavaScript", "curl"]} defaultValue="TypeScript">
+	<Tabs.Tab value="TypeScript">
+```ts copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		maxRequests: 10,
+		interval: "minute",
+		type: "sliding",
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="JavaScript">
+```js copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		maxRequests: 10,
+		interval: "minute",
+		type: "sliding",
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="curl">
+```bash copy
+curl https://api.borrow.dev/v1/limiter \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "userId": "current-user-id",
+  "key": "login",
+  "limiters": [
+    {
+      "type": "sliding",
+      "maxRequests": 10,
+      "interval": "minute"
+    }
+  ]
+}'
+```
+	</Tabs.Tab>
+</Tabs>
+
+### Rate limiting with the token bucket algorithm
+Let's use the [token bucket](/limiter/algorithms#token-bucket) algorithm to rate limit requests to 10 tokens per minute, with a maximum of 20 tokens.
+
+<Tabs items={["TypeScript", "JavaScript", "curl"]} defaultValue="TypeScript">
+	<Tabs.Tab value="TypeScript">
+```ts copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		maxTokens: 20,
+		tokensCost: 5,
+		tokensPerReplenish: 10,
+		interval: "minute",
+		type: "token",
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="JavaScript">
+```js copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		maxTokens: 20,
+		tokensCost: 5,
+		tokensPerReplenish: 10,
+		interval: "minute",
+		type: "token",
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="curl">
+```bash copy
+curl https://api.borrow.dev/v1/limiter \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'x-borrow-api-key: YOUR_API_KEY' \
+  --data '{
+  "userId": "current-user-id",
+  "key": "my-limiter-id",
+  "limiters": [
+    {
+      "maxTokens": 20,
+      "tokensCost": 5,
+      "tokensPerReplenish": 10,
+      "interval": "minute",
+	  "type": "token"
+    }
+  ]
+}'
+```
+	</Tabs.Tab>
+</Tabs>
+
+### Limiting with the borrow algorithm
+Let's use the [borrow](/limiter/algorithms#borrow) algorithm to rate limit requests to one request at a time.
+
+<Tabs items={["TypeScript", "JavaScript", "curl"]} defaultValue="TypeScript">
+	<Tabs.Tab value="TypeScript">
+```ts copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		borrowAction: "start",
+		type: "borrow",
+		timeout: 10,
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+// ... Your expensive business logic
+const { success: endSuccess } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		borrowAction: "end",
+		type: "borrow",
+		timeout: 10,
+	}]
+});
+if (!endSuccess) {
+	return { message: "Failed to end borrow." };
+}
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="JavaScript">
+```js copy
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		borrowAction: "start",
+		type: "borrow",
+		timeout: 10,
+	}]
+});
+if (!success) {
+	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+}
+// ... Your expensive business logic
+const { success: endSuccess } = await borrow.limiter("my-limiter-id", "current-user-id", {
+	limiters: [{
+		borrowAction: "end",
+		type: "borrow",
+		timeout: 10,
+	}]
+});
+if (!endSuccess) {
+	return { message: "Failed to end borrow." };
+}
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="curl">
+```bash copy
+# Start the borrow
+curl https://api.borrow.dev/v1/limiter \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'x-borrow-api-key: YOUR_API_KEY' \
+  --data '{
+  "userId": "current-user-id",
+  "key": "my-limiter-id",
+  "limiters": [
+    {
+	  "borrowAction": "start",
+      "type": "borrow",
+	  "timeout": 10
+    }
+  ]
+}'
+
+# End the borrow when finished
+curl https://api.borrow.dev/v1/limiter \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'x-borrow-api-key: YOUR_API_KEY' \
+  --data '{
+  "userId": "current-user-id",
+  "key": "my-limiter-id",
+  "limiters": [
+    {
+      "type": "borrow",
+      "borrowAction": "end",
+	  "timeout": 10
+    }
+  ]
+}'
+```
+	</Tabs.Tab>
+</Tabs>
+
+### Conclusion
+
+In this Quick Start guide, we've barely scratched the surface of what Borrow Limiter can do.
+You can do so much more such as refilling tokens on demand and creating different limiter combinations with up to 4 limiters of unique types.
+
+If you want to learn more, the best way to do so is to just [install Borrow](/limiter/quick-start#installation) and read the in-editor comments (JSDoc for TS/JS).

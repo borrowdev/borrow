@@ -1,0 +1,41 @@
+---
+title: Borrow | Limiter Algorithms
+description: Overview for the Limiter API algorithms
+---
+
+# Rate limiting algorithms
+In this section, we will explore the different algorithms available for rate limiting using the Borrow API.
+If you're more of a visual learner we recommend visiting [this article.](https://smudge.ai/blog/ratelimit-algorithms)
+> The previously mentioned article only covers 3 of our 4 algorithms, that's because we've developed the **borrow** algorithm, even though it's less of an algorithm, more of just synchronous rate limiting.
+
+## Fixed Window
+The fixed limiter is simply an algorithm that limits the number of requests to a fixed number on the **clock**.
+
+For example, if you set the limit to 10 requests per minute, the first 10 requests will be allowed, and the next requests will be blocked until the next **clock** minute.
+In the fixed window algorithm, it doesn't matter if the 10 requests were made 1 second before the next minute or however long before the next minute. In either scenario,
+it will reset in the next minute on the **clock**.
+
+You can use the fixed window algorithm by specifying the limiter `type` to `"fixed"`.
+
+## Sliding Window
+The sliding window algorithm is a more sophisticated approach to rate limiting that allows for a more fair distribution of requests over time.
+In this algorithm, the limit is applied over the time window at the time of the request rather than a fixed clock interval.
+
+For example, if you set the limit to 10 requests per minute, the first 10 requests made within any 60-second window will be allowed.\
+Let's say the user makes a request at 00:00:30, that means their 10-request limit will reset at 00:01:30, rather than at 00:01:00, as in the fixed window algorithm.
+
+You can use the sliding window algorithm by specifying the limiter `type` to `"sliding"`.
+
+## Token Bucket
+The token bucket algorithm is the most flexible of our rate limiting algorithms.\
+In this algorithm, tokens are added to a bucket at a rate you specify (`interval` and `tokensPerReplenish`), and each request consumes a specified amount of tokens from the bucket (`tokensCost`).
+
+After the maximum amount of tokens is reached (`maxTokens`), the requests will be blocked until the user has enough tokens.
+Likewise, if the user only has 70 tokens, and the request consumes 80 tokens, the request will be blocked until enough tokens are replenished.
+
+## Borrow
+The borrow algorithm is a synchronous rate limiting algorithm that allows you to limit requests without the need for a time window.\
+In this algorithm, you call the API when a user has made a request, and then you call it again when the user has finished the request.
+
+In the time between the two calls the user is blocked from making any requests. You'll also need to specify a timeout parameter to ensure that
+if you forget or are unable to call the API again the user will be automatically unblocked after the timeout has expired.

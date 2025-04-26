@@ -13,17 +13,17 @@
 </p>
 
 ## Authentication
-[Follow this guide to authenticate if using our managed service.](https://borrow.dev/documentation/limiter/quick-start#authentication)
+[Follow this guide to authenticate if using our managed service.](https://borrow.dev/docs/limiter/quick-start#authentication)
 
 ## Documentation
-[Read the full documentation for Borrow.](https://borrow.dev/documentation)
+[Read the full documentation for Borrow.](https://borrow.dev/docs)
 
 ## Limiter
 Self-hostable rate limiting API for protecting regular service usage.
 
 ### Usage
 
-Let's use the [fixed window](https://borrow.dev/documentation/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
+Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```javascript
 import { borrow } from "@borrowdev/node";
@@ -41,4 +41,4 @@ if (!success) {
 ```
 
 ### Self host
-To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev/documentation/limiter/self-hosting).
+To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev/docs/limiter/self-hosting).

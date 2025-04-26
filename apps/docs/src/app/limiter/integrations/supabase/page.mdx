@@ -1,0 +1,55 @@
+---
+title: Borrow | Supabase Integration
+description: Overview for the Supabase integration
+---
+
+import { Tabs } from "nextra/components";
+
+# Supabase Integration
+
+The TS/JS client library for limiter is integrated with Supabase to make your life easier as a developer.
+
+The way it works is if you want to rate limit a user ID, instead of getting the environment variables, creating a Supabase instance, and parsing the authentication token, 
+you can simply pass the request object to the limiter function and we'll handle the rest for you!
+
+You can also pass only the request object to the limiter function and it'll automatically create a unique key for the request based on the request URL.
+
+This might have diminishing returns for when you already need the user object anyway, but for simple use cases where you just want to protect an endpoint and return a response
+without touching the user object, this greatly simplifies the whole process!
+
+Here's how it works:
+
+<Tabs items={["TypeScript", "JavaScript", "curl"]} defaultValue="TypeScript">
+	<Tabs.Tab value="TypeScript">
+```ts copy
+import { borrow } from "@borrowdev/node";
+// ... Your Supabase Edge Function handler
+
+const { success, timeLeft } = await borrow.limiter(req, {
+	limiters: [{
+		interval: 20,
+		maxRequests: 10,
+		type: "fixed",
+	}]
+});
+
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+	<Tabs.Tab value="JavaScript">
+```js copy
+import { borrow } from "@borrowdev/node";
+// ... Your Supabase Edge Function handler
+
+const { success, timeLeft } = await borrow.limiter(req, {
+	limiters: [{
+		interval: 20,
+		maxRequests: 10,
+		type: "fixed",
+	}]
+});
+
+// ... Your expensive business logic
+```
+	</Tabs.Tab>
+</Tabs>

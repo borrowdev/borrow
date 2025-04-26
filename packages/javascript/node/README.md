@@ -17,7 +17,7 @@
 - **Minimal dependencies** - Lightweight and secure
 - **Fully typed** - Complete TypeScript + JSDoc support
 - **Simple API** - Intuitive interfaces for all tools
-- **Serverless-first** - [Integration](https://borrow.dev/documentation/limiter/integrations/supabase) with modern cloud environments
+- **Serverless-first** - [Integration](https://borrow.dev/docs/limiter/integrations/supabase) with modern cloud environments
 
 ## Installation
 
@@ -36,11 +36,11 @@ bun add @borrowdev/node
 ```
 
 ## Authentication
-[Follow this guide.](https://borrow.dev/documentation/limiter/quick-start#authentication)
+[Follow this guide.](https://borrow.dev/docs/limiter/quick-start#authentication)
 
 ## Usage
 
-Let's use the [fixed window](https://borrow.dev/documentation/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
+Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```javascript
 import { borrow } from "@borrowdev/node";
@@ -58,4 +58,4 @@ if (!success) {
 ```
 
 ## Documentation
-[Read the full documentation for Limiter](https://borrow.dev/documentation/limiter)
+[Read the full documentation for Limiter](https://borrow.dev/docs/limiter)

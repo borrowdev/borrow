@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npx nx build docs --prod && npx nx run docs:postbuild",
+  "outputDirectory": "apps/docs/.next",
+  "framework": "nextjs"
+}

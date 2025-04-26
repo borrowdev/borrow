@@ -1,0 +1,236 @@
+---
+title: Borrow | Limiter Self-Hosting
+description: Guide to self-host the Borrow Limiter
+---
+
+import { Tabs } from "nextra/components";
+
+## Self-Hosting on Cloudflare Workers
+
+Follow these steps to run Limiter on Cloudflare Workers.\
+While we work on the documentation, you can use this example as the basis for running on other serverless platforms such as AWS Lambda, Vercel, or Supabase.
+
+### Prerequisites
+- A Cloudflare [worker environment](https://developers.cloudflare.com/workers/get-started/guide/).
+- An [Upstash](https://upstash.com/) Redis instance (or any other database if you plan on writing an adapter).
+
+### 1. Install Dependencies
+```bash copy
+npm install @borrowdev/node @upstash/redis
+```
+
+### 2. Configure `wrangler.jsonc`
+
+<Tabs items={["wrangler.jsonc"]} defaultValue="wrangler.jsonc">
+  <Tabs.Tab value="wrangler.jsonc">
+```jsonc copy
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "borrow-limiter",
+  "compatibility_date": "2025-04-25",
+  "main": "src/index.ts",
+  "vars": {
+    // Use this if you're using Upstash Redis.
+    "UPSTASH_REDIS_REST_URL": "https://your-upstash-redis-url",
+  }
+}
+```
+  </Tabs.Tab>
+</Tabs>
+
+### 3. Configure your secrets
+For local development, you should store your secrets in a `.dev.vars` file in the root of your project.\
+**Do not commit this file to your version control system.**\
+For more information, check out the [official secrets documentation](https://developers.cloudflare.com/workers/configuration/secrets/).
+<Tabs items={[".dev.vars"]} defaultValue=".dev.vars">
+  <Tabs.Tab value=".dev.vars">
+```dotenv copy
+BORROW_LIMITER_INVOKE_SECRET="random-secure-string"
+UPSTASH_REDIS_REST_TOKEN="your-upstash-redis-token"
+UPSTASH_REDIS_REST_URL="https://your-upstash-redis-url"
+```
+  </Tabs.Tab>
+</Tabs>
+
+
+### 4. Create the `src/index.ts` file
+
+<Tabs items={["src/index.ts"]} defaultValue="src/index.ts">
+  <Tabs.Tab value="src/index.ts">
+```ts copy
+import { limiter, UpstashRedisAdapter } from "@borrowdev/node/limiter/host";
+import { Redis } from "@upstash/redis/cloudflare";
+
+export default {
+  async fetch(request, env, ctx) {
+    const redis = Redis.fromEnv(env);
+    const adapters = { storage: new UpstashRedisAdapter(redis) };
+    const req = await request.json();
+
+    // Execute the limiter function, passing:
+    // - invokeSecret from env for authentication
+    // - the Redis-backed storage adapter
+    // - ctx.waitUntil for background updates (or false if you want to execute synchronously)
+    const response = await limiter({
+      env,
+      req: {
+        ...req || {},
+        invokeSecret: request.headers.get("X-Borrow-Api-Key") || "",
+      } as any,
+      adapters,
+      backgroundExecute: ctx.waitUntil.bind(ctx),
+      hooks: {
+        beforeResponse: async (r) => console.log("Limiter result: ", r),
+      },
+    });
+
+    if (response.error) {
+      console.error("Limiter error: ", response.message);
+    }
+
+    // Return JSON result
+    return new Response(
+      JSON.stringify({
+        result: response.result,
+        timeLeft: response.timeLeft,
+        tokensLeft: response.tokensLeft,
+      }),
+      {
+        status: response.status,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  },
+} satisfies ExportedHandler<any>;
+```
+  </Tabs.Tab>
+</Tabs>
+
+### 5. Call the Limiter API from your application server
+
+You can now call the Limiter API by using our client library or by making an HTTP request.
+<Tabs items={["TypeScript", "curl"]} defaultValue="TypeScript">
+  <Tabs.Tab value="TypeScript">
+```ts copy
+import { borrow } from "@borrowdev/node";
+ 
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [{
+    maxTokens: 20,
+    tokensCost: 5,
+    tokensPerReplenish: 10,
+    interval: "minute",
+    type: "token",
+  }],
+  options: {
+    // Use for testing or if you want to fail closed.
+    failBehavior: "fail",
+    apiKey: "random-secure-string",
+    endpoint: {
+      baseUrl: "http://localhost:8787",
+    }
+  }
+});
+if (!success) {
+  return { message: "Rate limit exceeded." + (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "") };
+}
+// ... Your expensive business logic
+```
+  </Tabs.Tab>
+  <Tabs.Tab value="curl">
+```bash copy
+curl http://localhost:8787 \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'x-borrow-api-key: YOUR_INVOKE_SECRET' \
+  --data '{
+  "action": "check",
+  "userId": "current-user-id",
+  "key": "my-limiter-id",
+  "limiters": [
+    {
+      "maxTokens": 20,
+      "tokensCost": 5,
+      "tokensPerReplenish": 10,
+      "interval": "minute",
+      "type": "token"
+    }
+  ]
+}'
+```
+  </Tabs.Tab>
+</Tabs>
+
+### 6. Use another database (optional)
+
+If you want to use a different database than Upstash Redis, you can write your own adapter.\
+You just need to extend the `StorageAdapter` class and implement the required methods.
+
+<Tabs items={["TypeScript", "JavaScript"]} defaultValue="TypeScript">
+  <Tabs.Tab value="TypeScript">
+```ts copy
+import { StorageAdapter } from "@borrowdev/node/limiter/host";
+
+class MyCustomAdapter extends StorageAdapter {
+  private db: DbType;
+
+  constructor(db: DbType) {
+    super();
+    this.db = db;
+  }
+
+  override get = (key: string) => {
+    // Implement your logic to get a value using the given input. Must not throw.
+  }
+
+  override set = async (key: string, value: any) => {
+    // Implement your logic to set a value using the given inputs. May throw.
+  }
+
+  override relative = async (key: string, field: string, amount: number) => {
+    // Implement your logic to increment/decrement an integer using the given inputs. May throw.
+  }
+
+  // (optional)
+  override getStorageKey = (
+    params: {
+      limiterType: LimiterType;
+      userId: string | null;
+      key: string | null;
+    }
+  ) => {
+    // Implement your logic to generate a storage key using the given parameters. May throw.
+  }
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab value="JavaScript">
+```js copy
+import { StorageAdapter } from "@borrowdev/node/limiter/host";
+
+class MyCustomAdapter extends StorageAdapter {
+  constructor(db) {
+    super();
+    this.db = db;
+  }
+
+  get(key) {
+    // Implement your logic to get a value using the given input. Must not throw.
+  }
+
+  async set(key, value) {
+    // Implement your logic to set a value using the given inputs. May throw.
+  }
+
+  async relative(key, field, amount) {
+    // Implement your logic to increment/decrement an integer using the given inputs. May throw.
+  }
+
+  // (optional)
+  getStorageKey(params) {
+    // Implement your logic to generate a storage key using the given parameters. May throw.
+  }
+}
+```
+  </Tabs.Tab>
+</Tabs>

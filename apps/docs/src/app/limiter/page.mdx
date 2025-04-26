@@ -1,0 +1,33 @@
+---
+title: Borrow | Limiter Overview
+description: Overview for the Limiter API
+---
+
+# Limiter
+
+Limiter is a serverless **rate limiting API**.
+You'll usually call Limiter before you start executing your function logic, especially
+expensive logic such as database scans or AI inferences.\
+Using a rate limiter can ensure your services don't get overwhelmed, which can potentially save you thousands of dollars.
+
+## Infrastructure
+
+Behind the scenes we use [Redis](https://redis.io/) with data persistence to provide an accurate and fast atomic counter.
+
+Imagine you have an AI inference endpoint that effectively costs you around $0.01 per request and allows
+signed up users to use it for free. If you allow them to make however many requests they want, the request rate
+will be impossible to predict and you'll have no way to control your costs.
+
+> [!WARNING]
+>
+> Limiter is currently not suitable for DoS protection, you should use it only for rate limiting regular usage.
+> It should be seen as a tool to help you have more predictable costs and to prevent your services from being overwhelmed by too many requests under normal circumstances.
+>
+> In its current state, it should NOT be used as a tool to prevent malicious attacks, such as [DoS](https://en.wikipedia.org/wiki/Denial-of-service_attack).
+> We highly recommend you take a holistic approach to cost control and security, using Limiter as only part of your overall strategy. 
+
+Implementing a rate limiter from scratch can be a complex task, the pitfalls are many, and the cost of mistakes is usually high if things go south.\
+It becomes even more complex when you want to support multiple rate limiting algorithms at the same time.
+
+We made Limiter so you don't have to worry about these complexities.\
+As a bonus, since [our philosophy](/#philosophy) is to provide the best developer experience possible, you'll most likely find using our APIs intuitive and easy.
