@@ -5,6 +5,7 @@
   "scripts": {},
   "private": true,
   "devDependencies": {
+    "@monodon/rust": "^2.3.0",
     "@nx/js": "20.8.1",
     "@nx/next": "20.8.1",
     "@nx/vite": "20.8.1",

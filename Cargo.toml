@@ -1,0 +1,7 @@
+
+[workspace]
+resolver = '2'
+members = ['apps/cli']
+
+[profile.release]
+lto = true
