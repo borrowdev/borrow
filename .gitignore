@@ -49,3 +49,6 @@ vitest.config.*.timestamp*
 .next
 out
 .vercel
+template
+
+target

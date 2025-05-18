@@ -18,7 +18,7 @@
 ## Documentation
 [Read the full documentation for Borrow.](https://borrow.dev/docs)
 
-## Limiter
+## Borrow Limiter
 Self-hostable rate limiting API for protecting regular service usage.
 
 ### Usage
@@ -42,3 +42,20 @@ if (!success) {
 
 ### Self host
 To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev/docs/limiter/self-hosting).
+
+## Borrow Start
+Fully open-source scaffolding tool for downloading project and component templates.
+
+### Roadmap
+- [ ] Add support for third-party templates made by the community.
+  - [ ] Add support for publishing and downloading, and searching templates from the Borrow registry repository.
+	- [ ] Add support for publishing and downloading templates from GitHub repositories.
+	- [ ] Add support for publishing and downloading templates from NPM.
+	- [ ] Add support for publishing and downloading templates from crates.io.
+	- [ ] Add support for publishing and downloading templates from local files.
+- [ ] Add support for executing pre/post-proccessing code in any language by using WASM.
+- [ ] Add support for generating WASM code from any language for template development with the CLI.
+- [ ] Add support for language selection within one template.
+- [ ] Add support for per-file config with frontmatter.
+	- [ ] Add support for customizing output path.
+	- [ ] Add support for conditionally including files.
