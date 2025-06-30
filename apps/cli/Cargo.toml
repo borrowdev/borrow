@@ -1,8 +1,18 @@
 [package]
-name = "cli"
+name = "borrow-dev"
 version = "0.1.0"
+authors=["Lorenzo Bloedow <dev@lorenzobloedow.com>"]
+license = "MIT"
 edition = "2024"
 description = "Official CLI for Borrow tools"
+homepage = "https://github.com/borrowdev/borrow"
+repository = "https://github.com/borrowdev/borrow"
+keywords = ["cli", "toolkit", "template", "boilerplate"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "borrow"
+path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.5.37", features = ["derive", "unicode", "wrap_help"] }

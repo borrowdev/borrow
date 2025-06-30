@@ -43,19 +43,35 @@ if (!success) {
 ### Self host
 To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev/docs/limiter/self-hosting).
 
-## Borrow Start
-Fully open-source scaffolding tool for downloading project and component templates.
+## Borrow CLI - The Developer Toolkit
 
-### Roadmap
-- [ ] Add support for third-party templates made by the community.
-  - [ ] Add support for publishing and downloading, and searching templates from the Borrow registry repository.
-	- [ ] Add support for publishing and downloading templates from GitHub repositories.
-	- [ ] Add support for publishing and downloading templates from NPM.
-	- [ ] Add support for publishing and downloading templates from crates.io.
-	- [ ] Add support for publishing and downloading templates from local files.
-- [ ] Add support for executing pre/post-proccessing code in any language by using WASM.
-- [ ] Add support for generating WASM code from any language for template development with the CLI.
-- [ ] Add support for language selection within one template.
+### Install
+```bash
+cargo install borrow-dev
+```
+
+### Start
+Borrow Start is a command-line tool that helps you quickly set up common boilerplate code with pre-defined templates and placeholders.
+
+Templates are downloaded from the [Borrow registry](https://github.com/borrowdev/registry), or you can create your own templates
+and refer to them locally by using the `local:` prefix before `<template>`.
+
+#### Usage
+```bash
+# Download and install a template
+borrow start new -t <template> -o <output_dir>
+# Delete a template from the cache
+borrow start del -t <template>
+```
+
+#### Example
+```bash
+borrow start new -t supabase-proxy -o ~/my-awesome-project
+```
+
+#### Roadmap
+- [ ] Add support for self-hosted GitHub templates.
+- [ ] Add support for package metadata.
+- [ ] Add support for sandboxed template code execution with hooks.
 - [ ] Add support for per-file config with frontmatter.
-	- [ ] Add support for customizing output path.
-	- [ ] Add support for conditionally including files.
+- [ ] Write documentation for how to create your own templates.
