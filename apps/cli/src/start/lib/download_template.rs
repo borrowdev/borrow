@@ -1,4 +1,4 @@
-use std::{fs::remove_dir_all, path::PathBuf};
+use std::path::PathBuf;
 use git2::{build, FetchOptions};
 
 use crate::start::lib::{get_git_dir, get_template_dir, TemplateSpecifier};

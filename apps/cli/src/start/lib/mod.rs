@@ -33,7 +33,7 @@ impl TemplateSpecifier {
                 name: template_name,
                 path
             }
-        } else if (spec.starts_with("gh:")) {
+        } else if spec.starts_with("gh:") {
             panic!("GitHub templates are not yet supported");
         } else {
             let mut specs = spec.split("@").into_iter();
