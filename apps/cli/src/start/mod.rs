@@ -12,8 +12,8 @@ pub enum StartCommand {
     New {
         #[arg(short, long)]
         template: String,
-        #[arg(long)]
-        target_dir: String,
+        #[arg(short, long)]
+        output_dir: String,
     },
 
     #[command(name = "del", arg_required_else_help(true))]
@@ -27,13 +27,13 @@ pub fn handle_start_command(command: StartCommand) {
     match command {
         StartCommand::New {
             template,
-            target_dir
+            output_dir
         } => {
             let template_specifier = TemplateSpecifier::new(&template);
             let template_dir = get_template_dir(&template_specifier);
 
             download_template(template_specifier.clone(), template_dir.clone());
-            install_template(template_dir, PathBuf::from(target_dir));
+            install_template(template_dir, PathBuf::from(output_dir));
         },
         StartCommand::Del { template } => {
             let template_specifier = TemplateSpecifier::new(&template);
