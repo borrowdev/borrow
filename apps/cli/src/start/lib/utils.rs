@@ -13,10 +13,17 @@ pub fn get_templates_dir() -> PathBuf {
     get_data_dir().join("templates")
 }
 
-pub fn get_template_dir(specifier: TemplateSpecifier) -> PathBuf {
+pub fn get_template_dir(specifier: &TemplateSpecifier) -> PathBuf {
     match specifier {
         TemplateSpecifier::Local { name, path: _ } => get_templates_dir().join(name),
-        TemplateSpecifier::GitHub { name, owner: _, repo: _, branch: _, dir: _ } => get_templates_dir().join(name),
+        TemplateSpecifier::GitHub { name: _, owner: _, repo, branch: _, dir } => get_templates_dir().join(dir.clone().unwrap_or(repo.to_string())),
+    }
+}
+
+pub fn get_git_dir(specifier: &TemplateSpecifier) -> PathBuf {
+    match specifier {
+        TemplateSpecifier::GitHub { name, owner: _, repo: _, branch: _, dir: _ } => get_data_dir().join("git").join(name),
+        _ => panic!("Git directory is only applicable for GitHub templates"),
     }
 }
 

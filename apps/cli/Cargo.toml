@@ -9,3 +9,4 @@ clap = { version = "4.5.37", features = ["derive", "unicode", "wrap_help"] }
 inquire = "0.7.5"
 walkdir = "2"
 dirs = "6"
+git2 = "0.20.2"
