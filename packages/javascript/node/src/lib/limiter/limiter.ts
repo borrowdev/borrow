@@ -6,13 +6,15 @@ import {
   LimiterParams,
   AnyLimiter,
 } from "@lib/limiter/types.js";
-import { getSupabaseRequestInfo } from "../utils.js";
 import {
   handleErrorResponse,
   isTokenLimiterArray,
   // @ts-expect-error It's being used by JSDoc
+  // oxlint-disable-next-line no-unused-vars
   LimiterError,
 } from "@lib/limiter/utils.js";
+
+import { getSupabaseRequestInfo } from "../utils.js";
 
 const failBehaviorString = {
   bypass: "Bypassing this error since failBehavior is set to 'bypass'.",
@@ -32,95 +34,116 @@ function isParamsObject(obj: any): boolean {
 }
 
 /**
- * @typedef {Object} Params
- * This type represents the parameters object for the limiter function,
- * including:
- * - id: The unique identifier for the rate limiter.
- * - userIdentifier: Either a unique user identifier (string) or a Supabase Request object.
- * - limiters: A limiter object (or array of them) where each includes a 'type' field and type-specific properties:
- *   - For 'fixed' and 'sliding' limiters:
- *     - maxRequests: The maximum number of requests allowed
- *     - interval: Either one of "minute", "hour", "day", or a number (treated as seconds)
- *   - For 'token' limiters:
- *     - maxTokens: The maximum number of tokens allowed
- *     - tokensCost: The cost of the request in tokens
- *     - tokensPerReplenish: The number of tokens to replenish
- *     - interval: Either one of "minute", "hour", "day", or a number (treated as seconds)
- *   - For 'borrow' limiters:
- *     - borrowAction: The action to take when borrowing
- *     - timeout: The timeout duration
- * - options: Optional common limiter options (apiKey, failBehavior, debug).
+ * @typedef {Object} Params This type represents the parameters object for the
+ *   limiter function, including:
+ *
+ *   - id: The unique identifier for the rate limiter.
+ *   - userIdentifier: Either a unique user identifier (string) or a Supabase
+ *     Request object.
+ *   - limiters: A limiter object (or array of them) where each includes a 'type'
+ *     field and type-specific properties:
+ *
+ *     - For 'fixed' and 'sliding' limiters:
+ *
+ *         - maxRequests: The maximum number of requests allowed
+ *         - interval: Either one of "minute", "hour", "day", or a number (treated as
+ *           seconds)
+ *     - For 'token' limiters:
+ *
+ *         - maxTokens: The maximum number of tokens allowed
+ *         - tokensCost: The cost of the request in tokens
+ *         - tokensPerReplenish: The number of tokens to replenish
+ *         - interval: Either one of "minute", "hour", "day", or a number (treated as
+ *           seconds)
+ *     - For 'borrow' limiters:
+ *
+ *         - borrowAction: The action to take when borrowing
+ *         - timeout: The timeout duration
+ *   - options: Optional common limiter options (apiKey, failBehavior, debug).
  */
 
 /**
  * Checks the global rate limit.
  *
- * @param {Params<T>} params - The parameters object containing all limiter configuration.
- * @throws {LimiterError} - If the request fails and failBehavior is set to "fail".
+ * @param {Params<T>} params - The parameters object containing all limiter
+ *   configuration.
  * @returns {LimiterResultPromise<T, R>}
+ * @throws {LimiterError} - If the request fails and failBehavior is set to
+ *   "fail".
  */
 export function limiter<T extends Limiters>(
-  params: Params<T>
+  params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 /**
  * Checks the rate limit with an ID.
  *
  * @param {string} id - The unique identifier used to scope the limiter.
- * @param {Params<T>} params - The parameters object containing all limiter configuration.
- * @throws {LimiterError} - If the request fails and failBehavior is set to "fail".
+ * @param {Params<T>} params - The parameters object containing all limiter
+ *   configuration.
  * @returns {LimiterResultPromise<T, R>}
+ * @throws {LimiterError} - If the request fails and failBehavior is set to
+ *   "fail".
  */
 export function limiter<T extends Limiters>(
   id: string,
-  params: Params<T>
+  params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 /**
  * Checks the rate limit with a userIdentifier.
  *
- * @param {string|Request} userIdentifier - A unique user identifier (e.g.: user ID, email).
- * @param {Params<T>} params - The parameters object containing all limiter configuration.
- * @throws {LimiterError} - If the request fails and failBehavior is set to "fail".
+ * @param {string | Request} userIdentifier - A unique user identifier (e.g.:
+ *   user ID, email).
+ * @param {Params<T>} params - The parameters object containing all limiter
+ *   configuration.
  * @returns {LimiterResultPromise<T, R>}
+ * @throws {LimiterError} - If the request fails and failBehavior is set to
+ *   "fail".
  */
 export function limiter<T extends Limiters>(
   userIdentifier: string,
-  params: Params<T>
+  params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 /**
- * Checks the rate limit linked to this Supabase edge function endpoint and user identifier who made the request.
+ * Checks the rate limit linked to this Supabase edge function endpoint and user
+ * identifier who made the request.
  *
- * @param {string|Request} request - A Supabase Request object.
- * @param {Params<T>} params - The parameters object containing all limiter configuration.
- * @throws {LimiterError} - If the request fails and failBehavior is set to "fail".
+ * @param {string | Request} request - A Supabase Request object.
+ * @param {Params<T>} params - The parameters object containing all limiter
+ *   configuration.
  * @returns {LimiterResultPromise<T, R>}
+ * @throws {LimiterError} - If the request fails and failBehavior is set to
+ *   "fail".
  */
 export function limiter<T extends Limiters>(
   supabaseRequest: Request,
-  params: Params<T>
+  params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 /**
  * Checks the rate limit with an ID and userIdentifier.
  *
  * @param {string} id - The unique identifier used to scope the limiter.
- * @param {string|Request} userIdentifier - A unique user identifier (e.g., user ID, email) or a Supabase Request object.
- * @param {Params<T>} params - The parameters object containing all limiter configuration.
- * @throws {LimiterError} - If the request fails and failBehavior is set to "fail".
+ * @param {string | Request} userIdentifier - A unique user identifier (e.g.,
+ *   user ID, email) or a Supabase Request object.
+ * @param {Params<T>} params - The parameters object containing all limiter
+ *   configuration.
  * @returns {LimiterResultPromise<T, R>}
+ * @throws {LimiterError} - If the request fails and failBehavior is set to
+ *   "fail".
  */
 export function limiter<T extends Limiters>(
   id: string,
   userIdentifier: string | Request,
-  params: Params<T>
+  params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 export async function limiter<T extends Limiters>(
   arg0: string | Request | Params<T>,
   arg1?: string | Request | Params<T>,
-  arg2?: Params<T>
+  arg2?: Params<T>,
 ): Promise<LimiterResult<T, boolean>> {
   // Initialize the params object that we'll build based on the arguments
   let finalParams: any = {};
@@ -166,7 +189,7 @@ export async function limiter<T extends Limiters>(
   if (params.userIdentifier instanceof Request) {
     const requestInfo = await getSupabaseRequestInfo(
       params.userIdentifier,
-      params.options?.debug
+      params.options?.debug,
     );
 
     // If we got a user ID from the request, use that as the user identifier
@@ -206,7 +229,7 @@ export async function limiter<T extends Limiters>(
         code: "MISSING_PARAMETERS",
       },
       params.limiters as T,
-      bypassErrors
+      bypassErrors,
     );
   }
 
@@ -215,7 +238,7 @@ export async function limiter<T extends Limiters>(
     params.options?.apiKey || params.options?.endpoint
       ? new BorrowClient(
           params.options.apiKey,
-          params.options.endpoint?.baseUrl
+          params.options.endpoint?.baseUrl,
         )
       : borrow;
 
@@ -271,7 +294,7 @@ export async function limiter<T extends Limiters>(
           limiters: formattedLimiters,
           action: "check",
         }),
-      }
+      },
     );
 
     const data = (await response.json()) as {
@@ -284,7 +307,7 @@ export async function limiter<T extends Limiters>(
     if (data.result === "limited") {
       if (params.options?.debug) {
         console.warn(
-          `Rate limit exceeded for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Message: ${data.message}`
+          `Rate limit exceeded for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Message: ${data.message}`,
         );
       }
 
@@ -313,9 +336,7 @@ export async function limiter<T extends Limiters>(
     if (!response.ok || data.result === "error") {
       const errorMessage = `Limiter returned an error for id: ${
         limiterKey || "[not provided]"
-      } with userIdentifier: ${
-        finalUserIdentifier || "[not provided]"
-      }. Message: ${data.message}`;
+      } with userIdentifier: ${finalUserIdentifier || "[not provided]"}. Message: ${data.message}`;
       const bypassErrors = params.options?.failBehavior !== "fail";
 
       if (params.options?.debug) {
@@ -328,13 +349,13 @@ export async function limiter<T extends Limiters>(
           code: "LIMITER_ERROR",
         },
         params.limiters as T,
-        bypassErrors
+        bypassErrors,
       );
     }
 
     if (params.options?.debug) {
       console.info(
-        `Limiter passed for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Message: ${data.message}`
+        `Limiter passed for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Message: ${data.message}`,
       );
     }
 
@@ -360,7 +381,7 @@ export async function limiter<T extends Limiters>(
     if (params.options?.debug) {
       console.error(
         `Error calling Borrow API for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Error: `,
-        err
+        err,
       );
     }
 
@@ -371,7 +392,7 @@ export async function limiter<T extends Limiters>(
       Array.isArray(params.limiters)
         ? params.limiters
         : ([params.limiters] as unknown as T),
-      bypassErrors
+      bypassErrors,
     );
   }
 }

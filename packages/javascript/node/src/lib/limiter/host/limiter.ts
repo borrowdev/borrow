@@ -1,6 +1,7 @@
+import { z } from "zod";
+
 import { StorageAdapter } from "./adapters/storage/StorageAdapter.js";
 import { borrow, fixed, sliding, token } from "./algorithms.js";
-import { z } from "zod";
 
 type LimiterParams = z.infer<typeof inputLimiterParamsSchema>;
 export type ParsedLimiterParams = z.infer<typeof outputLimiterParamsSchema>;
@@ -11,7 +12,7 @@ export function getUsageKey(userUuid: string, projectId: string) {
 
 export function isomorphicExecute(
   promise: Promise<unknown>,
-  backgroundExecute: ParsedLimiterParams["backgroundExecute"]
+  backgroundExecute: ParsedLimiterParams["backgroundExecute"],
 ) {
   if (typeof backgroundExecute === "function") {
     backgroundExecute(promise);
@@ -27,7 +28,7 @@ function getBiggest(numbers: number[]) {
 export function getCurrentWindow(
   dateInSeconds = Date.now() / 1000,
   // Only fixed windows need this
-  interval?: number
+  interval?: number,
 ) {
   return typeof interval === "number"
     ? dateInSeconds / interval
@@ -41,7 +42,7 @@ export function isNewWindow(
   _timeout: number,
   // Only sliding windows need this, fixed windows have
   // their interval calculated differently
-  interval?: number
+  interval?: number,
 ) {
   const cleanLastWindow = Math.trunc(lastWindow);
   const cleanCurrentWindow = Math.trunc(currentWindow);
@@ -102,7 +103,7 @@ const storage = {
     });
 
     const userData = (await params.adapters.storage.get(
-      key
+      key,
     )) as UserData | null;
 
     // If the user doesn't exist yet
@@ -113,7 +114,7 @@ const storage = {
         requests: 0,
         lastWindow: getCurrentWindow(
           Date.now() / 1000,
-          params.limiterType === "fixed" ? params.interval : undefined
+          params.limiterType === "fixed" ? params.interval : undefined,
         ),
         ...(params.interval ? { interval: params.interval } : {}),
       } as const;
@@ -192,7 +193,7 @@ const limitersSchema = z
         borrowAction: z.enum(["start", "end"]).optional(),
         timeout: positiveIntSchema,
       }),
-    ])
+    ]),
   )
   .min(1, "You must provide at least 1 limiter configuration")
   .max(4, "You can provide at most 4 limiter configurations")
@@ -203,9 +204,11 @@ const limitersSchema = z
 
 const requestCommonSchema = z.object({
   /**
-   * If provided, will check if `invokeSecret` matches the secret stored in the environment variable `BORROW_LIMITER_INVOKE_SECRET`
-   * before allowing the request to proceed. Only use this along with `BORROW_LIMITER_INVOKE_SECRET` when you want your servers to be able to call this function, such as when using this API
-   * to rate limit your own servers.
+   * If provided, will check if `invokeSecret` matches the secret stored in the
+   * environment variable `BORROW_LIMITER_INVOKE_SECRET` before allowing the
+   * request to proceed. Only use this along with `BORROW_LIMITER_INVOKE_SECRET`
+   * when you want your servers to be able to call this function, such as when
+   * using this API to rate limit your own servers.
    */
   invokeSecret: z.string().optional(),
 });
@@ -226,7 +229,7 @@ const requestRefillTokensSchema = requestCommonSchema.extend({
       z.object({
         userId: z.string().nullable(),
         key: z.string().nullable(),
-      })
+      }),
     )
     .min(1)
     .max(100)
@@ -241,9 +244,10 @@ const requestSchema = z.discriminatedUnion("action", [
 export type Adapters = z.infer<typeof adaptersSchema>;
 const adaptersSchema = z.object({
   /**
-   * The storage adapter to use for keeping track of requests to the rate limiter.
-   * We highly recommend using Redis or other atomic and high-throughput database for production environments, as the amount of requests
-   * Limiter can handle is highly limited by the database performance.
+   * The storage adapter to use for keeping track of requests to the rate
+   * limiter. We highly recommend using Redis or other atomic and
+   * high-throughput database for production environments, as the amount of
+   * requests Limiter can handle is highly limited by the database performance.
    */
   storage: z.instanceof(StorageAdapter),
 });
@@ -259,9 +263,14 @@ const retrievalAdapterParamsSchema = z.object({
 const inputLimiterParamsSchema = z.object({
   req: requestSchema,
   /**
-   * By default, Borrow updates the request counter in the background to avoid high latency, this is the function to use to perform operations in the background.
-   * When using serverless functions, this is usually a variation of `waitUntil`, but may be called something else. For example, in Supabase Edge Functions, this is `EdgeRuntime.waitUntil`.
-   * If you want to update the request counter synchronously, you can provide this parameter with `false`.
+   * By default, Borrow updates the request counter in the background to avoid
+   * high latency, this is the function to use to perform operations in the
+   * background. When using serverless functions, this is usually a variation of
+   * `waitUntil`, but may be called something else. For example, in Supabase
+   * Edge Functions, this is `EdgeRuntime.waitUntil`. If you want to update the
+   * request counter synchronously, you can provide this parameter with
+   * `false`.
+   *
    * @default false
    */
   backgroundExecute: z
@@ -272,16 +281,16 @@ const inputLimiterParamsSchema = z.object({
     .optional(),
   adapters: adaptersSchema,
   /**
-   * Environment variables. Use this when deploying to a serverless environment such as Cloudflare Workers.
+   * Environment variables. Use this when deploying to a serverless environment
+   * such as Cloudflare Workers.
    */
   env: z.record(z.string(), z.any()).default({}).optional(),
-  /**
-   * Optional hooks to get notified when certain actions happen.
-   */
+  /** Optional hooks to get notified when certain actions happen. */
   hooks: z
     .object({
       /**
-       * Execute a function before the response is sent. This gets executed in the background, unless `backgroundExecute` is set to `false`.
+       * Execute a function before the response is sent. This gets executed in
+       * the background, unless `backgroundExecute` is set to `false`.
        */
       beforeResponse: z
         .function(
@@ -295,7 +304,7 @@ const inputLimiterParamsSchema = z.object({
               tokensLeft: positiveIntSchema.nullable().optional().default(null),
             }),
           ]),
-          z.promise(z.void())
+          z.promise(z.void()),
         )
         .optional(),
     })
@@ -306,8 +315,8 @@ const outputLimiterParamsSchema = inputLimiterParamsSchema.transform((data) => {
   // Transform intervals to seconds
   return {
     ...data,
-    req: {
-      ...(data.req.action === "check"
+    req:
+      data.req.action === "check"
         ? {
             // For some reason we need to repeat this so TypeScript can infer the discriminated union type correctly
             ...data.req,
@@ -322,12 +331,12 @@ const outputLimiterParamsSchema = inputLimiterParamsSchema.transform((data) => {
                         ? l.interval === "minute"
                           ? 60
                           : l.interval === "hour"
-                          ? 60 * 60
-                          : l.interval === "day"
-                          ? 60 * 60 * 24
-                          : l.interval
+                            ? 60 * 60
+                            : l.interval === "day"
+                              ? 60 * 60 * 24
+                              : l.interval
                         : l.interval,
-                  }
+                  },
             ),
           }
         : {
@@ -339,8 +348,7 @@ const outputLimiterParamsSchema = inputLimiterParamsSchema.transform((data) => {
                   key: k.key?.trim?.() || null,
                 }))
               : null,
-          }),
-    },
+          },
     hooks: {
       beforeResponse: data.hooks?.beforeResponse || asyncNoop,
     },
@@ -370,7 +378,7 @@ async function refillTokens(params: {
       finalKeys.push({
         userId: key.userId,
         key: key.key,
-      })
+      }),
     );
   }
 
@@ -383,14 +391,14 @@ async function refillTokens(params: {
         amount: 0,
         type: "exact",
         adapters: params.adapters,
-      })
-    )
+      }),
+    ),
   );
 }
 
 function getIsomorphicEnvVariable(
   variableName: string,
-  env: any
+  env: any,
 ): string | undefined {
   if (env) {
     return env[variableName];
@@ -407,7 +415,7 @@ function getIsomorphicEnvVariable(
 }
 
 export async function limiter(
-  params: LimiterParams
+  params: LimiterParams,
 ): Promise<LimiterHandlerResponse> {
   const {
     success,
@@ -430,7 +438,7 @@ export async function limiter(
   if (
     typeof getIsomorphicEnvVariable(
       "BORROW_LIMITER_INVOKE_SECRET",
-      parsedParams.env
+      parsedParams.env,
     ) === "string" &&
     parsedParams.req.invokeSecret !==
       getIsomorphicEnvVariable("BORROW_LIMITER_INVOKE_SECRET", parsedParams.env)
@@ -446,7 +454,7 @@ export async function limiter(
     const beforeResponse = parsedParams.hooks.beforeResponse;
     await isomorphicExecute(
       beforeResponse(commonParams),
-      parsedParams.backgroundExecute
+      parsedParams.backgroundExecute,
     );
     return commonParams;
   }
@@ -469,7 +477,7 @@ export async function limiter(
     const beforeResponse = parsedParams.hooks.beforeResponse;
     await isomorphicExecute(
       beforeResponse(commonParams),
-      parsedParams.backgroundExecute
+      parsedParams.backgroundExecute,
     );
 
     return commonParams;
@@ -494,7 +502,7 @@ export async function limiter(
       // For some reason TypeScript can't currently infer the type of `action` from previous code, so we need this.
       if (parsedParams.req.action !== "check") {
         throw new Error(
-          `Invalid action: ${parsedParams.req.action}. Only 'check' action is supported.`
+          `Invalid action: ${parsedParams.req.action}. Only 'check' action is supported.`,
         );
       }
 
@@ -508,7 +516,7 @@ export async function limiter(
 
       if (!userData) {
         throw new Error(
-          `User data not found for key: ${parsedParams.req.key}, userId: ${parsedParams.req.userId}, limiterType: ${limiter.type}.`
+          `User data not found for key: ${parsedParams.req.key}, userId: ${parsedParams.req.userId}, limiterType: ${limiter.type}.`,
         );
       }
 
@@ -525,44 +533,44 @@ export async function limiter(
               storage,
             })
           : limiter.type === "sliding"
-          ? sliding({
-              backgroundExecute: parsedParams.backgroundExecute,
-              limiter,
-              userData,
-              userId: parsedParams.req.userId,
-              key: parsedParams.req.key,
-              adapters: parsedParams.adapters,
-              storage,
-            })
-          : limiter.type === "token"
-          ? token({
-              backgroundExecute: parsedParams.backgroundExecute,
-              limiter,
-              userData,
-              userId: parsedParams.req.userId,
-              key: parsedParams.req.key,
-              adapters: parsedParams.adapters,
-              storage,
-            })
-          : limiter.type === "borrow"
-          ? borrow({
-              backgroundExecute: parsedParams.backgroundExecute,
-              limiter,
-              userData,
-              userId: parsedParams.req.userId,
-              key: parsedParams.req.key,
-              adapters: parsedParams.adapters,
-              storage,
-            })
-          : null;
+            ? sliding({
+                backgroundExecute: parsedParams.backgroundExecute,
+                limiter,
+                userData,
+                userId: parsedParams.req.userId,
+                key: parsedParams.req.key,
+                adapters: parsedParams.adapters,
+                storage,
+              })
+            : limiter.type === "token"
+              ? token({
+                  backgroundExecute: parsedParams.backgroundExecute,
+                  limiter,
+                  userData,
+                  userId: parsedParams.req.userId,
+                  key: parsedParams.req.key,
+                  adapters: parsedParams.adapters,
+                  storage,
+                })
+              : limiter.type === "borrow"
+                ? borrow({
+                    backgroundExecute: parsedParams.backgroundExecute,
+                    limiter,
+                    userData,
+                    userId: parsedParams.req.userId,
+                    key: parsedParams.req.key,
+                    adapters: parsedParams.adapters,
+                    storage,
+                  })
+                : null;
 
       return result;
-    })
+    }),
   );
 
   // Currently only gets the greatest time left
   const timeLeftArray = result.flatMap((r) =>
-    r && "timeLeft" in r && typeof r.timeLeft === "number" ? r.timeLeft : []
+    r && "timeLeft" in r && typeof r.timeLeft === "number" ? r.timeLeft : [],
   );
   const timeLeft =
     timeLeftArray.length > 0
@@ -572,7 +580,7 @@ export async function limiter(
   const tokensLeftArray = result.flatMap((r) =>
     r && "tokensLeft" in r && typeof r.tokensLeft === "number"
       ? r.tokensLeft
-      : []
+      : [],
   );
   const tokensLeft =
     tokensLeftArray.length > 0
@@ -596,7 +604,7 @@ export async function limiter(
     const beforeResponse = parsedParams.hooks.beforeResponse;
     await isomorphicExecute(
       beforeResponse(commonParams),
-      parsedParams.backgroundExecute
+      parsedParams.backgroundExecute,
     );
     return commonParams;
   }
@@ -613,7 +621,7 @@ export async function limiter(
   const beforeResponse = parsedParams.hooks.beforeResponse;
   await isomorphicExecute(
     beforeResponse(commonParams),
-    parsedParams.backgroundExecute
+    parsedParams.backgroundExecute,
   );
   return commonParams;
 }

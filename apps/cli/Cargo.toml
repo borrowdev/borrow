@@ -1,7 +1,7 @@
 [package]
 name = "borrow-dev"
 version = "0.1.0"
-authors=["Lorenzo Bloedow <dev@lorenzobloedow.com>"]
+authors = ["Lorenzo Bloedow <dev@lorenzobloedow.com>"]
 license = "MIT"
 edition = "2024"
 description = "Official CLI for Borrow tools"

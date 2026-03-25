@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "@borrowdev/typescript-config/tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
   "references": [

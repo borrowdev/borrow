@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+
 import { StorageAdapter } from "../StorageAdapter.js";
 
 export class UpstashRedisAdapter extends StorageAdapter {

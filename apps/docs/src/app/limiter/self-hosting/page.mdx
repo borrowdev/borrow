@@ -11,10 +11,12 @@ Follow these steps to run Limiter on Cloudflare Workers.\
 While we work on the documentation, you can use this example as the basis for running on other serverless platforms such as AWS Lambda, Vercel, or Supabase.
 
 ### Prerequisites
+
 - A Cloudflare [worker environment](https://developers.cloudflare.com/workers/get-started/guide/).
 - An [Upstash](https://upstash.com/) Redis instance (or any other database if you plan on writing an adapter).
 
 ### 1. Install Dependencies
+
 ```bash copy
 npm install @borrowdev/node @upstash/redis
 ```
@@ -39,19 +41,18 @@ npm install @borrowdev/node @upstash/redis
 </Tabs>
 
 ### 3. Configure your secrets
+
 For local development, you should store your secrets in a `.dev.vars` file in the root of your project.\
 **Do not commit this file to your version control system.**\
 For more information, check out the [official secrets documentation](https://developers.cloudflare.com/workers/configuration/secrets/).
+
 <Tabs items={[".dev.vars"]} defaultValue=".dev.vars">
   <Tabs.Tab value=".dev.vars">
-```dotenv copy
-BORROW_LIMITER_INVOKE_SECRET="random-secure-string"
-UPSTASH_REDIS_REST_TOKEN="your-upstash-redis-token"
-UPSTASH_REDIS_REST_URL="https://your-upstash-redis-url"
-```
+    ```dotenv copy BORROW_LIMITER_INVOKE_SECRET="random-secure-string"
+    UPSTASH_REDIS_REST_TOKEN="your-upstash-redis-token"
+    UPSTASH_REDIS_REST_URL="https://your-upstash-redis-url" ```
   </Tabs.Tab>
 </Tabs>
-
 
 ### 4. Create the `src/index.ts` file
 
@@ -100,9 +101,11 @@ export default {
         headers: { "Content-Type": "application/json" },
       },
     );
-  },
+
+},
 } satisfies ExportedHandler<any>;
-```
+
+````
   </Tabs.Tab>
 </Tabs>
 
@@ -113,7 +116,7 @@ You can now call the Limiter API by using our client library or by making an HTT
   <Tabs.Tab value="TypeScript">
 ```ts copy
 import { borrow } from "@borrowdev/node";
- 
+
 const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
   limiters: [{
     maxTokens: 20,
@@ -135,7 +138,8 @@ if (!success) {
   return { message: "Rate limit exceeded." + (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "") };
 }
 // ... Your expensive business logic
-```
+````
+
   </Tabs.Tab>
   <Tabs.Tab value="curl">
 ```bash copy
@@ -172,37 +176,38 @@ You just need to extend the `StorageAdapter` class and implement the required me
 import { StorageAdapter } from "@borrowdev/node/limiter/host";
 
 class MyCustomAdapter extends StorageAdapter {
-  private db: DbType;
+private db: DbType;
 
-  constructor(db: DbType) {
-    super();
-    this.db = db;
-  }
-
-  override get = (key: string) => {
-    // Implement your logic to get a value using the given input. Must not throw.
-  }
-
-  override set = async (key: string, value: any) => {
-    // Implement your logic to set a value using the given inputs. May throw.
-  }
-
-  override relative = async (key: string, field: string, amount: number) => {
-    // Implement your logic to increment/decrement an integer using the given inputs. May throw.
-  }
-
-  // (optional)
-  override getStorageKey = (
-    params: {
-      limiterType: LimiterType;
-      userId: string | null;
-      key: string | null;
-    }
-  ) => {
-    // Implement your logic to generate a storage key using the given parameters. May throw.
-  }
+constructor(db: DbType) {
+super();
+this.db = db;
 }
-```
+
+override get = (key: string) => {
+// Implement your logic to get a value using the given input. Must not throw.
+}
+
+override set = async (key: string, value: any) => {
+// Implement your logic to set a value using the given inputs. May throw.
+}
+
+override relative = async (key: string, field: string, amount: number) => {
+// Implement your logic to increment/decrement an integer using the given inputs. May throw.
+}
+
+// (optional)
+override getStorageKey = (
+params: {
+limiterType: LimiterType;
+userId: string | null;
+key: string | null;
+}
+) => {
+// Implement your logic to generate a storage key using the given parameters. May throw.
+}
+}
+
+````
   </Tabs.Tab>
   <Tabs.Tab value="JavaScript">
 ```js copy
@@ -231,6 +236,7 @@ class MyCustomAdapter extends StorageAdapter {
     // Implement your logic to generate a storage key using the given parameters. May throw.
   }
 }
-```
+````
+
   </Tabs.Tab>
 </Tabs>

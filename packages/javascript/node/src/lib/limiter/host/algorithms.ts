@@ -28,7 +28,7 @@ export async function fixed(params: {
   const promises = [];
   const currentWindow = getCurrentWindow(
     Date.now() / 1000,
-    params.limiter.interval
+    params.limiter.interval,
   );
 
   let success = false;
@@ -49,7 +49,7 @@ export async function fixed(params: {
           ...userDataNoRequest,
           lastWindow: currentWindow,
         },
-      })
+      }),
     );
     // So we don't have to fetch the user again
     userRequests = 0;
@@ -70,7 +70,7 @@ export async function fixed(params: {
         type: "relative",
         limiterType: params.limiter.type,
         adapters: params.adapters,
-      })
+      }),
     );
 
     success = true;
@@ -113,7 +113,7 @@ export async function sliding(params: {
       userDataNoRequest.lastWindow!,
       currentWindow,
       NaN,
-      params.limiter.interval
+      params.limiter.interval,
     )
   ) {
     promises.push(
@@ -128,7 +128,7 @@ export async function sliding(params: {
           ...userDataNoRequest,
           lastWindow: currentWindow,
         },
-      })
+      }),
     );
 
     userRequests = 0;
@@ -147,7 +147,7 @@ export async function sliding(params: {
         type: "relative",
         limiterType: params.limiter.type,
         adapters: params.adapters,
-      })
+      }),
     );
     success = true;
   }
@@ -182,7 +182,7 @@ export async function token(params: {
   const promises = [];
   const currentWindow = getCurrentWindow(
     Date.now() / 1000,
-    params.limiter.interval
+    params.limiter.interval,
   );
 
   const { requests: userRequests, ...userDataNoRequest } = params.userData;
@@ -193,12 +193,12 @@ export async function token(params: {
 
   // Elapsing happens in intervals, you can't replenish tokens in between tokensPerReplenish
   const intervals = Math.abs(
-    Math.trunc(currentWindow - userDataNoRequest.lastWindow!)
+    Math.trunc(currentWindow - userDataNoRequest.lastWindow!),
   );
   const elapsed = currentWindow - userDataNoRequest.lastWindow!;
   const tokensToReplenish = Math.max(
     0,
-    Math.floor(intervals * tokensPerReplenish)
+    Math.floor(intervals * tokensPerReplenish),
   );
 
   let success = false;
@@ -235,7 +235,7 @@ export async function token(params: {
           lastWindow: newLastWindow,
           maxTokens: maxTokens,
         },
-      })
+      }),
     );
 
     timeLeft = maxTokens - Math.abs(currentTokens);
@@ -299,7 +299,7 @@ export async function borrow(params: {
             ...userDataNoRequest,
             lastWindow: currentWindow,
           },
-        })
+        }),
       );
       success = true;
     }
@@ -315,7 +315,7 @@ export async function borrow(params: {
         userData: {
           ...userDataNoRequest,
         },
-      })
+      }),
     );
     success = true;
   }

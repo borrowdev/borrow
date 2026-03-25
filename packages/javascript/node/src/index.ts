@@ -3,13 +3,13 @@ import { refillTokens } from "@lib/limiter/tokens.js";
 import { LimiterError } from "@lib/limiter/utils.js";
 
 /**
- *
  * @param fn - The function to call when this property is being called.
- * @param obj - An object with the properties to attach to the function when it's not being called.
+ * @param obj - An object with the properties to attach to the function when
+ *   it's not being called.
  */
 function createPolymorphicObject<
   F extends (...args: any[]) => any,
-  O extends object
+  O extends object,
 >(fn: F, obj: O): F & O {
   const newFn = fn;
   for (const prop in obj) {

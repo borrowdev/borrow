@@ -1,18 +1,12 @@
 import borrow, { BorrowClient } from "../client.js";
 import { CommonLimiterOptions } from "./types.js";
 
-/**
- * Key interface for refill tokens
- */
+/** Key interface for refill tokens */
 export interface Key {
-  /**
-   * The unique identifier used to scope the limiter.
-   */
+  /** The unique identifier used to scope the limiter. */
   key?: string;
 
-  /**
-   * A unique user identifier (e.g., user ID or email).
-   */
+  /** A unique user identifier (e.g., user ID or email). */
   userId?: string;
 }
 
@@ -36,13 +30,15 @@ type RefillTokensResponse = {
 /**
  * Refills tokens for a global limiter.
  *
- * @param {boolean} isGlobal - If true, refills tokens for the global token limiter.
+ * @param {boolean} isGlobal - If true, refills tokens for the global token
+ *   limiter.
  * @param {RefillTokensOptions} [options] - Optional settings.
- * @returns {Promise<RefillTokensResponse>} - The result of the refill operation.
+ * @returns {Promise<RefillTokensResponse>} - The result of the refill
+ *   operation.
  */
 export function refillTokens(
   isGlobal: boolean,
-  options?: RefillTokensOptions
+  options?: RefillTokensOptions,
 ): Promise<RefillTokensResponse>;
 
 /**
@@ -50,28 +46,31 @@ export function refillTokens(
  *
  * @param {Key} key - Object containing either id or userId, or both.
  * @param {RefillTokensOptions} [options] - Optional settings.
- * @returns {Promise<RefillTokensResponse>} - The result of the refill operation.
+ * @returns {Promise<RefillTokensResponse>} - The result of the refill
+ *   operation.
  */
 export function refillTokens(
   key: Key,
-  options?: RefillTokensOptions
+  options?: RefillTokensOptions,
 ): Promise<RefillTokensResponse>;
 
 /**
  * Refills tokens for multiple keys.
  *
- * @param {Key[]} keys - Array of objects containing either id or userId, or both.
+ * @param {Key[]} keys - Array of objects containing either id or userId, or
+ *   both.
  * @param {RefillTokensOptions} [options] - Optional settings.
- * @returns {Promise<RefillTokensResponse>} - The result of the refill operation.
+ * @returns {Promise<RefillTokensResponse>} - The result of the refill
+ *   operation.
  */
 export function refillTokens(
   keys: Key[],
-  options?: RefillTokensOptions
+  options?: RefillTokensOptions,
 ): Promise<RefillTokensResponse>;
 
 export async function refillTokens(
   arg0: boolean | Key | Key[],
-  arg1?: RefillTokensOptions
+  arg1?: RefillTokensOptions,
 ): Promise<RefillTokensResponse> {
   // Parse options
   const options = arg1 || {};

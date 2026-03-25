@@ -36,6 +36,7 @@ bun add @borrowdev/node
 ```
 
 ## Authentication
+
 [Follow this guide.](https://borrow.dev/docs/limiter/quick-start#authentication)
 
 ## Usage
@@ -45,17 +46,29 @@ Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-wi
 ```javascript
 import { borrow } from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-	limiters: [{
-		maxRequests: 10,
-		interval: "minute",
-		type: "fixed",
-	}]
-});
+const { success, timeLeft } = await borrow.limiter(
+  "my-limiter-id",
+  "current-user-id",
+  {
+    limiters: [
+      {
+        maxRequests: 10,
+        interval: "minute",
+        type: "fixed",
+      },
+    ],
+  },
+);
 if (!success) {
-	return { message: "Rate limit exceeded." + timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : "" };
+  return {
+    message:
+      "Rate limit exceeded." + timeLeft !== null
+        ? ` You can try again in ${timeLeft} seconds.`
+        : "",
+  };
 }
 ```
 
 ## Documentation
+
 [Read the full documentation for Limiter](https://borrow.dev/docs/limiter)

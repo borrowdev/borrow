@@ -26,9 +26,7 @@ export const getStorageKey = (params: {
   }
 
   if (params.userId && params.key) {
-    return `count:user-key:${params.key}:${params.limiterType || "unknown"}:${
-      params.userId
-    }`;
+    return `count:user-key:${params.key}:${params.limiterType || "unknown"}:${params.userId}`;
   }
 
   if (params.key) {
@@ -41,17 +39,17 @@ export const getStorageKey = (params: {
 export class StorageAdapter implements StorageAdapterType {
   getStorageKey = getStorageKey;
   get = async (
-    ...args: Parameters<StorageAdapterType["get"]>
+    ..._args: Parameters<StorageAdapterType["get"]>
   ): Promise<Record<string, any> | null> => {
     throw new Error("Method not implemented.");
   };
   set = async (
-    ...args: Parameters<StorageAdapterType["set"]>
+    ..._args: Parameters<StorageAdapterType["set"]>
   ): Promise<void> => {
     throw new Error("Method not implemented.");
   };
   relative = async (
-    ...args: Parameters<StorageAdapterType["relative"]>
+    ..._args: Parameters<StorageAdapterType["relative"]>
   ): Promise<void> => {
     throw new Error("Method not implemented.");
   };

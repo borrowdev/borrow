@@ -21,7 +21,7 @@ class BorrowClient {
       typeof Deno !== "object"
     ) {
       console.warn(
-        "@borrowdev/node should NOT be used in a browser environment, you might end up exposing your secret token!"
+        "@borrowdev/node should NOT be used in a browser environment, you might end up exposing your secret token!",
       );
     }
 
@@ -31,7 +31,7 @@ class BorrowClient {
     // so we just issue a warning and check for them when calling the API
     if (!finalSecret && !isSingleton) {
       console.warn(
-        "BORROW_API_KEY environment variable not set or 'apiKey' not provided at instantiation time, Borrow will attempt to get it when calling the API..."
+        "BORROW_API_KEY environment variable not set or 'apiKey' not provided at instantiation time, Borrow will attempt to get it when calling the API...",
       );
     }
 

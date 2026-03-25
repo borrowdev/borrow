@@ -8,6 +8,7 @@ import {
 
 /**
  * Custom error class for limiter
+ *
  * @property {string} message - Error message
  * @property {ErrorCode} code - Error code
  */
@@ -22,22 +23,23 @@ export class LimiterError extends Error {
 }
 
 /**
- * Type guard to check if the limiters array contains at least one token limiter.
+ * Type guard to check if the limiters array contains at least one token
+ * limiter.
  */
 export function isTokenLimiterArray<T extends readonly AnyLimiter[]>(
-  limiters: T
+  limiters: T,
 ): limiters is T & ReadonlyArray<TokenLimiter> {
   return limiters.some((limiter) => limiter.type === "token");
 }
 
 /**
- * Handles error responses based on limiter types and bypass setting.
- * Throws errors when bypass is false, otherwise returns a success response.
+ * Handles error responses based on limiter types and bypass setting. Throws
+ * errors when bypass is false, otherwise returns a success response.
  */
 export function handleErrorResponse<T extends Limiters>(
   error: any,
   limiters: T,
-  bypass = true
+  bypass = true,
 ): LimiterResult<T, true> {
   const errorCode = error?.error || error?.code || "UNKNOWN_ERROR";
   const errorMessage = error?.message || "An unknown error occurred";

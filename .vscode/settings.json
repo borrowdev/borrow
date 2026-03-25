@@ -1,4 +1,9 @@
 {
-  "prettier.prettierPath": "node_modules/prettier",
-  "prettier.ignorePath": ".prettierignore"
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "oxc.fmt.configPath": "./vite.config.ts",
+  "editor.formatOnSave": false,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  }
 }

@@ -1,10 +1,11 @@
+import { Metadata } from "next";
+import { Inter } from "next/font/google";
+import Image from "next/image";
+
+import "nextra-theme-docs/style.css";
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
-import "nextra-theme-docs/style.css";
-import Image from "next/image";
-import { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -34,7 +35,7 @@ export default async function RootLayout({
         style={{
           fontFamily: ["-apple-system", inter.style.fontFamily].join(", "),
         }}
-        className="min-h-screen flex flex-col"
+        className="flex min-h-screen flex-col"
       >
         <Layout
           navbar={

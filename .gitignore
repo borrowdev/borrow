@@ -38,12 +38,8 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.nx/cache
-.nx/workspace-data
-
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
-**/.env.local
 
 # Next.js
 .next
@@ -52,3 +48,6 @@ out
 template
 
 target
+
+.env.local
+.env.*.local
