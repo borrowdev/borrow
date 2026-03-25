@@ -31,7 +31,7 @@
     "vitest": "^3.0.0"
   },
   "engines": {
-    "node": "22.14.0"
+    "node": "25.8.2"
   },
   "workspaces": [
     "packages/*",
