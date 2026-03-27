@@ -1,0 +1,231 @@
+openapi: 3.1.1
+info:
+  title: Borrow - API Reference
+  description: |
+    API reference for the Borrow developer toolkit API.  
+    This section covers the Limiter API which enables advanced, flexible rate limiting.
+  contact:
+    email: developer@borrow.dev
+  version: 1.0.0
+
+externalDocs:
+  description: Full Documentation
+  url: https://borrow.dev/documentation
+
+servers:
+  - url: https://api.borrow.dev/v1
+
+tags:
+  - name: Rate Limiting
+    description: Endpoints for managing rate limits and token buckets.
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /limiter:
+    post:
+      tags:
+        - Rate Limiting
+      summary: Check rate limits or refill tokens
+      description: |
+        Use this endpoint to either:
+        - Check if a user or resource can proceed (`action: check`).
+        - Refill tokens for multiple resource keys (`action: refillTokens`).
+
+        The API will return `200` whether a user is allowed or rate limited. You'll be able to check whether the user was rate limited from the `result` property. A separate `429` is used only when the developer account reaches their quota, if any.
+      operationId: limiter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/LimiterRequest"
+                - $ref: "#/components/schemas/RefillRequest"
+            examples:
+              CheckRequest:
+                summary: Check if a user can proceed
+                value:
+                  userId: "user_123"
+                  key: "login"
+                  action: "check"
+                  limiters:
+                    - type: "fixed"
+                      maxRequests: 10
+                      interval: "minute"
+              RefillTokens:
+                summary: Refill tokens for multiple keys
+                value:
+                  action: "refillTokens"
+                  keys:
+                    [
+                      { key: "login", userId: null },
+                      { key: "register", userId: "user_123" },
+                      { key: null, userId: "user_1234" },
+                    ]
+      responses:
+        "200":
+          description: Request processed
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SuccessResult"
+                  - $ref: "#/components/schemas/LimitedResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResult"
+        "401":
+          description: Unauthorized - Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResult"
+        "429":
+          description: Quota reached - Customer exceeded their allowed quota
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResult"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Borrow-Api-Key
+
+  schemas:
+    LimiterRequest:
+      type: object
+      required:
+        - action
+        - limiters
+      properties:
+        userId:
+          type: string
+          nullable: true
+          description: The ID of the user to rate limit. Used to keep track of users across requests.
+        key:
+          type: string
+          nullable: true
+          description: The key to identify your protected resource. Used to keep track of requests to the same resource.
+        action:
+          type: string
+          enum: [check, refillTokens]
+          description: Whether to completely refill one or multiple users' tokens (`refillTokens`) or check if the user can proceed with the request (`check`).
+        limiters:
+          type: array
+          maxItems: 4
+          description: Up to 4 limiters of unique types to check against.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [fixed, sliding, token, borrow]
+              maxRequests:
+                type: integer
+                description: if `type` is `fixed` or `sliding`, this must be supplied. It means the amount of requests the user can make in the given `interval`.
+              interval:
+                oneOf:
+                  - type: string
+                    enum: ["minute", "hour", "day"]
+                  - type: number
+                    description: The interval in seconds.
+                description: If `type` is `fixed` or `sliding`, this must be supplied. It means the amount of time before the `maxRequests` counter is reset. This is relative, and the final result is different based on `type`, check the full documentation for more details.
+              tokensCost:
+                type: number
+                description: if `type` is `token`, this must be supplied. It means the amount of tokens the current request will cost. If the user has less than this amount of tokens, they will be rate limited.
+              tokensPerReplenish:
+                type: number
+                description: if `type` is `token`, this must be supplied. It means the amount of tokens that will be replenished per `interval`.
+              maxTokens:
+                type: number
+                description: If `type` is `token`, this must be supplied. It means the amount of tokens the user starts with and the maximum amount they can accumulate.
+              borrowAction:
+                type: string
+                enum: [start, end]
+                description: If `type` is `borrow`, this must supplied. It means whether to start or stop blocking requests for this borrow limiter.
+              timeout:
+                type: number
+                description: If `type` is `borrow`, this must be supplied. It means the timeout in seconds to reset the rate limiter if your code fails to end the borrow.
+
+    RefillRequest:
+      type: object
+      required:
+        - action
+        - keys
+      properties:
+        action:
+          type: string
+          enum: [refillTokens]
+          description: Must be set to `refillTokens`.
+        keys:
+          type: array
+          nullable: true
+          maxItems: 100
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+                nullable: true
+              userId:
+                type: string
+                nullable: true
+          description: A list of up to 100 keys to refill tokens for. If null, will refill the global key for the token limiter.
+
+    SuccessResult:
+      type: object
+      required:
+        - result
+        - message
+      properties:
+        result:
+          type: string
+          enum: [success]
+        message:
+          type: string
+        tokensLeft:
+          type: number
+          nullable: true
+
+    ErrorResult:
+      type: object
+      required:
+        - result
+        - message
+      properties:
+        result:
+          type: string
+          enum: [error]
+        message:
+          type: string
+        error:
+          type: string
+          enum: [UNAUTHORIZED, QUOTA_REACHED, INVALID_PARAMETERS, MISSING_PARAMETERS]
+          nullable: true
+
+    LimitedResult:
+      type: object
+      required:
+        - result
+        - timeLeft
+        - message
+      properties:
+        result:
+          type: string
+          enum: [limited]
+        message:
+          type: string
+        timeLeft:
+          type: number
+          description: Time left in seconds until the user can make the next request without being rate limited. If multiple limiters are passed, this is time left for the longest limiter to reset.
+        tokensLeft:
+          type: number
+          nullable: true

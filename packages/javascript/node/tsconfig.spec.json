@@ -1,4 +1,4 @@
 {
-  "extends": "@borrowdev/typescript-config/tsconfig.test.json",
+  "extends": "@borrowdev/config/tsconfig.test.json",
   "include": ["src/**/*.spec.ts"]
 }

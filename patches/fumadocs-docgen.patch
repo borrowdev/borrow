@@ -1,0 +1,106 @@
+diff --git a/dist/remark-ts2js.d.ts b/dist/remark-ts2js.d.ts
+index e6c8c3c0388e7ba124c04393bfc6307eacb1ac71..a02471bfc01bf608c665c9f931aee4345b3ba87b 100644
+--- a/dist/remark-ts2js.d.ts
++++ b/dist/remark-ts2js.d.ts
+@@ -1,5 +1,6 @@
+ import { Root } from "mdast";
+ import { Transformer } from "unified";
++import { FormatConfig } from "oxfmt";
+ 
+ //#region src/remark-ts2js.d.ts
+ interface TypeScriptToJavaScriptOptions {
+@@ -16,6 +17,7 @@ interface TypeScriptToJavaScriptOptions {
+    * Transform all TypeScript codeblocks by default, without a trigger
+    */
+   disableTrigger?: boolean;
++  formatOptions?: FormatConfig;
+ }
+ /**
+  * A remark plugin to transform TypeScript codeblocks into two tabs of codeblocks with its JS variant.
+@@ -34,7 +36,8 @@ interface TypeScriptToJavaScriptOptions {
+ declare function remarkTypeScriptToJavaScript({
+   persist,
+   defaultValue,
+-  disableTrigger
++  disableTrigger,
++  formatOptions,
+ }?: TypeScriptToJavaScriptOptions): Transformer<Root>;
+ //#endregion
+ export { TypeScriptToJavaScriptOptions, remarkTypeScriptToJavaScript };
+diff --git a/dist/remark-ts2js.js b/dist/remark-ts2js.js
+index ec6da2555dea350baa567562b93d9ba7bd5fb83a..2bfac9f4b9484f93b70ebf5c8205c30b6da39d87 100644
+--- a/dist/remark-ts2js.js
++++ b/dist/remark-ts2js.js
+@@ -16,9 +16,10 @@ import { generateCodeBlockTabs, parseCodeBlockAttributes } from "fumadocs-core/m
+ * ```
+ * ````
+ */
+-function remarkTypeScriptToJavaScript({ persist = false, defaultValue = "ts", disableTrigger = false } = {}) {
++function remarkTypeScriptToJavaScript({ persist = false, defaultValue = "ts", disableTrigger = false, formatOptions } = {}) {
+ 	return async (tree, file) => {
+ 		const oxc = await import("oxc-transform");
++		const { format } = await import("oxfmt");
+ 		const tasks = [];
+ 		visit(tree, "code", (node) => {
+ 			const lang = node.lang;
+@@ -26,10 +27,24 @@ function remarkTypeScriptToJavaScript({ persist = false, defaultValue = "ts", di
+ 			const meta = parseCodeBlockAttributes(node.meta ?? "", ["ts2js"]);
+ 			if (!disableTrigger && !("ts2js" in meta.attributes)) return;
+ 			tasks.push((async () => {
+-				const result = await oxc.transform(`${file.path ?? "test"}.${lang}`, node.value, {
+-					sourcemap: false,
+-					jsx: "preserve"
+-				});
++        const jsCode = await oxc
++					.transform(`${file.path ?? "test"}.${lang}`, node.value, {
++						sourcemap: false,
++						jsx: "preserve",
++					})
++					.then((res) => res.code);
++
++				const [formattedTsCode, formattedJsCode] = await Promise.all([
++					format(`${file.path ?? "test"}.fmt.ts`, node.value, formatOptions).then((res) => {
++						// The current version of osx-transform is removing empty newlines.
++						// So we remove all empty newlines from the original code (TypeScript) as well 
++						// to avoid unnecessary diffs in the generated codeblocks.
++						const formattedCode = res.code.replace(/\n\s*\n/g, "\n");
++						return formattedCode;
++					}),
++					format(`${file.path ?? "test"}.fmt.js`, jsCode, formatOptions).then((res) => res.code),
++				]);
++
+ 				const replacement = generateCodeBlockTabs({
+ 					persist,
+ 					defaultValue,
+@@ -52,7 +67,7 @@ function remarkTypeScriptToJavaScript({ persist = false, defaultValue = "ts", di
+ 							type: "code",
+ 							lang: node.lang,
+ 							meta: meta.rest,
+-							value: node.value
++							value: formattedTsCode,
+ 						}]
+ 					}, {
+ 						value: "js",
+@@ -60,7 +75,7 @@ function remarkTypeScriptToJavaScript({ persist = false, defaultValue = "ts", di
+ 							type: "code",
+ 							lang: lang === "tsx" ? "jsx" : "js",
+ 							meta: meta.attributes.ts2js ?? meta.rest,
+-							value: result.code
++							value: formattedJsCode,
+ 						}]
+ 					}]
+ 				});
+diff --git a/package.json b/package.json
+index f3286ca76cc9ec634a0d25e69d8e52d0e2e06e5b..9d659093ffb647de25c1a0aff86fc8e18eb94510 100644
+--- a/package.json
++++ b/package.json
+@@ -53,7 +53,8 @@
+     "typescript": "^5.9.3",
+     "eslint-config-custom": "0.0.0",
+     "fumadocs-core": "16.6.8",
+-    "tsconfig": "0.0.0"
++    "tsconfig": "0.0.0",
++    "oxfmt": "0.42.0"
+   },
+   "peerDependencies": {
+     "@types/estree": "*",

@@ -8,7 +8,7 @@
     "prepare": "vp config"
   },
   "devDependencies": {
-    "@borrowdev/typescript-config": "workspace:*",
+    "@borrowdev/config": "workspace:*",
     "vite-plus": "catalog:"
   },
   "engines": {

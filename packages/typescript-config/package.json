@@ -1,9 +1,0 @@
-{
-  "name": "@borrowdev/typescript-config",
-  "version": "0.0.0",
-  "private": true,
-  "devDependencies": {
-    "vite": "catalog:",
-    "vitest": "catalog:"
-  }
-}

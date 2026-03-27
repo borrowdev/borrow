@@ -1,0 +1,158 @@
+---
+title: Quick Start
+description: Quick Start guide for the Limiter API.
+icon: Rabbit
+---
+
+# Quick Start
+
+## Authentication
+
+Follow these steps to get your API key and start using Borrow Limiter:
+
+1. [Create a Borrow account.](https://borrow.dev/sign-up)
+2. [Create a new project.](https://borrow.dev/dashboard)
+3. Inside your project, go to the Settings tab.
+4. In the Authentication section, click Show API Key.
+5. Wait for the API key to be decrypted and copy it.
+6. Set the `BORROW_API_KEY` environment variable in your application to the copied API key.
+
+## Installation
+
+Install the Borrow Node.js package using your preferred package manager:
+
+```npm
+npm install @borrowdev/node
+```
+
+## Usage
+
+### Limiting with the fixed window algorithm
+
+Let's use the [fixed window](/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
+
+```ts ts2js
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [
+    {
+      maxRequests: 10,
+      interval: "minute",
+      type: "fixed",
+    },
+  ],
+});
+if (!success) {
+  return {
+    message:
+      "Rate limit exceeded." + timeLeft !== null
+        ? ` You can try again in ${timeLeft} seconds.`
+        : "",
+  };
+}
+
+// ... Your expensive business logic
+```
+
+### Rate limiting with the sliding window algorithm
+
+Let's use the [sliding window](/limiter/algorithms#sliding-window) algorithm to rate limit our login endpoint to 10 requests per minute.
+
+```ts ts2js
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [
+    {
+      maxRequests: 10,
+      interval: "minute",
+      type: "sliding",
+    },
+  ],
+});
+if (!success) {
+  return {
+    message:
+      "Rate limit exceeded." + timeLeft !== null
+        ? ` You can try again in ${timeLeft} seconds.`
+        : "",
+  };
+}
+// ... Your expensive business logic
+```
+
+### Rate limiting with the token bucket algorithm
+
+Let's use the [token bucket](/limiter/algorithms#token-bucket) algorithm to rate limit requests to 10 tokens per minute, with a maximum of 20 tokens.
+
+```ts ts2js
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [
+    {
+      maxTokens: 20,
+      tokensCost: 5,
+      tokensPerReplenish: 10,
+      interval: "minute",
+      type: "token",
+    },
+  ],
+});
+if (!success) {
+  return {
+    message:
+      "Rate limit exceeded." + timeLeft !== null
+        ? ` You can try again in ${timeLeft} seconds.`
+        : "",
+  };
+}
+// ... Your expensive business logic
+```
+
+### Limiting with the borrow algorithm
+
+Let's use the [borrow](/limiter/algorithms#borrow) algorithm to rate limit requests to one request at a time.
+
+```ts ts2js
+import { borrow } from "@borrowdev/node";
+
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [
+    {
+      borrowAction: "start",
+      type: "borrow",
+      timeout: 10,
+    },
+  ],
+});
+if (!success) {
+  return {
+    message:
+      "Rate limit exceeded." + timeLeft !== null
+        ? ` You can try again in ${timeLeft} seconds.`
+        : "",
+  };
+}
+// ... Your expensive business logic
+const { success: endSuccess } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [
+    {
+      borrowAction: "end",
+      type: "borrow",
+      timeout: 10,
+    },
+  ],
+});
+if (!endSuccess) {
+  return { message: "Failed to end borrow." };
+}
+```
+
+### Conclusion
+
+In this Quick Start guide, we've barely scratched the surface of what Borrow Limiter can do.
+You can do so much more such as refilling tokens on demand and creating different limiter combinations with up to 4 limiters of unique types.
+
+If you want to learn more, the best way to do so is to just [install Borrow](/limiter/quick-start#installation) and read the in-editor comments (JSDoc for TS/JS).

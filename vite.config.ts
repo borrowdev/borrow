@@ -1,22 +1,12 @@
 import { defineConfig } from "vite-plus";
 
+const fmt = await import("@borrowdev/config/oxfmt.json", { with: { type: "json" } });
 export default defineConfig({
   staged: {
     "*": "vp check --fix",
   },
   lint: { options: { typeAware: true, typeCheck: true } },
-  fmt: {
-    singleQuote: false,
-    printWidth: 80,
-    semi: true,
-    jsdoc: {},
-    sortTailwindcss: {
-      functions: ["cn"],
-    },
-    sortImports: {},
-    sortPackageJson: true,
-    ignorePatterns: ["/dist", "/coverage", "pnpm-lock.yaml"],
-  },
+  fmt,
   test: {
     globals: true,
   },

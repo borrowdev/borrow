@@ -1,0 +1,10 @@
+{
+  "name": "@borrowdev/config",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "oxfmt": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

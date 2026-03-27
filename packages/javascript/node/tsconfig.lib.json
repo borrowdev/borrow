@@ -1,5 +1,5 @@
 {
-  "extends": "@borrowdev/typescript-config/tsconfig.node.json",
+  "extends": "@borrowdev/config/tsconfig.node.json",
   "compilerOptions": {
     "composite": true,
     "paths": {

@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+@import "fumadocs-openapi/css/preset.css";
+@import "@fontsource-variable/raleway";
+@import "@fontsource-variable/jetbrains-mono";
+
+@font-face {
+  font-family: "Raleway Variable";
+  font-style: normal;
+  font-display: block;
+  font-weight: 100 900;
+  src: url(@fontsource-variable/raleway/files/raleway-latin-wght-normal.woff2)
+    format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Variable";
+  font-style: normal;
+  font-display: block;
+  font-weight: 100 800;
+  src: url(@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2)
+    format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --color-fd-background: oklch(1 0 0);
+  --color-fd-foreground: oklch(0.147 0.004 49.25);
+  --color-fd-card: oklch(0.98 0.001 106.424);
+  --color-fd-card-foreground: oklch(0.147 0.004 49.25);
+  --color-fd-popover: oklch(1 0 0);
+  --color-fd-popover-foreground: oklch(0.147 0.004 49.25);
+  --color-fd-primary: oklch(0.505 0.213 27.518);
+  --color-fd-primary-foreground: oklch(0.971 0.013 17.38);
+  --color-fd-secondary: oklch(0.967 0.001 286.375);
+  --color-fd-secondary-foreground: oklch(0.21 0.006 285.885);
+  --color-fd-muted: oklch(0.97 0.001 106.424);
+  --color-fd-muted-foreground: oklch(0.553 0.013 58.071);
+  --color-fd-accent: oklch(0.97 0.001 106.424 / 50%);
+  --color-fd-accent-foreground: oklch(0.216 0.006 56.043);
+  --color-fd-border: oklch(0.923 0.003 48.717 / 50%);
+  --color-fd-ring: oklch(62.813% 0.25739 28.782);
+}
+
+.dark {
+  --color-fd-background: oklch(0.147 0.004 49.25);
+  --color-fd-foreground: oklch(0.985 0.001 106.423);
+  --color-fd-card: oklch(0.216 0.006 56.043);
+  --color-fd-card-foreground: oklch(0.985 0.001 106.423);
+  --color-fd-popover: oklch(0.216 0.006 56.043);
+  --color-fd-popover-foreground: oklch(0.985 0.001 106.423);
+  --color-fd-primary: oklch(62.826% 0.25721 28.495);
+  --color-fd-primary-foreground: oklch(0.971 0.013 17.38);
+  --color-fd-secondary: oklch(0.274 0.006 286.033);
+  --color-fd-secondary-foreground: oklch(0.985 0 0);
+  --color-fd-muted: oklch(0.268 0.007 34.298);
+  --color-fd-muted-foreground: oklch(0.709 0.01 56.259);
+  --color-fd-accent: oklch(0.268 0.007 34.298 / 50%);
+  --color-fd-accent-foreground: oklch(0.985 0.001 106.423);
+  --color-fd-border: oklch(1 0 0 / 10%);
+  --color-fd-ring: oklch(0.577 0.245 27.325);
+}
+
+body {
+  font-family: "Raleway Variable", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply font-light;
+}
+
+code {
+  font-family: "JetBrains Mono Variable", monospace;
+}
+
+.tabler-icon {
+  stroke-width: 1;
+}
