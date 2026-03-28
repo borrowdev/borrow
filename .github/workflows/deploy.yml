@@ -25,4 +25,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
           workingDirectory: apps/docs
+          command: vp run deploy
           wranglerVersion: 4.77.0
