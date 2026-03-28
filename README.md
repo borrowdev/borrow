@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://borrow.dev/opengraph-image.png" alt="Borrow Logo" width="600" height="300" />
+  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="600" height="300" />
 </p>
 
 <h3 align="center">We automate the boring stuff for you</h3>
 
 <p align="center">
-  <b>Simple, open-source, powerful tools for modern serverless applications</b><br>
+  <b>Simple, open-source, powerful tools for modern applications</b><br>
 </p>
 
 <p align="center" style="font-size:12px">
@@ -31,19 +31,15 @@ Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-wi
 ```javascript
 import { borrow } from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter(
-  "my-limiter-id",
-  "current-user-id",
-  {
-    limiters: [
-      {
-        maxRequests: 10,
-        interval: "minute",
-        type: "fixed",
-      },
-    ],
-  },
-);
+const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
+  limiters: [
+    {
+      maxRequests: 10,
+      interval: "minute",
+      type: "fixed",
+    },
+  ],
+});
 if (!success) {
   return {
     message:
@@ -58,7 +54,7 @@ if (!success) {
 
 To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev/docs/limiter/self-hosting).
 
-## Borrow CLI - The Developer Toolkit
+## Borrow CLI
 
 ### Install
 

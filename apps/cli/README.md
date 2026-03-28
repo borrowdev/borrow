@@ -1,4 +1,4 @@
-# Borrow CLI - The Developer Toolkit
+# Borrow CLI
 
 ## Install
 
