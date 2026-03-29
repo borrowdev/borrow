@@ -1,4 +1,13 @@
 {
   "extends": "@borrowdev/config/tsconfig.test.json",
-  "include": ["src/**/*.spec.ts"]
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "tsBuildInfoFile": "dist/tsconfig.spec.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"]
 }

@@ -101,7 +101,7 @@ export default {
 Now you can call the Limiter API by using our client library or by making an HTTP request.
 
 ```ts ts2js
-import { borrow } from "@borrowdev/node";
+import borrow from "@borrowdev/node";
 
 const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
   limiters: [

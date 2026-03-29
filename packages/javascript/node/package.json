@@ -2,28 +2,30 @@
   "name": "@borrowdev/node",
   "version": "0.2.0",
   "private": false,
+  "license": "MIT",
   "files": [
     "dist",
     "package.json",
     "README.md"
   ],
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/main.mjs",
+  "module": "./dist/main.mjs",
+  "types": "./dist/main.d.mts",
   "exports": {
-    "./package.json": "./package.json",
-    "./limiter/host": "./dist/lib/limiter/host/index.js",
+    "./limiter/host": {
+      "types": "./dist/limiterHost.d.mts",
+      "import": "./dist/limiterHost.mjs",
+      "default": "./dist/limiterHost.mjs"
+    },
     ".": {
-      "development": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "node": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./dist/main.d.mts",
+      "import": "./dist/main.mjs",
+      "default": "./dist/main.mjs"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.lib.json && resolve-tspaths -p tsconfig.lib.json",
+    "build": "tsdown && tsc -p tsconfig.lib.json --noEmit",
     "test": "vp test run"
   },
   "dependencies": {
@@ -36,12 +38,17 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",
+    "publint": "catalog:",
     "resolve-tspaths": "catalog:",
+    "tsdown": "catalog:",
     "tslib": "catalog:",
     "type-fest": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
+  },
+  "inlinedDependencies": {
+    "type-fest": "4.41.0"
   }
 }

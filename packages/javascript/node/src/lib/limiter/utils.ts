@@ -1,10 +1,4 @@
-import {
-  Limiters,
-  LimiterResult,
-  TokenLimiter,
-  ErrorCode,
-  AnyLimiter,
-} from "./types.js";
+import { Limiters, LimiterResult, TokenLimiter, ErrorCode, AnyLimiter } from "./types";
 
 /**
  * Custom error class for limiter

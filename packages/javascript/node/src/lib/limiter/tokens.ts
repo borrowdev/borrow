@@ -1,5 +1,5 @@
-import borrow, { BorrowClient } from "../client.js";
-import { CommonLimiterOptions } from "./types.js";
+import borrow, { BorrowClient } from "@/lib/client";
+import { CommonLimiterOptions } from "./types";
 
 /** Key interface for refill tokens */
 export interface Key {
@@ -76,9 +76,7 @@ export async function refillTokens(
   const options = arg1 || {};
 
   // Choose the correct Borrow client
-  const borrowClient = options?.apiKey
-    ? new BorrowClient(options.apiKey)
-    : borrow;
+  const borrowClient = options?.apiKey ? new BorrowClient(options.apiKey) : borrow;
 
   try {
     // Prepare request body based on input
@@ -115,9 +113,7 @@ export async function refillTokens(
     const data = (await response.json()) as any;
 
     if (!response.ok) {
-      const errorMessage = `Failed to refill tokens: ${
-        data.message || response.statusText
-      }`;
+      const errorMessage = `Failed to refill tokens: ${data.message || response.statusText}`;
 
       if (options?.debug) {
         console.warn(errorMessage);

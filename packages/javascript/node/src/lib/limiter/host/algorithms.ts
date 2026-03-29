@@ -7,7 +7,7 @@ import {
   RequestCheckSchema,
   UserData,
   Storage,
-} from "./limiter.js";
+} from "./limiter";
 
 export async function fixed(params: {
   backgroundExecute: ParsedLimiterParams["backgroundExecute"];
@@ -26,10 +26,7 @@ export async function fixed(params: {
   timeLeft: number | null;
 }> {
   const promises = [];
-  const currentWindow = getCurrentWindow(
-    Date.now() / 1000,
-    params.limiter.interval,
-  );
+  const currentWindow = getCurrentWindow(Date.now() / 1000, params.limiter.interval);
 
   let success = false;
   let timeLeft: number | null = null;
@@ -108,14 +105,7 @@ export async function sliding(params: {
 
   let { requests: userRequests, ...userDataNoRequest } = params.userData;
 
-  if (
-    isNewWindow(
-      userDataNoRequest.lastWindow!,
-      currentWindow,
-      NaN,
-      params.limiter.interval,
-    )
-  ) {
+  if (isNewWindow(userDataNoRequest.lastWindow!, currentWindow, NaN, params.limiter.interval)) {
     promises.push(
       params.storage.storeUserData({
         key: params.key,
@@ -135,8 +125,7 @@ export async function sliding(params: {
   }
 
   if (userRequests! >= (params.limiter.maxRequests as number)) {
-    timeLeft =
-      params.limiter.interval - (currentWindow - userDataNoRequest.lastWindow!);
+    timeLeft = params.limiter.interval - (currentWindow - userDataNoRequest.lastWindow!);
     timeLeft = timeLeft < 0 ? 0 : timeLeft;
   } else {
     promises.push(
@@ -180,10 +169,7 @@ export async function token(params: {
   tokensLeft: number | null;
 }> {
   const promises = [];
-  const currentWindow = getCurrentWindow(
-    Date.now() / 1000,
-    params.limiter.interval,
-  );
+  const currentWindow = getCurrentWindow(Date.now() / 1000, params.limiter.interval);
 
   const { requests: userRequests, ...userDataNoRequest } = params.userData;
 
@@ -192,14 +178,9 @@ export async function token(params: {
   const maxTokens = params.limiter.maxTokens;
 
   // Elapsing happens in intervals, you can't replenish tokens in between tokensPerReplenish
-  const intervals = Math.abs(
-    Math.trunc(currentWindow - userDataNoRequest.lastWindow!),
-  );
+  const intervals = Math.abs(Math.trunc(currentWindow - userDataNoRequest.lastWindow!));
   const elapsed = currentWindow - userDataNoRequest.lastWindow!;
-  const tokensToReplenish = Math.max(
-    0,
-    Math.floor(intervals * tokensPerReplenish),
-  );
+  const tokensToReplenish = Math.max(0, Math.floor(intervals * tokensPerReplenish));
 
   let success = false;
   let newRequests = userRequests;
@@ -241,10 +222,7 @@ export async function token(params: {
     timeLeft = maxTokens - Math.abs(currentTokens);
     tokensLeft = timeLeft;
 
-    timeLeft =
-      timeLeft > 0
-        ? params.limiter.interval - elapsed * params.limiter.interval
-        : 0;
+    timeLeft = timeLeft > 0 ? params.limiter.interval - elapsed * params.limiter.interval : 0;
     // Time left until next replenish
     timeLeft = timeLeft < 0 ? 0 : timeLeft;
     success = true;

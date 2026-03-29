@@ -1,19 +1,36 @@
 import { z } from "zod";
 
-import { StorageAdapter } from "./adapters/storage/StorageAdapter.js";
-import { borrow, fixed, sliding, token } from "./algorithms.js";
+import { StorageAdapter } from "./adapters/storage/StorageAdapter";
+import { borrow, fixed, sliding, token } from "./algorithms";
 
-type LimiterParams = z.infer<typeof inputLimiterParamsSchema>;
-export type ParsedLimiterParams = z.infer<typeof outputLimiterParamsSchema>;
+type LimiterParams = {
+  req: (RequestCheckSchema | RequestRefillTokensSchema) & { invokeSecret?: string };
+  backgroundExecute?: ((promise: Promise<any>) => void) | false;
+  adapters: Adapters;
+  env?: Record<string, any>;
+  hooks?: {
+    beforeResponse?: (result: {
+      result: "success" | "error" | "limited";
+      error?: "INVALID_PARAMS" | "UNAUTHORIZED";
+      status: number;
+      message: string;
+      timeLeft: number | null;
+      tokensLeft?: number | null;
+    }) => Promise<void>;
+  };
+};
+export type ParsedLimiterParams = {
+  backgroundExecute: ((promise: Promise<any>) => void) | false | undefined;
+};
 
 export function getUsageKey(userUuid: string, projectId: string) {
   return `limiter:usage:${userUuid}:${projectId}`;
 }
 
-export function isomorphicExecute(
-  promise: Promise<unknown>,
+export function isomorphicExecute<T>(
+  promise: Promise<T>,
   backgroundExecute: ParsedLimiterParams["backgroundExecute"],
-) {
+): Promise<T> {
   if (typeof backgroundExecute === "function") {
     backgroundExecute(promise);
   }
@@ -26,13 +43,11 @@ function getBiggest(numbers: number[]) {
 }
 
 export function getCurrentWindow(
-  dateInSeconds = Date.now() / 1000,
+  dateInSeconds: number = Date.now() / 1000,
   // Only fixed windows need this
   interval?: number,
-) {
-  return typeof interval === "number"
-    ? dateInSeconds / interval
-    : dateInSeconds;
+): number {
+  return typeof interval === "number" ? dateInSeconds / interval : dateInSeconds;
 }
 
 export function isNewWindow(
@@ -43,7 +58,7 @@ export function isNewWindow(
   // Only sliding windows need this, fixed windows have
   // their interval calculated differently
   interval?: number,
-) {
+): boolean {
   const cleanLastWindow = Math.trunc(lastWindow);
   const cleanCurrentWindow = Math.trunc(currentWindow);
   return interval
@@ -52,7 +67,14 @@ export function isNewWindow(
 }
 
 const asyncNoop = () => Promise.resolve();
-export type UserData = z.infer<typeof userDataSchema>;
+export type UserData = {
+  key: string;
+  type: LimiterType;
+  requests?: number;
+  lastWindow?: number;
+  interval?: number;
+  maxTokens?: number;
+};
 
 type LimiterHandlerResponse = {
   result: "success" | "error" | "limited";
@@ -71,9 +93,9 @@ const storage = {
     amount: number;
     type: "exact" | "relative";
     limiterType: LimiterType;
-    adapters: z.infer<typeof adaptersSchema>;
+    adapters: Adapters;
     userData?: UserData | null;
-  }) => {
+  }): Promise<void> => {
     const key = params.adapters.storage.getStorageKey({
       key: params.key,
       userId: params.userId,
@@ -91,7 +113,13 @@ const storage = {
     }
   },
 
-  getUserData: async (params: z.infer<typeof retrievalAdapterParamsSchema>) => {
+  getUserData: async (params: {
+    key: string | null;
+    userId: string | null;
+    limiterType: LimiterType;
+    interval?: number;
+    adapters: Adapters;
+  }): Promise<UserData> => {
     if (!params.adapters) {
       throw new Error("You must provide storage adapters");
     }
@@ -102,9 +130,7 @@ const storage = {
       limiterType: params.limiterType,
     });
 
-    const userData = (await params.adapters.storage.get(
-      key,
-    )) as UserData | null;
+    const userData = (await params.adapters.storage.get(key)) as UserData | null;
 
     // If the user doesn't exist yet
     if (!userData) {
@@ -139,12 +165,12 @@ const storage = {
     return userData;
   },
 
-  beforeResponse: asyncNoop,
+  beforeResponse: asyncNoop as () => Promise<void>,
 };
 
 const positiveIntSchema = z.number().positive().int();
 
-export type LimiterType = z.infer<typeof limiterTypeSchema>;
+export type LimiterType = "fixed" | "sliding" | "token" | "borrow";
 const limiterTypeSchema = z.enum(["fixed", "sliding", "token", "borrow"]);
 
 const identifierSchema = z.object({
@@ -162,10 +188,7 @@ const userDataSchema = z.object({
   maxTokens: positiveIntSchema.optional(),
 });
 
-const limiterIntervalSchema = z.union([
-  z.enum(["minute", "hour", "day"]),
-  positiveIntSchema,
-]);
+const limiterIntervalSchema = z.union([z.enum(["minute", "hour", "day"]), positiveIntSchema]);
 
 const limitersSchema = z
   .array(
@@ -213,15 +236,35 @@ const requestCommonSchema = z.object({
   invokeSecret: z.string().optional(),
 });
 
-export type RequestCheckSchema = z.infer<typeof requestCheckSchema>;
+export type RequestCheckSchema = {
+  invokeSecret?: string;
+  userId: string | null;
+  key: string | null;
+  action: "check";
+  limiters: Array<
+    | { type: "fixed"; maxRequests: number; interval: "minute" | "hour" | "day" | number }
+    | { type: "sliding"; maxRequests: number; interval: "minute" | "hour" | "day" | number }
+    | {
+        type: "token";
+        maxRequests?: number;
+        interval: "minute" | "hour" | "day" | number;
+        tokensCost: number;
+        tokensPerReplenish: number;
+        maxTokens: number;
+      }
+    | { type: "borrow"; borrowAction?: "start" | "end"; timeout: number }
+  >;
+};
 const requestCheckSchema = requestCommonSchema.extend({
   ...identifierSchema.shape,
   action: z.literal("check"),
   limiters: limitersSchema,
 });
-export type RequestRefillTokensSchema = z.infer<
-  typeof requestRefillTokensSchema
->;
+export type RequestRefillTokensSchema = {
+  invokeSecret?: string;
+  action: "refillTokens";
+  keys: Array<{ userId: string | null; key: string | null }> | null;
+};
 const requestRefillTokensSchema = requestCommonSchema.extend({
   action: z.literal("refillTokens"),
   keys: z
@@ -241,7 +284,9 @@ const requestSchema = z.discriminatedUnion("action", [
   requestRefillTokensSchema,
 ]);
 
-export type Adapters = z.infer<typeof adaptersSchema>;
+export type Adapters = {
+  storage: StorageAdapter;
+};
 const adaptersSchema = z.object({
   /**
    * The storage adapter to use for keeping track of requests to the rate
@@ -274,10 +319,7 @@ const inputLimiterParamsSchema = z.object({
    * @default false
    */
   backgroundExecute: z
-    .union([
-      z.function().args(z.promise(z.any())).returns(z.void()),
-      z.literal(false),
-    ])
+    .union([z.function().args(z.promise(z.any())).returns(z.void()), z.literal(false)])
     .optional(),
   adapters: adaptersSchema,
   /**
@@ -359,7 +401,7 @@ const outputLimiterParamsSchema = inputLimiterParamsSchema.transform((data) => {
 async function refillTokens(params: {
   backgroundExecute: ParsedLimiterParams["backgroundExecute"];
   keys: { userId: string | null; key: string | null }[] | null;
-  adapters: z.infer<typeof adaptersSchema>;
+  adapters: Adapters;
   storage: Storage; // Optional for testing purposes
 }) {
   const finalKeys: {
@@ -396,10 +438,7 @@ async function refillTokens(params: {
   );
 }
 
-function getIsomorphicEnvVariable(
-  variableName: string,
-  env: any,
-): string | undefined {
+function getIsomorphicEnvVariable(variableName: string, env: any): string | undefined {
   if (env) {
     return env[variableName];
   }
@@ -414,14 +453,8 @@ function getIsomorphicEnvVariable(
   return undefined;
 }
 
-export async function limiter(
-  params: LimiterParams,
-): Promise<LimiterHandlerResponse> {
-  const {
-    success,
-    data: parsedParams,
-    error,
-  } = outputLimiterParamsSchema.safeParse(params);
+export async function limiter(params: LimiterParams): Promise<LimiterHandlerResponse> {
+  const { success, data: parsedParams, error } = outputLimiterParamsSchema.safeParse(params);
 
   if (!success) {
     const commonParams = {
@@ -436,10 +469,8 @@ export async function limiter(
   }
 
   if (
-    typeof getIsomorphicEnvVariable(
-      "BORROW_LIMITER_INVOKE_SECRET",
-      parsedParams.env,
-    ) === "string" &&
+    typeof getIsomorphicEnvVariable("BORROW_LIMITER_INVOKE_SECRET", parsedParams.env) ===
+      "string" &&
     parsedParams.req.invokeSecret !==
       getIsomorphicEnvVariable("BORROW_LIMITER_INVOKE_SECRET", parsedParams.env)
   ) {
@@ -452,10 +483,7 @@ export async function limiter(
     } as const;
 
     const beforeResponse = parsedParams.hooks.beforeResponse;
-    await isomorphicExecute(
-      beforeResponse(commonParams),
-      parsedParams.backgroundExecute,
-    );
+    await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
     return commonParams;
   }
 
@@ -475,10 +503,7 @@ export async function limiter(
     } as const;
 
     const beforeResponse = parsedParams.hooks.beforeResponse;
-    await isomorphicExecute(
-      beforeResponse(commonParams),
-      parsedParams.backgroundExecute,
-    );
+    await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
 
     return commonParams;
   }
@@ -572,27 +597,18 @@ export async function limiter(
   const timeLeftArray = result.flatMap((r) =>
     r && "timeLeft" in r && typeof r.timeLeft === "number" ? r.timeLeft : [],
   );
-  const timeLeft =
-    timeLeftArray.length > 0
-      ? parseInt(getBiggest(timeLeftArray).toFixed(2))
-      : null;
+  const timeLeft = timeLeftArray.length > 0 ? parseInt(getBiggest(timeLeftArray).toFixed(2)) : null;
   // Currently only gets the greatest tokens left
   const tokensLeftArray = result.flatMap((r) =>
-    r && "tokensLeft" in r && typeof r.tokensLeft === "number"
-      ? r.tokensLeft
-      : [],
+    r && "tokensLeft" in r && typeof r.tokensLeft === "number" ? r.tokensLeft : [],
   );
   const tokensLeft =
-    tokensLeftArray.length > 0
-      ? parseInt(getBiggest(tokensLeftArray).toFixed(2))
-      : null;
+    tokensLeftArray.length > 0 ? parseInt(getBiggest(tokensLeftArray).toFixed(2)) : null;
   const passedLimiters = result.filter((r) => r && r.success).length;
 
   if (passedLimiters < parsedParams.req.limiters.length) {
     const failedLimiters = parsedParams.req.limiters.length - passedLimiters;
-    const message = `${failedLimiters} Limiter${
-      failedLimiters === 1 ? "" : "s"
-    } did not pass.`;
+    const message = `${failedLimiters} Limiter${failedLimiters === 1 ? "" : "s"} did not pass.`;
     const commonParams = {
       result: "limited",
       message,
@@ -602,10 +618,7 @@ export async function limiter(
     } as const;
 
     const beforeResponse = parsedParams.hooks.beforeResponse;
-    await isomorphicExecute(
-      beforeResponse(commonParams),
-      parsedParams.backgroundExecute,
-    );
+    await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
     return commonParams;
   }
 
@@ -619,9 +632,6 @@ export async function limiter(
   } as const;
 
   const beforeResponse = parsedParams.hooks.beforeResponse;
-  await isomorphicExecute(
-    beforeResponse(commonParams),
-    parsedParams.backgroundExecute,
-  );
+  await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
   return commonParams;
 }

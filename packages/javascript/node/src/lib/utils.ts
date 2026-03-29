@@ -24,18 +24,12 @@ export function isSupabaseEdgeFunction(): boolean {
 }
 
 // TODO: Find a way to import the Deno Request type (only for this function) without all the declaration types
-export async function getSupabaseUser(
-  req: Request,
-  debug?: boolean,
-): Promise<User | null> {
+export async function getSupabaseUser(req: Request, debug?: boolean): Promise<User | null> {
   if (!isSupabaseEdgeFunction()) {
     return null;
   }
   const supabase = await import("@supabase/supabase-js").then((mod) =>
-    mod.createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    ),
+    mod.createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!),
   );
   const authHeader = req.headers.get("Authorization")!;
   const token = authHeader.replace("Bearer ", "");
@@ -72,10 +66,7 @@ export async function getSupabaseRequestInfo(
   // Extract user ID if in a Supabase environment
   if (isSupabaseEdgeFunction()) {
     const supabase = await import("@supabase/supabase-js").then((mod) =>
-      mod.createClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      ),
+      mod.createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!),
     );
     const authHeader = req.headers.get("Authorization")!;
     if (authHeader) {
@@ -117,4 +108,24 @@ export async function getSupabaseRequestInfo(
   }
 
   return result;
+}
+
+/**
+ * @param fn - The function to call when this property is being called.
+ * @param obj - An object with the properties to attach to the function when
+ *   it's not being called.
+ */
+export function createHybridObject<F extends (...args: any[]) => any, O extends object>(
+  fn: F,
+  obj: O,
+): F & O {
+  const newFn = fn;
+  for (const prop in obj) {
+    if (!fn.hasOwnProperty(prop)) {
+      // @ts-expect-error It seems TypeScript doesn't currently have a way of telling we're safely attaching O to F.
+      newFn[prop] = obj[prop];
+    }
+  }
+
+  return newFn as F & O;
 }

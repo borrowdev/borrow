@@ -1,20 +1,13 @@
-import borrow, { BorrowClient } from "@lib/client.js";
-import {
-  Limiters,
-  LimiterResult,
-  Params,
-  LimiterParams,
-  AnyLimiter,
-} from "@lib/limiter/types.js";
+import borrow, { BorrowClient } from "@/lib/client";
+import { Limiters, LimiterResult, Params, LimiterParams, AnyLimiter } from "@/lib/limiter/types";
 import {
   handleErrorResponse,
   isTokenLimiterArray,
   // @ts-expect-error It's being used by JSDoc
   // oxlint-disable-next-line no-unused-vars
   LimiterError,
-} from "@lib/limiter/utils.js";
-
-import { getSupabaseRequestInfo } from "../utils.js";
+} from "@/lib/limiter/utils";
+import { getSupabaseRequestInfo } from "@/lib/utils";
 
 const failBehaviorString = {
   bypass: "Bypassing this error since failBehavior is set to 'bypass'.",
@@ -26,11 +19,7 @@ function isParamsObject(obj: any): boolean {
   if (obj instanceof Request) return false;
 
   // Check if it has typical Params object properties
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    ("limiters" in obj || "options" in obj)
-  );
+  return typeof obj === "object" && obj !== null && ("limiters" in obj || "options" in obj);
 }
 
 /**
@@ -71,9 +60,7 @@ function isParamsObject(obj: any): boolean {
  * @throws {LimiterError} - If the request fails and failBehavior is set to
  *   "fail".
  */
-export function limiter<T extends Limiters>(
-  params: Params<T>,
-): Promise<LimiterResult<T, boolean>>;
+function limiter<T extends Limiters>(params: Params<T>): Promise<LimiterResult<T, boolean>>;
 
 /**
  * Checks the rate limit with an ID.
@@ -85,7 +72,7 @@ export function limiter<T extends Limiters>(
  * @throws {LimiterError} - If the request fails and failBehavior is set to
  *   "fail".
  */
-export function limiter<T extends Limiters>(
+function limiter<T extends Limiters>(
   id: string,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
@@ -101,7 +88,7 @@ export function limiter<T extends Limiters>(
  * @throws {LimiterError} - If the request fails and failBehavior is set to
  *   "fail".
  */
-export function limiter<T extends Limiters>(
+function limiter<T extends Limiters>(
   userIdentifier: string,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
@@ -117,7 +104,7 @@ export function limiter<T extends Limiters>(
  * @throws {LimiterError} - If the request fails and failBehavior is set to
  *   "fail".
  */
-export function limiter<T extends Limiters>(
+function limiter<T extends Limiters>(
   supabaseRequest: Request,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
@@ -134,13 +121,13 @@ export function limiter<T extends Limiters>(
  * @throws {LimiterError} - If the request fails and failBehavior is set to
  *   "fail".
  */
-export function limiter<T extends Limiters>(
+function limiter<T extends Limiters>(
   id: string,
   userIdentifier: string | Request,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
-export async function limiter<T extends Limiters>(
+async function limiter<T extends Limiters>(
   arg0: string | Request | Params<T>,
   arg1?: string | Request | Params<T>,
   arg2?: Params<T>,
@@ -154,11 +141,7 @@ export async function limiter<T extends Limiters>(
     finalParams = arg0;
   }
   // Case 2: limiter(id, params)
-  else if (
-    typeof arg0 === "string" &&
-    typeof arg1 === "object" &&
-    isParamsObject(arg1)
-  ) {
+  else if (typeof arg0 === "string" && typeof arg1 === "object" && isParamsObject(arg1)) {
     finalParams = { ...arg1, id: arg0 };
   }
   // Case 3: limiter(userIdentifier, params)
@@ -187,10 +170,7 @@ export async function limiter<T extends Limiters>(
   let urlAsId: string | undefined;
 
   if (params.userIdentifier instanceof Request) {
-    const requestInfo = await getSupabaseRequestInfo(
-      params.userIdentifier,
-      params.options?.debug,
-    );
+    const requestInfo = await getSupabaseRequestInfo(params.userIdentifier, params.options?.debug);
 
     // If we got a user ID from the request, use that as the user identifier
     if (requestInfo.userId) {
@@ -223,9 +203,7 @@ export async function limiter<T extends Limiters>(
 
     return handleErrorResponse(
       {
-        message:
-          "No user identifier or limiter ID found. " +
-          failBehaviorString.bypass,
+        message: "No user identifier or limiter ID found. " + failBehaviorString.bypass,
         code: "MISSING_PARAMETERS",
       },
       params.limiters as T,
@@ -236,18 +214,13 @@ export async function limiter<T extends Limiters>(
   // Choose the correct Borrow client.
   const borrowClient =
     params.options?.apiKey || params.options?.endpoint
-      ? new BorrowClient(
-          params.options.apiKey,
-          params.options.endpoint?.baseUrl,
-        )
+      ? new BorrowClient(params.options.apiKey, params.options.endpoint?.baseUrl)
       : borrow;
 
   try {
     // Format limiters according to API spec with 'type' field
     // Convert the Limiters type to an array for mapping
-    const limitersArray = Array.isArray(params.limiters)
-      ? params.limiters
-      : [params.limiters];
+    const limitersArray = Array.isArray(params.limiters) ? params.limiters : [params.limiters];
 
     // Use type assertion to tell TypeScript this is an array of AnyLimiter
     const formattedLimiters = (limitersArray as AnyLimiter[]).map((limiter) => {
@@ -285,17 +258,14 @@ export async function limiter<T extends Limiters>(
       }
     });
 
-    const response = await borrowClient.post(
-      params.options?.endpoint?.path || "/limiter",
-      {
-        body: JSON.stringify({
-          key: limiterKey,
-          userId: finalUserIdentifier,
-          limiters: formattedLimiters,
-          action: "check",
-        }),
-      },
-    );
+    const response = await borrowClient.post(params.options?.endpoint?.path || "/limiter", {
+      body: JSON.stringify({
+        key: limiterKey,
+        userId: finalUserIdentifier,
+        limiters: formattedLimiters,
+        action: "check",
+      }),
+    });
 
     const data = (await response.json()) as {
       result: "success" | "limited" | "error";
@@ -312,10 +282,7 @@ export async function limiter<T extends Limiters>(
       }
 
       // Use Array.isArray to check if params.limiters is an array before passing to isTokenLimiterArray
-      if (
-        Array.isArray(params.limiters) &&
-        isTokenLimiterArray(params.limiters)
-      ) {
+      if (Array.isArray(params.limiters) && isTokenLimiterArray(params.limiters)) {
         // For limiters with token type, include tokensLeft
         return {
           success: false,
@@ -360,10 +327,7 @@ export async function limiter<T extends Limiters>(
     }
 
     // Use Array.isArray to check if params.limiters is an array before passing to isTokenLimiterArray
-    if (
-      Array.isArray(params.limiters) &&
-      isTokenLimiterArray(params.limiters)
-    ) {
+    if (Array.isArray(params.limiters) && isTokenLimiterArray(params.limiters)) {
       return {
         success: true,
         timeLeft: null,
@@ -389,10 +353,10 @@ export async function limiter<T extends Limiters>(
     // Use Array.isArray to check if params.limiters is an array
     return handleErrorResponse(
       err,
-      Array.isArray(params.limiters)
-        ? params.limiters
-        : ([params.limiters] as unknown as T),
+      Array.isArray(params.limiters) ? params.limiters : ([params.limiters] as unknown as T),
       bypassErrors,
     );
   }
 }
+
+export default limiter;

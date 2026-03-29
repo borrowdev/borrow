@@ -1,5 +1,5 @@
-import { UpstashRedisAdapter } from "./adapters/storage/redis/UpstashRedisAdapter.js";
-import { StorageAdapter } from "./adapters/storage/StorageAdapter.js";
-import { limiter } from "./limiter.js";
+import { UpstashRedisAdapter } from "./adapters/storage/redis/UpstashRedisAdapter";
+import { StorageAdapter } from "./adapters/storage/StorageAdapter";
+import { limiter } from "./limiter";
 
 export { limiter, StorageAdapter, UpstashRedisAdapter };

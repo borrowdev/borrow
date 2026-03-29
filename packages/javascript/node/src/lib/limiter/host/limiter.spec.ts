@@ -1,8 +1,8 @@
 import { Redis } from "@upstash/redis";
 import fc from "fast-check";
 
-import { UpstashRedisAdapter } from "./adapters/storage/redis/UpstashRedisAdapter.js";
-import { limiter } from "./limiter.js";
+import { UpstashRedisAdapter } from "./adapters/storage/redis/UpstashRedisAdapter";
+import { limiter } from "./limiter";
 
 const redis = new Redis({
   url: import.meta.env.VITE_UPSTASH_REDIS_REST_URL_BORROW_LIMITER,
@@ -94,9 +94,7 @@ describe(
           ],
         },
       });
-      expect(tokensLeft).toBe(
-        tokenLimiter.maxTokens - tokenLimiter.tokensCost * 3,
-      );
+      expect(tokensLeft).toBe(tokenLimiter.maxTokens - tokenLimiter.tokensCost * 3);
 
       const result = await limiter({
         ...commonParams,

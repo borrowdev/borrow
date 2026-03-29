@@ -1,4 +1,4 @@
-import { LimiterType } from "@lib/limiter/host/limiter.js";
+import { LimiterType } from "@/lib/limiter/host/limiter";
 
 type StorageAdapterType = {
   getStorageKey: (params: {
@@ -16,7 +16,7 @@ export const getStorageKey = (params: {
   limiterType: LimiterType;
   userId: string | null;
   key: string | null;
-}) => {
+}): string => {
   if (!params.userId && !params.key) {
     return `count:global:${params.limiterType || "unknown"}`;
   }
@@ -37,20 +37,16 @@ export const getStorageKey = (params: {
 };
 
 export class StorageAdapter implements StorageAdapterType {
-  getStorageKey = getStorageKey;
+  getStorageKey: StorageAdapterType["getStorageKey"] = getStorageKey;
   get = async (
     ..._args: Parameters<StorageAdapterType["get"]>
   ): Promise<Record<string, any> | null> => {
     throw new Error("Method not implemented.");
   };
-  set = async (
-    ..._args: Parameters<StorageAdapterType["set"]>
-  ): Promise<void> => {
+  set = async (..._args: Parameters<StorageAdapterType["set"]>): Promise<void> => {
     throw new Error("Method not implemented.");
   };
-  relative = async (
-    ..._args: Parameters<StorageAdapterType["relative"]>
-  ): Promise<void> => {
+  relative = async (..._args: Parameters<StorageAdapterType["relative"]>): Promise<void> => {
     throw new Error("Method not implemented.");
   };
 }

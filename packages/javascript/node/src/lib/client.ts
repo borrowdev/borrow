@@ -70,6 +70,6 @@ class BorrowClient {
   }
 }
 
-export const borrow = new BorrowClient(undefined, undefined, true);
+export const borrow: BorrowClient = new BorrowClient(undefined, undefined, true);
 export { BorrowClient };
 export default borrow;
