@@ -16,14 +16,9 @@ jobs:
         with:
           cache: true
           run-install: true
-      - name: Build docs website
-        run: cd apps/docs && vp run build
-      - name: Deploy docs website
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          packageManager: pnpm
-          workingDirectory: apps/docs
-          command: vp run deploy
-          wranglerVersion: 4.77.0
+      - name: Build and deploy docs website
+        working-directory: apps/docs
+        run: vp run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
