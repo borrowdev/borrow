@@ -62,10 +62,12 @@ class BorrowClient {
     });
   }
 
-  async get(path: ManagedApiPath | string, options: RequestInit = {}) {
+  // oxlint-disable-next-line typescript/no-redundant-type-constituents - ManagedApiPath here is only for documentation purposes.
+  async get(path: ManagedApiPath | string, options: RequestInit = {}): Promise<Response> {
     return this.#call("GET", path, options);
   }
-  async post(path: ManagedApiPath | string, options: RequestInit = {}) {
+  // oxlint-disable-next-line typescript/no-redundant-type-constituents - ManagedApiPath here is only for documentation purposes.
+  async post(path: ManagedApiPath | string, options: RequestInit = {}): Promise<Response> {
     return this.#call("POST", path, options);
   }
 }

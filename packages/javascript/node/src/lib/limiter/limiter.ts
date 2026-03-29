@@ -14,7 +14,7 @@ const failBehaviorString = {
 };
 
 // Helper function to check if an object is a params object
-function isParamsObject(obj: any): boolean {
+function isParamsObject(obj: any): obj is Params<Limiters> {
   // Check if it's a Request object first
   if (obj instanceof Request) return false;
 

@@ -2,7 +2,7 @@ import borrow, { BorrowClient } from "@/lib/client";
 import { CommonLimiterOptions } from "./types";
 
 /** Key interface for refill tokens */
-export interface Key {
+interface Key {
   /** The unique identifier used to scope the limiter. */
   key?: string;
 
@@ -19,7 +19,7 @@ function validateKey(key: Key): boolean {
 }
 
 // Options for refillTokens
-export type RefillTokensOptions = CommonLimiterOptions;
+type RefillTokensOptions = CommonLimiterOptions;
 
 // Response type for refill tokens operation
 type RefillTokensResponse = {

@@ -12,7 +12,7 @@ type StorageAdapterType = {
   relative: (key: string, field: string, amount: number) => Promise<void>;
 };
 
-export const getStorageKey = (params: {
+const getStorageKey = (params: {
   limiterType: LimiterType;
   userId: string | null;
   key: string | null;

@@ -39,7 +39,6 @@
     "@types/react-dom": "catalog:",
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
-    "tsx": "catalog:",
     "typescript": "catalog:",
     "wrangler": "catalog:"
   }

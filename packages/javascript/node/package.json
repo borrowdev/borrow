@@ -36,10 +36,8 @@
   "devDependencies": {
     "@borrowdev/config": "workspace:*",
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",
     "publint": "catalog:",
-    "resolve-tspaths": "catalog:",
     "tsdown": "catalog:",
     "tslib": "catalog:",
     "type-fest": "catalog:",

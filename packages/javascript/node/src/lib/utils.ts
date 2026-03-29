@@ -1,12 +1,6 @@
 import process from "node:process";
 
-import type { User } from "@supabase/supabase-js";
-
-export function isBorrowEnv(): boolean {
-  return process.env.BORROW_ENV === "borrow";
-}
-
-export function isSupabaseEdgeFunction(): boolean {
+function isSupabaseEdgeFunction(): boolean {
   const requiredEnvVars = [
     "SUPABASE_URL",
     "SUPABASE_ANON_KEY",
@@ -21,29 +15,6 @@ export function isSupabaseEdgeFunction(): boolean {
   }
 
   return true;
-}
-
-// TODO: Find a way to import the Deno Request type (only for this function) without all the declaration types
-export async function getSupabaseUser(req: Request, debug?: boolean): Promise<User | null> {
-  if (!isSupabaseEdgeFunction()) {
-    return null;
-  }
-  const supabase = await import("@supabase/supabase-js").then((mod) =>
-    mod.createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!),
-  );
-  const authHeader = req.headers.get("Authorization")!;
-  const token = authHeader.replace("Bearer ", "");
-  const { error, data } = await supabase.auth.getUser(token);
-
-  if (error || !data?.user) {
-    return null;
-  }
-
-  if (debug) {
-    console.log("Found Supabase user with ID: ", data.user?.id);
-  }
-
-  return data.user || null;
 }
 
 /**

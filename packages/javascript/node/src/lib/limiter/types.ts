@@ -194,10 +194,8 @@ export type ContainsTokenLimiter<T extends Limiters> =
 /** Creates the appropriate result type based on success state and limiter types */
 export type LimiterResult<T extends Limiters, R extends boolean> = SimplifyDeep<
   R extends true
-    ? SuccessLimiterResult &
-        (ContainsTokenLimiter<T> extends true ? TokenLimiterResultFields : {})
-    : FailureLimiterResult &
-        (ContainsTokenLimiter<T> extends true ? TokenLimiterResultFields : {})
+    ? SuccessLimiterResult & (ContainsTokenLimiter<T> extends true ? TokenLimiterResultFields : {})
+    : FailureLimiterResult & (ContainsTokenLimiter<T> extends true ? TokenLimiterResultFields : {})
 >;
 
 export type Params<T extends Limiters> = {

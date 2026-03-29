@@ -23,10 +23,6 @@ export type ParsedLimiterParams = {
   backgroundExecute: ((promise: Promise<any>) => void) | false | undefined;
 };
 
-export function getUsageKey(userUuid: string, projectId: string) {
-  return `limiter:usage:${userUuid}:${projectId}`;
-}
-
 export function isomorphicExecute<T>(
   promise: Promise<T>,
   backgroundExecute: ParsedLimiterParams["backgroundExecute"],
@@ -260,7 +256,7 @@ const requestCheckSchema = requestCommonSchema.extend({
   action: z.literal("check"),
   limiters: limitersSchema,
 });
-export type RequestRefillTokensSchema = {
+type RequestRefillTokensSchema = {
   invokeSecret?: string;
   action: "refillTokens";
   keys: Array<{ userId: string | null; key: string | null }> | null;
@@ -297,14 +293,6 @@ const adaptersSchema = z.object({
   storage: z.instanceof(StorageAdapter),
 });
 
-const retrievalAdapterParamsSchema = z.object({
-  key: z.string().nullable(),
-  userId: z.string().nullable(),
-  limiterType: limiterTypeSchema,
-  interval: z.number().optional(),
-  adapters: adaptersSchema,
-});
-
 const inputLimiterParamsSchema = z.object({
   req: requestSchema,
   /**
@@ -319,14 +307,17 @@ const inputLimiterParamsSchema = z.object({
    * @default false
    */
   backgroundExecute: z
-    .union([z.function().args(z.promise(z.any())).returns(z.void()), z.literal(false)])
+    .union([
+      z.function({ input: z.tuple([z.promise(z.any())]), output: z.void() }),
+      z.literal(false),
+    ])
     .optional(),
   adapters: adaptersSchema,
   /**
    * Environment variables. Use this when deploying to a serverless environment
    * such as Cloudflare Workers.
    */
-  env: z.record(z.string(), z.any()).default({}).optional(),
+  env: z.record(z.string(), z.any()).optional(),
   /** Optional hooks to get notified when certain actions happen. */
   hooks: z
     .object({
@@ -335,8 +326,8 @@ const inputLimiterParamsSchema = z.object({
        * the background, unless `backgroundExecute` is set to `false`.
        */
       beforeResponse: z
-        .function(
-          z.tuple([
+        .function({
+          input: z.tuple([
             z.object({
               result: z.enum(["success", "error", "limited"]),
               error: z.enum(["INVALID_PARAMS", "UNAUTHORIZED"]).optional(),
@@ -346,8 +337,8 @@ const inputLimiterParamsSchema = z.object({
               tokensLeft: positiveIntSchema.nullable().optional().default(null),
             }),
           ]),
-          z.promise(z.void()),
-        )
+          output: z.promise(z.void()),
+        })
         .optional(),
     })
     .optional(),
