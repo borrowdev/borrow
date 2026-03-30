@@ -17,6 +17,21 @@ function isSupabaseEdgeFunction(): boolean {
   return true;
 }
 
+export function getIsomorphicEnvVariable(variableName: string, env: any): string | undefined {
+  if (env) {
+    return env[variableName];
+  }
+
+  // @ts-expect-error We're checking for Deno env
+  if (typeof Deno !== "undefined" && Deno.env?.get) {
+    // @ts-expect-error We're checking for Deno env
+    return Deno.env.get(variableName);
+  } else if (typeof process !== "undefined" && process.env) {
+    return process.env[variableName];
+  }
+  return undefined;
+}
+
 /**
  * Extracts relevant information from a Supabase request object. Returns both
  * the user ID (if available) and the request URL (if available).

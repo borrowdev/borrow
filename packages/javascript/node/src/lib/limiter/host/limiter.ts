@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { StorageAdapter } from "./adapters/storage/StorageAdapter";
 import { borrow, fixed, sliding, token } from "./algorithms";
+import { getIsomorphicEnvVariable } from "@/lib/utils";
 
 type LimiterParams = {
   req: (RequestCheckSchema | RequestRefillTokensSchema) & { invokeSecret?: string };
@@ -429,34 +430,19 @@ async function refillTokens(params: {
   );
 }
 
-function getIsomorphicEnvVariable(variableName: string, env: any): string | undefined {
-  if (env) {
-    return env[variableName];
-  }
-
-  // @ts-expect-error We're checking for Deno env
-  if (typeof Deno !== "undefined" && Deno.env?.get) {
-    // @ts-expect-error We're checking for Deno env
-    return Deno.env.get(variableName);
-  } else if (typeof process !== "undefined" && process.env) {
-    return process.env[variableName];
-  }
-  return undefined;
-}
-
 export async function limiter(params: LimiterParams): Promise<LimiterHandlerResponse> {
   const { success, data: parsedParams, error } = outputLimiterParamsSchema.safeParse(params);
 
   if (!success) {
-    const commonParams = {
-      result: "error",
+    const res = {
+      result: "error" as const,
       status: 400,
-      error: "INVALID_PARAMS",
+      error: "INVALID_PARAMS" as const,
       message: error.message,
       timeLeft: null,
-    } as const;
+    };
 
-    return commonParams;
+    return res;
   }
 
   if (
@@ -465,17 +451,17 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
     parsedParams.req.invokeSecret !==
       getIsomorphicEnvVariable("BORROW_LIMITER_INVOKE_SECRET", parsedParams.env)
   ) {
-    const commonParams = {
-      result: "error",
+    const res = {
+      result: "error" as const,
       status: 401,
-      error: "UNAUTHORIZED",
+      error: "UNAUTHORIZED" as const,
       message: "Invalid invoke secret.",
       timeLeft: null,
-    } as const;
+    };
 
     const beforeResponse = parsedParams.hooks.beforeResponse;
-    await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
-    return commonParams;
+    await isomorphicExecute(beforeResponse(res), parsedParams.backgroundExecute);
+    return res;
   }
 
   if (parsedParams.req.action === "refillTokens") {
@@ -486,17 +472,17 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
       storage,
     });
 
-    const commonParams = {
-      result: "success",
+    const res = {
+      result: "success" as const,
       status: 200,
       message: "Tokens refilled successfully.",
       timeLeft: null,
-    } as const;
+    };
 
     const beforeResponse = parsedParams.hooks.beforeResponse;
-    await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
+    await isomorphicExecute(beforeResponse(res), parsedParams.backgroundExecute);
 
-    return commonParams;
+    return res;
   }
 
   const result: (
@@ -600,29 +586,29 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
   if (passedLimiters < parsedParams.req.limiters.length) {
     const failedLimiters = parsedParams.req.limiters.length - passedLimiters;
     const message = `${failedLimiters} Limiter${failedLimiters === 1 ? "" : "s"} did not pass.`;
-    const commonParams = {
-      result: "limited",
+    const res = {
+      result: "limited" as const,
       message,
       timeLeft,
       status: 200,
       ...(typeof tokensLeft === "number" ? { tokensLeft } : {}),
-    } as const;
+    };
 
     const beforeResponse = parsedParams.hooks.beforeResponse;
-    await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
-    return commonParams;
+    await isomorphicExecute(beforeResponse(res), parsedParams.backgroundExecute);
+    return res;
   }
 
   const message = `Every limiter passed (${parsedParams.req.limiters.length}).`;
-  const commonParams = {
-    result: "success",
+  const res = {
+    result: "success" as const,
     status: 200,
     message,
     timeLeft: null,
     tokensLeft,
-  } as const;
+  };
 
   const beforeResponse = parsedParams.hooks.beforeResponse;
-  await isomorphicExecute(beforeResponse(commonParams), parsedParams.backgroundExecute);
-  return commonParams;
+  await isomorphicExecute(beforeResponse(res), parsedParams.backgroundExecute);
+  return res;
 }

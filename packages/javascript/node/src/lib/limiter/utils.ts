@@ -51,9 +51,7 @@ export function handleErrorResponse<T extends Limiters>(
   };
 
   // Add tokensLeft property if we have token limiters
-  // Convert limiters to array and check if any are token limiters
-  const limitersArray = Array.isArray(limiters) ? limiters : [limiters];
-  if (isTokenLimiterArray(limitersArray as readonly AnyLimiter[])) {
+  if (isTokenLimiterArray(limiters)) {
     return {
       ...baseResponse,
       tokensLeft: 0, // Use 0 as default when an error occurs
