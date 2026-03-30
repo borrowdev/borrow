@@ -1,4 +1,5 @@
 import { BorrowClient, borrow } from "@/lib/client";
+import { describe, expect, beforeEach, test, vi } from "vitest";
 
 describe("BorrowClient", () => {
   const secret = "test_secret";

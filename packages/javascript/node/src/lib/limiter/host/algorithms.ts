@@ -168,7 +168,6 @@ export async function token(params: {
   timeLeft: number | null;
   tokensLeft: number | null;
 }> {
-  const promises = [];
   const currentWindow = getCurrentWindow(Date.now() / 1000, params.limiter.interval);
 
   const { requests: userRequests, ...userDataNoRequest } = params.userData;
@@ -193,6 +192,7 @@ export async function token(params: {
     newLastWindow = currentWindow;
   }
 
+  let promise: Promise<void> | null = null;
   // Check if there are enough available tokens in the bucket.
   // In this table design, "newRequests" represents how many tokens have been consumed,
   // so available tokens = maxTokens - newRequests.
@@ -203,21 +203,19 @@ export async function token(params: {
     timeLeft = timeLeft < 0 ? 0 : timeLeft;
   } else {
     const currentTokens = newRequests! + tokensCost;
-    promises.push(
-      params.storage.storeUserData({
-        key: params.key,
-        userId: params.userId,
-        amount: currentTokens,
-        type: "exact",
-        limiterType: params.limiter.type,
-        adapters: params.adapters,
-        userData: {
-          ...userDataNoRequest,
-          lastWindow: newLastWindow,
-          maxTokens: maxTokens,
-        },
-      }),
-    );
+    promise = params.storage.storeUserData({
+      key: params.key,
+      userId: params.userId,
+      amount: currentTokens,
+      type: "exact",
+      limiterType: params.limiter.type,
+      adapters: params.adapters,
+      userData: {
+        ...userDataNoRequest,
+        lastWindow: newLastWindow,
+        maxTokens: maxTokens,
+      },
+    });
 
     timeLeft = maxTokens - Math.abs(currentTokens);
     tokensLeft = timeLeft;
@@ -228,7 +226,9 @@ export async function token(params: {
     success = true;
   }
 
-  await isomorphicExecute(Promise.all(promises), params.backgroundExecute);
+  if (promise) {
+    await isomorphicExecute(promise, params.backgroundExecute);
+  }
 
   return {
     success,

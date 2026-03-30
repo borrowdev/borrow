@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext"
+  },
+  "include": ["worker-configuration.d.ts", "src/**/*.ts"]
+}

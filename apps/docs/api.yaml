@@ -208,7 +208,7 @@ components:
           type: string
         error:
           type: string
-          enum: [UNAUTHORIZED, QUOTA_REACHED, INVALID_PARAMETERS, MISSING_PARAMETERS]
+          enum: [UNAUTHORIZED, QUOTA_REACHED, INVALID_PARAMETERS]
           nullable: true
 
     LimitedResult:

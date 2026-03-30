@@ -1,0 +1,6 @@
+{
+  "name": "borrow-limiter-test",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-31",
+  "compatibility_flags": ["nodejs_compat"],
+}

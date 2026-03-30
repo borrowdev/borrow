@@ -155,10 +155,6 @@ const storage = {
       return fallbackUserData;
     }
 
-    if (typeof userData.lastWindow === "string") {
-      userData.lastWindow = parseFloat(userData.lastWindow);
-    }
-
     return userData;
   },
 
@@ -302,14 +298,14 @@ const inputLimiterParamsSchema = z.object({
    * background. When using serverless functions, this is usually a variation of
    * `waitUntil`, but may be called something else. For example, in Supabase
    * Edge Functions, this is `EdgeRuntime.waitUntil`. If you want to update the
-   * request counter synchronously, you can provide this parameter with
-   * `false`.
-   *
+   * request counter synchronously, you can set this parameter to `false`.
    * @default false
    */
   backgroundExecute: z
     .union([
-      z.function({ input: z.tuple([z.promise(z.any())]), output: z.void() }),
+      // Unfortunately promises are currently deprecated in Zod V4, it also breaks our code if we try to enforce
+      // promises as input (likely related to the lack of maintainance due to deprecation).
+      z.function({ input: z.any(), output: z.void() }),
       z.literal(false),
     ])
     .optional(),
@@ -565,7 +561,6 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
                     storage,
                   })
                 : null;
-
       return result;
     }),
   );
@@ -582,7 +577,6 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
   const tokensLeft =
     tokensLeftArray.length > 0 ? parseInt(getBiggest(tokensLeftArray).toFixed(2)) : null;
   const passedLimiters = result.filter((r) => r && r.success).length;
-
   if (passedLimiters < parsedParams.req.limiters.length) {
     const failedLimiters = parsedParams.req.limiters.length - passedLimiters;
     const message = `${failedLimiters} Limiter${failedLimiters === 1 ? "" : "s"} did not pass.`;
@@ -593,7 +587,6 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
       status: 200,
       ...(typeof tokensLeft === "number" ? { tokensLeft } : {}),
     };
-
     const beforeResponse = parsedParams.hooks.beforeResponse;
     await isomorphicExecute(beforeResponse(res), parsedParams.backgroundExecute);
     return res;
@@ -607,7 +600,6 @@ export async function limiter(params: LimiterParams): Promise<LimiterHandlerResp
     timeLeft: null,
     tokensLeft,
   };
-
   const beforeResponse = parsedParams.hooks.beforeResponse;
   await isomorphicExecute(beforeResponse(res), parsedParams.backgroundExecute);
   return res;

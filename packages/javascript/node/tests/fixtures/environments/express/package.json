@@ -1,0 +1,18 @@
+{
+  "name": "express",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Express.js environment for testing the Borrow Limiter",
+  "license": "MIT",
+  "author": "Lorenzo Bloedow",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@borrowdev/node": "workspace:*",
+    "express": "catalog:"
+  },
+  "devDependencies": {
+    "@types/express": "catalog:"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

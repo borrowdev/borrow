@@ -5,7 +5,8 @@
     "rootDir": ".",
     "outDir": "dist",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "~/*": ["./*"]
     }
   },
   "include": ["src/**/*.ts", "tests/**/*.ts", "./package.json"]

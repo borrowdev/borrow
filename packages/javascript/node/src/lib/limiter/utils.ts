@@ -27,27 +27,36 @@ export function isTokenLimiterArray<T extends readonly AnyLimiter[]>(
 }
 
 /**
- * Handles error responses based on limiter types and bypass setting. Throws
- * errors when bypass is false, otherwise returns a success response.
+ * Handles error responses based on limiter types and bypass setting.
+ *
+ * Bypass should never be true for "invalid parameter" errors.
  */
 export function handleErrorResponse<T extends Limiters>(
-  error: any,
+  error: {
+    message: string;
+    code: ErrorCode;
+  },
   limiters: T,
   bypass = true,
-): LimiterResult<T, true> {
-  const errorCode = error?.error || error?.code || "UNKNOWN_ERROR";
+): LimiterResult<T, boolean> {
+  const errorCode = error?.code ?? "UNKNOWN_ERROR";
   const errorMessage = error?.message || "An unknown error occurred";
 
-  // Throw error if bypass is false
-  if (!bypass) {
-    throw new LimiterError(errorMessage, errorCode);
+  if (!bypass || errorCode === "INVALID_PARAMETERS") {
+    return {
+      success: false,
+      message: errorMessage,
+      code: errorCode,
+      timeLeft: null,
+      ...(isTokenLimiterArray(limiters) ? { tokensLeft: 0 } : {}),
+    } as LimiterResult<T, false>;
   }
 
   // Create a success response for error bypass case
   const baseResponse = {
     success: true,
     timeLeft: null,
-    message: errorMessage || "Error bypassed",
+    message: errorMessage,
   };
 
   // Add tokensLeft property if we have token limiters

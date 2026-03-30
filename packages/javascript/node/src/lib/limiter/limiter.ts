@@ -1,5 +1,12 @@
 import borrow, { BorrowClient } from "@/lib/client";
-import { Limiters, LimiterResult, Params, LimiterParams, AnyLimiter } from "@/lib/limiter/types";
+import {
+  Limiters,
+  LimiterResult,
+  Params,
+  LimiterParams,
+  AnyLimiter,
+  ErrorCode,
+} from "@/lib/limiter/types";
 import {
   handleErrorResponse,
   isTokenLimiterArray,
@@ -8,10 +15,6 @@ import {
   LimiterError,
 } from "@/lib/limiter/utils";
 import { getSupabaseRequestInfo } from "@/lib/utils";
-
-const failBehaviorString = {
-  bypass: "Bypassing this error since failBehavior is set to 'bypass'.",
-};
 
 // Helper function to check if an object is a params object
 function isParamsObject(obj: any): obj is Params<Limiters> {
@@ -65,7 +68,7 @@ function limiter<T extends Limiters>(params: Params<T>): Promise<LimiterResult<T
 /**
  * Checks the rate limit with an ID.
  *
- * @param {string} id - The unique identifier used to scope the limiter.
+ * @param {string | null} id - The unique identifier used to scope the limiter.
  * @param {Params<T>} params - The parameters object containing all limiter
  *   configuration.
  * @returns {LimiterResultPromise<T, R>}
@@ -73,7 +76,7 @@ function limiter<T extends Limiters>(params: Params<T>): Promise<LimiterResult<T
  *   "fail".
  */
 function limiter<T extends Limiters>(
-  id: string,
+  id: string | null,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
@@ -89,7 +92,7 @@ function limiter<T extends Limiters>(
  *   "fail".
  */
 function limiter<T extends Limiters>(
-  userIdentifier: string,
+  userIdentifier: string | null,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
@@ -105,14 +108,14 @@ function limiter<T extends Limiters>(
  *   "fail".
  */
 function limiter<T extends Limiters>(
-  supabaseRequest: Request,
+  supabaseRequest: Request | null,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 /**
- * Checks the rate limit with an ID and userIdentifier.
+ * Checks the rate limit with an `id` and `userIdentifier`.
  *
- * @param {string} id - The unique identifier used to scope the limiter.
+ * @param {string | null} id - The unique identifier used to scope the limiter.
  * @param {string | Request} userIdentifier - A unique user identifier (e.g.,
  *   user ID, email) or a Supabase Request object.
  * @param {Params<T>} params - The parameters object containing all limiter
@@ -122,13 +125,13 @@ function limiter<T extends Limiters>(
  *   "fail".
  */
 function limiter<T extends Limiters>(
-  id: string,
+  id: string | null,
   userIdentifier: string | Request,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 async function limiter<T extends Limiters>(
-  arg0: string | Request | Params<T>,
+  arg0: string | Request | Params<T> | null,
   arg1?: string | Request | Params<T>,
   arg2?: Params<T>,
 ): Promise<LimiterResult<T, boolean>> {
@@ -141,7 +144,11 @@ async function limiter<T extends Limiters>(
     finalParams = arg0;
   }
   // Case 2: limiter(id, params)
-  else if (typeof arg0 === "string" && typeof arg1 === "object" && isParamsObject(arg1)) {
+  else if (
+    (typeof arg0 === "string" || arg0 === null) &&
+    typeof arg1 === "object" &&
+    isParamsObject(arg1)
+  ) {
     finalParams = { ...arg1, id: arg0 };
   }
   // Case 3: limiter(userIdentifier, params)
@@ -154,7 +161,7 @@ async function limiter<T extends Limiters>(
   }
   // Case 4: limiter(id, userIdentifier, params)
   else if (
-    typeof arg0 === "string" &&
+    (typeof arg0 === "string" || arg0 === null) &&
     (typeof arg1 === "string" || arg1 instanceof Request) &&
     typeof arg2 === "object"
   ) {
@@ -169,7 +176,9 @@ async function limiter<T extends Limiters>(
   let finalUserIdentifier: string | null = null;
   let urlAsId: string | undefined;
 
-  if (params.userIdentifier instanceof Request) {
+  if (typeof params.userIdentifier === "string") {
+    finalUserIdentifier = params.userIdentifier;
+  } else if (params.userIdentifier instanceof Request) {
     const requestInfo = await getSupabaseRequestInfo(params.userIdentifier, params.options?.debug);
 
     // If we got a user ID from the request, use that as the user identifier
@@ -194,35 +203,17 @@ async function limiter<T extends Limiters>(
   // Use request URL as ID if no explicit ID was provided and URL is available
   const limiterKey = params.id || urlAsId;
 
-  // If we don't have a user identifier or a limiter ID, we can't proceed
-  if (!finalUserIdentifier && !limiterKey) {
-    if (params.options?.debug) {
-      console.warn("No user identifier or limiter ID available.");
-    }
-    const bypassErrors = params.options?.failBehavior !== "fail";
-
-    return handleErrorResponse(
-      {
-        message: "No user identifier or limiter ID found. " + failBehaviorString.bypass,
-        code: "MISSING_PARAMETERS",
-      },
-      params.limiters as T,
-      bypassErrors,
-    );
-  }
-
-  // Choose the correct Borrow client.
-  const borrowClient =
-    params.options?.apiKey || params.options?.endpoint
-      ? new BorrowClient(params.options.apiKey, params.options.endpoint?.baseUrl)
-      : borrow;
-
   try {
+    // Choose the correct Borrow client.
+    const borrowClient =
+      params.options?.apiKey || params.options?.endpoint
+        ? new BorrowClient(params.options.apiKey, params.options.endpoint?.baseUrl)
+        : borrow;
+
     // Format limiters according to API spec with 'type' field
     // Convert the Limiters type to an array for mapping
     const limitersArray = Array.isArray(params.limiters) ? params.limiters : [params.limiters];
 
-    // Use type assertion to tell TypeScript this is an array of AnyLimiter
     const formattedLimiters = (limitersArray as AnyLimiter[]).map((limiter) => {
       const type = limiter.type;
 
@@ -260,7 +251,7 @@ async function limiter<T extends Limiters>(
 
     const response = await borrowClient.post(params.options?.endpoint?.path || "/limiter", {
       body: JSON.stringify({
-        key: limiterKey,
+        key: limiterKey ?? null,
         userId: finalUserIdentifier,
         limiters: formattedLimiters,
         action: "check",
@@ -270,6 +261,7 @@ async function limiter<T extends Limiters>(
     const data = (await response.json()) as {
       result: "success" | "limited" | "error";
       message: string;
+      code?: ErrorCode;
       timeLeft?: number | null;
       tokensLeft?: number | null;
     };
@@ -313,7 +305,7 @@ async function limiter<T extends Limiters>(
       return handleErrorResponse(
         {
           message: errorMessage,
-          code: "LIMITER_ERROR",
+          code: data.code!,
         },
         params.limiters as T,
         bypassErrors,

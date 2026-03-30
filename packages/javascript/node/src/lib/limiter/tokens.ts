@@ -2,18 +2,18 @@ import borrow, { BorrowClient } from "@/lib/client";
 import { CommonLimiterOptions } from "./types";
 
 /** Key interface for refill tokens */
-interface Key {
+export interface Key {
   /** The unique identifier used to scope the limiter. */
-  key?: string;
+  key: string | null;
 
   /** A unique user identifier (e.g., user ID or email). */
-  userId?: string;
+  userId: string | null;
 }
 
 // Function to validate a key
 function validateKey(key: Key): boolean {
   if (!key.key && !key.userId) {
-    throw new Error("At least one of 'id' or 'userId' must be provided");
+    throw new Error("At least one of 'key' or 'userId' must be provided");
   }
   return true;
 }
@@ -37,14 +37,14 @@ type RefillTokensResponse = {
  *   operation.
  */
 export function refillTokens(
-  isGlobal: boolean,
+  isGlobal: true,
   options?: RefillTokensOptions,
 ): Promise<RefillTokensResponse>;
 
 /**
  * Refills tokens for a specific key.
  *
- * @param {Key} key - Object containing either id or userId, or both.
+ * @param {Key} key - Object containing either key or userId, or both.
  * @param {RefillTokensOptions} [options] - Optional settings.
  * @returns {Promise<RefillTokensResponse>} - The result of the refill
  *   operation.
@@ -57,7 +57,7 @@ export function refillTokens(
 /**
  * Refills tokens for multiple keys.
  *
- * @param {Key[]} keys - Array of objects containing either id or userId, or
+ * @param {Key[]} keys - Array of objects containing either key or userId, or
  *   both.
  * @param {RefillTokensOptions} [options] - Optional settings.
  * @returns {Promise<RefillTokensResponse>} - The result of the refill
@@ -76,7 +76,9 @@ export async function refillTokens(
   const options = arg1 || {};
 
   // Choose the correct Borrow client
-  const borrowClient = options?.apiKey ? new BorrowClient(options.apiKey) : borrow;
+  const borrowClient = options?.apiKey
+    ? new BorrowClient(options.apiKey, options.endpoint?.baseUrl)
+    : borrow;
 
   try {
     // Prepare request body based on input
@@ -106,7 +108,7 @@ export async function refillTokens(
     }
 
     // Make the API call
-    const response = await borrowClient.post("/limiter", {
+    const response = await borrowClient.post(options.endpoint?.path ?? "/limiter", {
       body: JSON.stringify(requestBody),
     });
 

@@ -2,6 +2,7 @@ packages:
   - apps/*
   - packages/**
 catalog:
+  "@cloudflare/vitest-pool-workers": ^0.14.0
   "@fontsource-variable/jetbrains-mono": ^5.2.8
   "@fontsource-variable/raleway": ^5.2.8
   "@opennextjs/cloudflare": ^1.18.0
@@ -9,12 +10,15 @@ catalog:
   "@tabler/icons-react": ^3.40.0
   "@tailwindcss/postcss": "^4.2.2"
   "@takumi-rs/image-response": ^0.73.1
+  "@types/express": ^5.0.6
   "@types/mdx": ^2.0.13
   "@types/node": "^25.5.0"
   "@types/react": "19.2.14"
   "@types/react-dom": "19.2.3"
   "@upstash/redis": "^1.37.0"
   "@vitest/coverage-v8": "^4.1.2"
+  dotenv: ^17.3.1
+  express: ^5.2.1
   fast-check: "^4.6.0"
   fumadocs-core: ^16.7.6
   fumadocs-docgen: ^3.0.8
@@ -22,6 +26,8 @@ catalog:
   fumadocs-openapi: ^10.5.0
   fumadocs-ui: ^16.7.6
   lucide-react: ^1.7.0
+  mockttp: ^4.3.0
+  msw: ^2.12.14
   next: "^16.2.1"
   oxfmt: ^0.42.0
   postcss: "^8.5.8"

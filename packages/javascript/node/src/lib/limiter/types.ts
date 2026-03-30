@@ -117,9 +117,11 @@ export interface CommonLimiterOptions {
   };
 
   /**
-   * Determines what happens when the API call fails (e.g: network failure,
-   * quota reached, incorrect parameters, etc): "fail" treats it as a failed
-   * check, "bypass" treats it as a successful check.
+   * Determines what happens when the API call fails for network failure or insufficient quota.
+   *
+   * "fail": treats it as a failed check.
+   *
+   * "bypass": treats it as a successful check.
    *
    * @default "bypass"
    */
@@ -162,11 +164,7 @@ export type LimiterParams<T extends Limiters> = {
 };
 
 /** Common error codes */
-export type ErrorCode =
-  | "UNAUTHORIZED"
-  | "QUOTA_REACHED"
-  | "INVALID_PARAMETERS"
-  | "MISSING_PARAMETERS";
+export type ErrorCode = "UNAUTHORIZED" | "QUOTA_REACHED" | "INVALID_PARAMETERS";
 
 interface BaseLimiterResult {
   success: boolean;
@@ -180,7 +178,8 @@ interface SuccessLimiterResult extends BaseLimiterResult {
 
 interface FailureLimiterResult extends BaseLimiterResult {
   success: false;
-  timeLeft: number;
+  code: ErrorCode;
+  timeLeft: number | null;
 }
 
 interface TokenLimiterResultFields {

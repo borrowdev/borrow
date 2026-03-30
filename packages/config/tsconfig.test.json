@@ -1,6 +1,6 @@
 {
   "extends": "@borrowdev/config/tsconfig.node.json",
   "compilerOptions": {
-    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"]
+    "types": ["vitest/importMeta", "vite/client", "node", "vitest"]
   }
 }
