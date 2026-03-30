@@ -1,8 +1,8 @@
 import { Redis } from "@upstash/redis";
 import fc from "fast-check";
 
-import { UpstashRedisAdapter } from "./adapters/storage/redis/UpstashRedisAdapter";
-import { limiter } from "./limiter";
+import { UpstashRedisAdapter } from "@/lib/limiter/host/adapters/storage/redis/UpstashRedisAdapter";
+import { limiter } from "@/lib/limiter/host/limiter";
 
 vi.mock("@upstash/redis", () => {
   class MockRedis {

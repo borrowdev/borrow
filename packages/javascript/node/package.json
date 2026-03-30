@@ -25,7 +25,7 @@
     }
   },
   "scripts": {
-    "build": "tsdown && tsc -p tsconfig.lib.json --noEmit",
+    "build": "tsdown && tsc --noEmit",
     "test": "vp test run"
   },
   "dependencies": {

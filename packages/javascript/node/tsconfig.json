@@ -1,10 +1,12 @@
 {
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
+  "extends": ["@borrowdev/config/tsconfig.node.json", "@borrowdev/config/tsconfig.test.json"],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
     }
-  ]
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts", "./package.json"]
 }

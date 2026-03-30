@@ -1,7 +1,6 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  tsconfig: "./tsconfig.lib.json",
   entry: {
     main: "./src/index.ts",
     limiterHost: "./src/lib/limiter/host/index.ts",

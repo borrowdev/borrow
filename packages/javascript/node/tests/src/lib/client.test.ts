@@ -1,4 +1,4 @@
-import { BorrowClient, borrow } from "./client";
+import { BorrowClient, borrow } from "@/lib/client";
 
 describe("BorrowClient", () => {
   const secret = "test_secret";
