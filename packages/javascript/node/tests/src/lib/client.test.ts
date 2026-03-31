@@ -1,39 +1,39 @@
 import { BorrowClient, borrow } from "@/lib/client";
-import { describe, expect, beforeEach, test, vi } from "vitest";
+import { describe, expect, test, vi, beforeAll } from "vitest";
 
 describe("BorrowClient", () => {
   const secret = "test_secret";
 
-  beforeEach(() => {
+  beforeAll(() => {
     vi.stubEnv("BORROW_API_KEY", secret);
   });
 
-  test("should export a singleton", () => {
+  test.concurrent("should export a singleton", () => {
     const client = new BorrowClient();
     expect(borrow).toBeInstanceOf(BorrowClient);
     expect(borrow).not.toBe(client);
   });
 
-  test("should create a new instance every time the class is instantiated", () => {
+  test.concurrent("should create a new instance every time the class is instantiated", () => {
     const newClient = new BorrowClient();
     const client = new BorrowClient();
     expect(newClient).toBeInstanceOf(BorrowClient);
     expect(newClient).not.toBe(client);
   });
 
-  test("should detect secret from environment variable", () => {
+  test.concurrent("should detect secret from environment variable", () => {
     const client = new BorrowClient();
     expect(client.apiKey).toEqual(secret);
     expect(borrow.apiKey).toEqual(secret);
   });
 
-  test("should detect endpoint from constructor", () => {
+  test.concurrent("should detect endpoint from constructor", () => {
     const customEndpoint = "https://custom-endpoint.com/api/v1";
     const client = new BorrowClient(undefined, customEndpoint);
     expect(client.endpoint).toEqual(customEndpoint);
   });
 
-  test("should prioritize secret from constructor", () => {
+  test.concurrent("should prioritize secret from constructor", () => {
     const constructorSecret = "constructor_secret";
     const client = new BorrowClient(constructorSecret);
     expect(client.apiKey).toEqual(constructorSecret);
