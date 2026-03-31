@@ -3,6 +3,9 @@ packages:
   - packages/**
 catalog:
   "@cloudflare/vitest-pool-workers": ^0.14.0
+  "@commitlint/cli": ^20.5.0
+  "@commitlint/config-conventional": ^20.5.0
+  "@commitlint/types": ^20.5.0
   "@fontsource-variable/jetbrains-mono": ^5.2.8
   "@fontsource-variable/raleway": ^5.2.8
   "@opennextjs/cloudflare": ^1.18.0

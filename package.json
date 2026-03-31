@@ -5,10 +5,14 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "prepare": "vp config"
+    "prepare": "vp config",
+    "lint:commit": "commitlint --edit"
   },
   "devDependencies": {
     "@borrowdev/config": "workspace:*",
+    "@commitlint/cli": "catalog:",
+    "@commitlint/config-conventional": "catalog:",
+    "@commitlint/types": "catalog:",
     "vite-plus": "catalog:"
   },
   "engines": {
