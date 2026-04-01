@@ -1,6 +1,6 @@
 import express from "express";
 import type { Express } from "express";
-import { limiter, UpstashRedisAdapter } from "@borrowdev/node/limiter/host";
+import { limiter, UpstashRedisAdapter } from "@borrowdev/limiter/limiter/host";
 import { Redis } from "@upstash/redis";
 import config from "~/tests/fixtures/environments/config";
 

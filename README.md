@@ -33,9 +33,9 @@ Self-hostable rate limiting API for protecting regular service usage.
 Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```javascript
-import { borrow } from "@borrowdev/node";
+import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await borrow.limiter(
+const { success, timeLeft } = await limiter(
   {
     key: "my-limiter-id",
     userId: "current-user-id",

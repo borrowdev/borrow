@@ -17,7 +17,7 @@ While we work on the documentation, you can use this example as the basis for ru
 ### 1. Install Dependencies
 
 ```npm
-npm install @borrowdev/node @upstash/redis
+npm install @borrowdev/limiter @upstash/redis
 ```
 
 ### 2. Configure wrangler.jsonc
@@ -50,7 +50,7 @@ UPSTASH_REDIS_REST_URL="https://your-upstash-redis-url"
 ### 4. Create the src/index.ts file
 
 ```ts ts2js
-import { limiter, UpstashRedisAdapter } from "@borrowdev/node/limiter/host";
+import { limiter, UpstashRedisAdapter } from "@borrowdev/limiter/limiter/host";
 import { Redis } from "@upstash/redis/cloudflare";
 
 export default {
@@ -101,7 +101,7 @@ export default {
 Now you can call the Limiter API by using our client library or by making an HTTP request.
 
 ```ts ts2js
-import borrow from "@borrowdev/node";
+import borrow from "@borrowdev/limiter";
 
 const { success, timeLeft } = await borrow.limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
@@ -141,7 +141,7 @@ If you want to use a different database than Upstash Redis, you can write your o
 You just need to extend the `StorageAdapter` class and implement the required methods.
 
 ```ts ts2js
-import { StorageAdapter } from "@borrowdev/node/limiter/host";
+import { StorageAdapter } from "@borrowdev/limiter/limiter/host";
 
 class MyCustomAdapter extends StorageAdapter {
   private db: DbType;

@@ -4,7 +4,7 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/javascript/node"
+      "path": "./packages/limiter"
     },
     {
       "path": "./apps/docs"

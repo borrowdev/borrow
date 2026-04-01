@@ -21,7 +21,7 @@ class BorrowClient {
       typeof Deno !== "object"
     ) {
       console.warn(
-        "@borrowdev/node should NOT be used in a browser environment, you might end up exposing your secret token!",
+        "@borrowdev/limiter should NOT be used in a browser environment, you might end up exposing your secret token!",
       );
     }
 

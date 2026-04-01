@@ -1,7 +1,7 @@
 # Borrow Node.js SDK
 
 <div align="center">
-  <a href="https://www.npmjs.com/package/@borrowdev/node"><img src="https://img.shields.io/npm/v/@borrowdev/node" alt="NPM version"></a>
+  <a href="https://www.npmjs.com/package/@borrowdev/limiter"><img src="https://img.shields.io/npm/v/@borrowdev/limiter" alt="NPM version"></a>
   <a href="https://github.com/borrowdev/borrow/blob/main/LICENSE"><img src="https://img.shields.io/github/license/borrowdev/borrow" alt="License"></a>
 </div>
 
@@ -17,16 +17,16 @@
 
 ```bash
 # npm
-npm install @borrowdev/node
+npm install @borrowdev/limiter
 
 # pnpm
-pnpm add @borrowdev/node
+pnpm add @borrowdev/limiter
 
 # yarn
-yarn add @borrowdev/node
+yarn add @borrowdev/limiter
 
 # bun
-bun add @borrowdev/node
+bun add @borrowdev/limiter
 ```
 
 ## Authentication
@@ -38,7 +38,7 @@ bun add @borrowdev/node
 Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```javascript
-import borrow from "@borrowdev/node";
+import borrow from "@borrowdev/limiter";
 
 const { success, timeLeft } = await borrow.limiter(
   {

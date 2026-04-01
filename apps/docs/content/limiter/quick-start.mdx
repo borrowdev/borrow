@@ -31,7 +31,7 @@ Follow these steps to get your API key and start using Borrow Limiter:
 Install the Borrow Node.js package using your preferred package manager:
 
 ```npm
-npm install @borrowdev/node
+npm install @borrowdev/limiter
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ npm install @borrowdev/node
 Let's use the [fixed window](/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```ts ts2js
-import borrow from "@borrowdev/node";
+import borrow from "@borrowdev/limiter";
 
 const { success, timeLeft } = await borrow.limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
@@ -71,7 +71,7 @@ if (!success) {
 Let's use the [sliding window](/limiter/algorithms#sliding-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```ts ts2js
-import borrow from "@borrowdev/node";
+import borrow from "@borrowdev/limiter";
 
 const { success, timeLeft } = await borrow.limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
@@ -100,7 +100,7 @@ if (!success) {
 Let's use the [token bucket](/limiter/algorithms#token-bucket) algorithm to rate limit requests to 10 tokens per minute, with a maximum of 20 tokens.
 
 ```ts ts2js
-import borrow from "@borrowdev/node";
+import borrow from "@borrowdev/limiter";
 
 const { success, timeLeft } = await borrow.limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
@@ -137,7 +137,7 @@ await borrow.limiter.tokens.refill({
 Let's use the [borrow](/limiter/algorithms#borrow) algorithm to rate limit requests to one request at a time.
 
 ```ts ts2js
-import borrow from "@borrowdev/node";
+import borrow from "@borrowdev/limiter";
 
 const { success, timeLeft } = await borrow.limiter(
   { key: "my-limiter-id", userId: "current-user-id" },

@@ -1,5 +1,5 @@
 {
-  "name": "@borrowdev/node",
+  "name": "@borrowdev/limiter",
   "version": "1.2.0",
   "private": false,
   "description": "Borrow.dev: Open-Source Tools for Web Developers",
@@ -40,16 +40,16 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "catalog:",
-    "@typescript/native-preview": "catalog:",
     "@upstash/redis": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@borrowdev/config": "workspace:*",
-    "@borrowdev/node": "workspace:*",
+    "@borrowdev/limiter": "workspace:*",
     "@cloudflare/vitest-pool-workers": "catalog:",
     "@types/express": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native-preview": "catalog:",
     "express": "catalog:",
     "fast-check": "catalog:",
     "msw": "catalog:",
