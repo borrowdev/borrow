@@ -40,15 +40,18 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
       - uses: actions/checkout@v5
+        if: ${{ steps.release.outputs.releases_created }}
       - uses: pnpm/action-setup@v5
+        if: ${{ steps.release.outputs.releases_created }}
         with:
           version: 10.33.0
       - uses: voidzero-dev/setup-vp@v1
+        if: ${{ steps.release.outputs.releases_created }}
         with:
           cache: true
           run-install: true
       - name: Publish packages to NPM and JSR
-        if: ${{ steps.release.outputs.release_created }}
+        if: ${{ steps.release.outputs.releases_created }}
         run: vp run publish -r
   deploy-docs:
     runs-on: ubuntu-latest

@@ -1,7 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/refs/heads/main/schemas/config.json",
+  "draft": true,
   "packages": {
     "packages/javascript/node": {
+      "component": "@borrowdev/node",
       "release-type": "node",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
