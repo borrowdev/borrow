@@ -35,11 +35,12 @@
     }
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "test": "vp test"
   },
   "dependencies": {
     "@supabase/supabase-js": "catalog:",
+    "@typescript/native-preview": "catalog:",
     "@upstash/redis": "catalog:",
     "zod": "catalog:"
   },
@@ -53,7 +54,6 @@
     "fast-check": "catalog:",
     "msw": "catalog:",
     "publint": "catalog:",
-    "tsdown": "catalog:",
     "tslib": "catalog:",
     "type-fest": "catalog:",
     "typescript": "catalog:",

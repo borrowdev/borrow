@@ -4,7 +4,7 @@
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "lib": ["es2022"],
     "module": "esnext",
     "moduleResolution": "bundler",

@@ -2,6 +2,22 @@ import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  pack: {
+    entry: {
+      main: "./src/index.ts",
+      limiterHost: "./src/lib/limiter/host/index.ts",
+    },
+    dts: {
+      tsgo: true,
+    },
+    target: false,
+    minify: false,
+    treeshake: true,
+    unbundle: true,
+    exports: false,
+    publint: true,
+    format: "esm",
+  },
   test: {
     projects: [
       {

@@ -2,7 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "module": "preserve",
-    "isolatedDeclarations": true,
+    "isolatedDeclarations": false,
     "resolveJsonModule": true,
     "types": ["node"]
   }
