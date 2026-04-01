@@ -41,6 +41,7 @@
     "postinstall": "vp run cf-typegen"
   },
   "dependencies": {
+    "@borrowdev/data": "workspace:*",
     "@supabase/supabase-js": "catalog:",
     "@upstash/redis": "catalog:",
     "zod": "catalog:"
