@@ -2,6 +2,8 @@
   <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="600" height="300" />
 </p>
 
+<img style="margin-left: auto; margin-right: auto; display: block;" src="https://img.shields.io/github/actions/workflow/status/borrowdev/borrow/release.yml" alt="Release Status" />
+
 <h3 align="center">We automate the boring stuff for you</h3>
 
 <p align="center">
