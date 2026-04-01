@@ -6,6 +6,15 @@ icon: Rabbit
 
 # Quick Start
 
+<Callout title="Default fail behavior" type="warn">
+  By default, if the Borrow API is unreachable or returns an error (e.g. due to a network failure or
+  quota issue), the limiter resolves with `success: true` and **allows the request through**. This
+  is controlled by the `failBehavior` option, which defaults to `"bypass"`. If your use case
+  requires that requests are blocked whenever the limiter cannot be verified, set `failBehavior` to
+  `"fail"`: Note that `INVALID_PARAMETERS` errors always result in `success: false` regardless of
+  this setting.
+</Callout>
+
 ## Authentication
 
 Follow these steps to get your API key and start using Borrow Limiter:
