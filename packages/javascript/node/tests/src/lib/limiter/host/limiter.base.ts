@@ -56,7 +56,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       );
     });
 
-    it("should refill tokens globally if 'keys' is null", async ({ endpoint }) => {
+    it("should refill tokens globally if 'keys' is missing", async ({ endpoint }) => {
       const tokenLimiter = {
         type: "token",
         maxTokens: 157,
@@ -73,7 +73,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
       expect(a.tokensLeft).toBe(tokenLimiter.maxTokens - tokenLimiter.tokensCost);
 
-      const result = await borrow.limiter.tokens.refill(true, getCommonOptions(endpoint));
+      const result = await borrow.limiter.tokens.refill(getCommonOptions(endpoint));
       expect(result).toMatchObject({
         success: true,
       });

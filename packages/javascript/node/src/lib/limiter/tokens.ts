@@ -21,19 +21,14 @@ type RefillTokensResponse = {
 /**
  * Refills tokens for a global limiter.
  *
- * @param {boolean} isGlobal - If true, refills tokens for the global token
- *   limiter.
  * @param {RefillTokensOptions} [options] - Optional settings.
  * @returns {Promise<RefillTokensResponse>} - The result of the refill
  *   operation.
  */
-export function refillTokens(
-  isGlobal: true,
-  options?: RefillTokensOptions,
-): Promise<RefillTokensResponse>;
+export function refillTokens(options?: RefillTokensOptions): Promise<RefillTokensResponse>;
 
 /**
- * Refills tokens for a specific key.
+ * Refills tokens for a specific limiter.
  *
  * @param {Key} key - Object containing either key or userId, or both.
  * @param {RefillTokensOptions} [options] - Optional settings.
@@ -60,16 +55,11 @@ export function refillTokens(
 ): Promise<RefillTokensResponse>;
 
 export async function refillTokens(
-  arg0: boolean | Key | Key[],
+  arg0?: Key | Key[] | RefillTokensOptions,
   arg1?: RefillTokensOptions,
 ): Promise<RefillTokensResponse> {
   // Parse options
-  const options = arg1 || {};
-
-  // Choose the correct Borrow client
-  const borrowClient = options?.apiKey
-    ? new BorrowClient(options.apiKey, options.endpoint?.baseUrl)
-    : borrow;
+  let options = arg1 || {};
 
   try {
     // Prepare request body based on input
@@ -78,25 +68,31 @@ export async function refillTokens(
     };
 
     // Handle different argument patterns
-    if (typeof arg0 === "boolean") {
-      // Global refill case, no keys needed
-      requestBody.keys = null;
-    } else if (Array.isArray(arg0)) {
+    if (Array.isArray(arg0)) {
       // Array of keys
       const validatedKeys = arg0.map((key) => {
         validateKey(key);
         return key;
       });
       requestBody.keys = validatedKeys;
-    } else {
+    } else if (arg0 && typeof arg0 === "object" && "key" in arg0 && "userId" in arg0) {
       // Single key object
       validateKey(arg0);
       requestBody.keys = [arg0];
+    } else {
+      // No keys provided, will refill globally
+      options = (arg0 as RefillTokensOptions) ?? options;
+      requestBody.keys = null;
     }
 
     if (options?.debug) {
       console.info(`Refilling tokens with params:`, requestBody);
     }
+
+    // Choose the correct Borrow client
+    const borrowClient = options?.apiKey
+      ? new BorrowClient(options.apiKey, options.endpoint?.baseUrl)
+      : borrow;
 
     // Make the API call
     const response = await borrowClient.post(options.endpoint?.path ?? "/limiter", {
