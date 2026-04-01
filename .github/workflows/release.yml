@@ -53,7 +53,7 @@ jobs:
           run-install: true
       - name: Publish packages to NPM
         if: ${{ steps.release.outputs.releases_created == 'true' }}
-        run: pnpm publish --access public --provenance
+        run: vp run build && pnpm publish --access public --provenance
         working-directory: packages/javascript/node
   deploy-docs:
     runs-on: ubuntu-latest
