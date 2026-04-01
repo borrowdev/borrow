@@ -10,6 +10,16 @@ const limiter: typeof limiterInternal & { tokens: { refill: typeof refillTokens 
   });
 
 export type { LimiterError } from "@/lib/limiter/utils";
+export type {
+  Key,
+  AnyLimiter,
+  BorrowLimiter,
+  FixedLimiter,
+  SlidingLimiter,
+  TokenLimiter,
+  CommonLimiterOptions,
+  LimiterResult,
+} from "@/lib/limiter/types";
 export { limiter };
 
 const defaultExport: { limiter: typeof limiter } = {
