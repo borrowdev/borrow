@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/borrowdev/borrow/compare/@borrowdev/node-v1.1.0...@borrowdev/node-v1.2.0) (2026-04-01)
+
+
+### Features
+
+* Export Limiters TypeScript type ([336678d](https://github.com/borrowdev/borrow/commit/336678d804f1965470a033f7f9dca198ee9a07e4))
+
 ## [1.1.0](https://github.com/borrowdev/borrow/compare/@borrowdev/node-v1.0.0...@borrowdev/node-v1.1.0) (2026-04-01)
 
 
