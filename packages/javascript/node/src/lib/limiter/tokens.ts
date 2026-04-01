@@ -1,14 +1,5 @@
 import borrow, { BorrowClient } from "@/lib/client";
-import { CommonLimiterOptions } from "./types";
-
-/** Key interface for refill tokens */
-export interface Key {
-  /** The unique identifier used to scope the limiter. */
-  key: string | null;
-
-  /** A unique user identifier (e.g., user ID or email). */
-  userId: string | null;
-}
+import { CommonLimiterOptions, Key } from "./types";
 
 // Function to validate a key
 function validateKey(key: Key): boolean {

@@ -103,25 +103,28 @@ Now you can call the Limiter API by using our client library or by making an HTT
 ```ts ts2js
 import borrow from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      maxTokens: 20,
-      tokensCost: 5,
-      tokensPerReplenish: 10,
-      interval: "minute",
-      type: "token",
-    },
-  ],
-  options: {
-    // Use for testing or if you want to fail closed.
-    failBehavior: "fail",
-    apiKey: "random-secure-string",
-    endpoint: {
-      baseUrl: "http://localhost:8787",
+const { success, timeLeft } = await borrow.limiter(
+  { key: "my-limiter-id", userId: "current-user-id" },
+  {
+    limiters: [
+      {
+        maxTokens: 20,
+        tokensCost: 5,
+        tokensPerReplenish: 10,
+        interval: "minute",
+        type: "token",
+      },
+    ],
+    options: {
+      // Use for testing or if you want to fail closed.
+      failBehavior: "fail",
+      apiKey: "random-secure-string",
+      endpoint: {
+        baseUrl: "http://localhost:8787",
+      },
     },
   },
-});
+);
 if (!success) {
   return {
     message:

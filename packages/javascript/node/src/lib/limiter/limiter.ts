@@ -3,9 +3,10 @@ import {
   Limiters,
   LimiterResult,
   Params,
-  LimiterParams,
   AnyLimiter,
   ErrorCode,
+  ResolvedLimiterParams,
+  Key,
 } from "@/lib/limiter/types";
 import {
   handleErrorResponse,
@@ -16,22 +17,10 @@ import {
 } from "@/lib/limiter/utils";
 import { getSupabaseRequestInfo } from "@/lib/utils";
 
-// Helper function to check if an object is a params object
-function isParamsObject(obj: any): obj is Params<Limiters> {
-  // Check if it's a Request object first
-  if (obj instanceof Request) return false;
-
-  // Check if it has typical Params object properties
-  return typeof obj === "object" && obj !== null && ("limiters" in obj || "options" in obj);
-}
-
 /**
  * @typedef {Object} Params This type represents the parameters object for the
  *   limiter function, including:
  *
- *   - id: The unique identifier for the rate limiter.
- *   - userIdentifier: Either a unique user identifier (string) or a Supabase
- *     Request object.
  *   - limiters: A limiter object (or array of them) where each includes a 'type'
  *     field and type-specific properties:
  *
@@ -66,9 +55,10 @@ function isParamsObject(obj: any): obj is Params<Limiters> {
 function limiter<T extends Limiters>(params: Params<T>): Promise<LimiterResult<T, boolean>>;
 
 /**
- * Checks the rate limit with an ID.
+ * Checks the rate limit for the given key and/or userId.
  *
- * @param {string | null} id - The unique identifier used to scope the limiter.
+ * @param {Key} key - Object containing `key` and/or `userId` to scope the
+ *   limiter.
  * @param {Params<T>} params - The parameters object containing all limiter
  *   configuration.
  * @returns {LimiterResultPromise<T, R>}
@@ -76,23 +66,7 @@ function limiter<T extends Limiters>(params: Params<T>): Promise<LimiterResult<T
  *   "fail".
  */
 function limiter<T extends Limiters>(
-  id: string | null,
-  params: Params<T>,
-): Promise<LimiterResult<T, boolean>>;
-
-/**
- * Checks the rate limit with a userIdentifier.
- *
- * @param {string | Request} userIdentifier - A unique user identifier (e.g.:
- *   user ID, email).
- * @param {Params<T>} params - The parameters object containing all limiter
- *   configuration.
- * @returns {LimiterResultPromise<T, R>}
- * @throws {LimiterError} - If the request fails and failBehavior is set to
- *   "fail".
- */
-function limiter<T extends Limiters>(
-  userIdentifier: string | null,
+  key: Key,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
@@ -100,7 +74,7 @@ function limiter<T extends Limiters>(
  * Checks the rate limit linked to this Supabase edge function endpoint and user
  * identifier who made the request.
  *
- * @param {string | Request} request - A Supabase Request object.
+ * @param {Request} request - A Supabase Request object.
  * @param {Params<T>} params - The parameters object containing all limiter
  *   configuration.
  * @returns {LimiterResultPromise<T, R>}
@@ -108,100 +82,46 @@ function limiter<T extends Limiters>(
  *   "fail".
  */
 function limiter<T extends Limiters>(
-  supabaseRequest: Request | null,
-  params: Params<T>,
-): Promise<LimiterResult<T, boolean>>;
-
-/**
- * Checks the rate limit with an `id` and `userIdentifier`.
- *
- * @param {string | null} id - The unique identifier used to scope the limiter.
- * @param {string | Request} userIdentifier - A unique user identifier (e.g.,
- *   user ID, email) or a Supabase Request object.
- * @param {Params<T>} params - The parameters object containing all limiter
- *   configuration.
- * @returns {LimiterResultPromise<T, R>}
- * @throws {LimiterError} - If the request fails and failBehavior is set to
- *   "fail".
- */
-function limiter<T extends Limiters>(
-  id: string | null,
-  userIdentifier: string | Request,
+  request: Request,
   params: Params<T>,
 ): Promise<LimiterResult<T, boolean>>;
 
 async function limiter<T extends Limiters>(
-  arg0: string | Request | Params<T> | null,
-  arg1?: string | Request | Params<T>,
-  arg2?: Params<T>,
+  arg0: Key | Request | Params<T>,
+  arg1?: Params<T>,
 ): Promise<LimiterResult<T, boolean>> {
-  // Initialize the params object that we'll build based on the arguments
-  let finalParams: any = {};
+  let finalParams: ResolvedLimiterParams<T>;
 
-  // Case 1: limiter(params)
-  // Single params object
-  if (typeof arg0 === "object" && isParamsObject(arg0)) {
-    finalParams = arg0;
-  }
-  // Case 2: limiter(id, params)
-  else if (
-    (typeof arg0 === "string" || arg0 === null) &&
-    typeof arg1 === "object" &&
-    isParamsObject(arg1)
-  ) {
-    finalParams = { ...arg1, id: arg0 };
-  }
-  // Case 3: limiter(userIdentifier, params)
-  else if (
-    (typeof arg0 === "string" || arg0 instanceof Request) &&
-    typeof arg1 === "object" &&
-    isParamsObject(arg1)
-  ) {
-    finalParams = { ...arg1, userIdentifier: arg0 };
-  }
-  // Case 4: limiter(id, userIdentifier, params)
-  else if (
-    (typeof arg0 === "string" || arg0 === null) &&
-    (typeof arg1 === "string" || arg1 instanceof Request) &&
-    typeof arg2 === "object"
-  ) {
-    finalParams = { ...arg2, id: arg0, userIdentifier: arg1 };
-  } else {
-    throw new Error("Invalid arguments provided to limiter function");
-  }
-
-  const params: LimiterParams<T> = finalParams;
-
-  // Resolve the final user identifier and possibly extract URL for id
-  let finalUserIdentifier: string | null = null;
-  let urlAsId: string | undefined;
-
-  if (typeof params.userIdentifier === "string") {
-    finalUserIdentifier = params.userIdentifier;
-  } else if (params.userIdentifier instanceof Request) {
-    const requestInfo = await getSupabaseRequestInfo(params.userIdentifier, params.options?.debug);
-
-    // If we got a user ID from the request, use that as the user identifier
-    if (requestInfo.userId) {
-      finalUserIdentifier = requestInfo.userId;
+  if (arg1 !== undefined) {
+    if (arg0 instanceof Request) {
+      // limiter(request, params)
+      finalParams = { ...(arg1 as any), key: null, userId: null, request: arg0 };
     } else {
-      // If no user ID is found and we're in debug mode, log a warning
-      if (params.options?.debug) {
-        console.warn("No user identifier found in Supabase Request object.");
-      }
+      // limiter(key, params)
+      finalParams = { ...(arg1 as any), key: (arg0 as Key).key, userId: (arg0 as Key).userId };
     }
+  } else {
+    // limiter(params)
+    finalParams = { ...(arg0 as any), key: null, userId: null };
+  }
 
-    // If we got a URL from the request and no explicit ID was provided, use the URL as the ID
-    if (requestInfo.url && !params.id) {
-      urlAsId = requestInfo.url;
+  const params: ResolvedLimiterParams<T> = finalParams;
+
+  // If a Supabase Request was provided, extract userId and key from it
+  if (params.request) {
+    const requestInfo = await getSupabaseRequestInfo(params.request, params.options?.debug);
+    if (requestInfo.userId) {
+      params.userId = requestInfo.userId;
+    } else if (params.options?.debug) {
+      console.warn("No user identifier found in Supabase Request object.");
+    }
+    if (requestInfo.url) {
+      params.key = requestInfo.url;
       if (params.options?.debug) {
-        console.info(`Using request URL as limiter ID: ${urlAsId}`);
+        console.info(`Using request URL as limiter key: ${params.key}`);
       }
     }
   }
-
-  // Use request URL as ID if no explicit ID was provided and URL is available
-  const limiterKey = params.id || urlAsId;
 
   try {
     // Choose the correct Borrow client.
@@ -251,8 +171,8 @@ async function limiter<T extends Limiters>(
 
     const response = await borrowClient.post(params.options?.endpoint?.path || "/limiter", {
       body: JSON.stringify({
-        key: limiterKey ?? null,
-        userId: finalUserIdentifier,
+        key: params.key,
+        userId: params.userId,
         limiters: formattedLimiters,
         action: "check",
       }),
@@ -269,7 +189,7 @@ async function limiter<T extends Limiters>(
     if (data.result === "limited") {
       if (params.options?.debug) {
         console.warn(
-          `Rate limit exceeded for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Message: ${data.message}`,
+          `Rate limit exceeded for key: ${params.key} with userId: ${params.userId}. Message: ${data.message}`,
         );
       }
 
@@ -293,9 +213,9 @@ async function limiter<T extends Limiters>(
     }
 
     if (!response.ok || data.result === "error") {
-      const errorMessage = `Limiter returned an error for id: ${
-        limiterKey || "[not provided]"
-      } with userIdentifier: ${finalUserIdentifier || "[not provided]"}. Message: ${data.message}`;
+      const errorMessage = `Limiter returned an error for key: ${
+        params.key || "[not provided]"
+      } with userId: ${params.userId || "[not provided]"}. Message: ${data.message}`;
       const bypassErrors = params.options?.failBehavior !== "fail";
 
       if (params.options?.debug) {
@@ -314,7 +234,7 @@ async function limiter<T extends Limiters>(
 
     if (params.options?.debug) {
       console.info(
-        `Limiter passed for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Message: ${data.message}`,
+        `Limiter passed for key: ${params.key} with userId: ${params.userId}. Message: ${data.message}`,
       );
     }
 
@@ -336,7 +256,7 @@ async function limiter<T extends Limiters>(
   } catch (err: any) {
     if (params.options?.debug) {
       console.error(
-        `Error calling Borrow API for id: ${limiterKey} with userIdentifier: ${finalUserIdentifier}. Error: `,
+        `Error calling Borrow API for key: ${params.key} with userId: ${params.userId}. Error: `,
         err,
       );
     }

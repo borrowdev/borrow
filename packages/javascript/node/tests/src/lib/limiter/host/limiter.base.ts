@@ -29,19 +29,22 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
     it("should return 401 if the invoke secret is invalid", async ({ endpoint }) => {
       await fc.assert(
         fc.asyncProperty(fc.string({ minLength: 1 }), async (invalidSecret) => {
-          const result = await borrow.limiter("test-key", "test-user-id", {
-            limiters: [
-              {
-                type: "fixed",
-                interval: 60,
-                maxRequests: 10,
+          const result = await borrow.limiter(
+            { key: "test-key", userId: "test-user-id" },
+            {
+              limiters: [
+                {
+                  type: "fixed",
+                  interval: 60,
+                  maxRequests: 10,
+                },
+              ],
+              options: {
+                ...getCommonOptions(endpoint),
+                apiKey: invalidSecret,
               },
-            ],
-            options: {
-              ...getCommonOptions(endpoint),
-              apiKey: invalidSecret,
             },
-          });
+          );
 
           expect(result).toMatchObject({
             success: false,
@@ -135,21 +138,11 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
       // Simulate the tokens being used
       for (const key of keys) {
-        let tokensLeft = -1;
-        if (key.userId) {
-          const result = await borrow.limiter(key.key, key.userId, {
-            limiters: [tokenLimiter],
-            options: getCommonOptions(endpoint),
-          });
-          tokensLeft = result.tokensLeft;
-        } else {
-          const result = await borrow.limiter(key.key, {
-            limiters: [tokenLimiter],
-            options: getCommonOptions(endpoint),
-          });
-          tokensLeft = result.tokensLeft;
-        }
-        expect(tokensLeft).toBe(tokenLimiter.maxTokens - tokenLimiter.tokensCost);
+        const result = await borrow.limiter(key, {
+          limiters: [tokenLimiter],
+          options: getCommonOptions(endpoint),
+        });
+        expect(result.tokensLeft).toBe(tokenLimiter.maxTokens - tokenLimiter.tokensCost);
       }
 
       const afterResult = await borrow.limiter.tokens.refill(keys, getCommonOptions(endpoint));
@@ -161,18 +154,10 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
       // Check the tokens were actually refilled
       for (const k of keys) {
-        let result: Record<string, any> = {};
-        if (k.userId) {
-          result = await borrow.limiter(k.key, k.userId, {
-            limiters: [tokenLimiter],
-            options: getCommonOptions(endpoint),
-          });
-        } else {
-          result = await borrow.limiter(k.key, {
-            limiters: [tokenLimiter],
-            options: getCommonOptions(endpoint),
-          });
-        }
+        const result = await borrow.limiter(k, {
+          limiters: [tokenLimiter],
+          options: getCommonOptions(endpoint),
+        });
         expect(result).toMatchObject({
           success: true,
           timeLeft: null,
@@ -191,7 +176,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       } as const;
 
       // Store globally
-      const globalResult = await borrow.limiter(null, {
+      const globalResult = await borrow.limiter({
         limiters: [fixedLimiter],
         options: getCommonOptions(endpoint),
       });
@@ -200,16 +185,19 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       });
 
       // Store per userId + key
-      const userKeyResult = await borrow.limiter("specific-key", "specific-user", {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const userKeyResult = await borrow.limiter(
+        { key: "specific-key", userId: "specific-user" },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(userKeyResult).toMatchObject({
         success: true,
       });
 
       // Check the globally stored usage is still the same (should increment once more)
-      const secondGlobalResult = await borrow.limiter(null, {
+      const secondGlobalResult = await borrow.limiter({
         limiters: [fixedLimiter],
         options: getCommonOptions(endpoint),
       });
@@ -229,23 +217,29 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       const userId = "test-user-specific";
 
       // Store per userId
-      const userResult = await borrow.limiter(null, userId, {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const userResult = await borrow.limiter(
+        { key: null, userId },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(userResult).toMatchObject({
         success: true,
       });
 
       // Make sure userId isn't colliding with key or global storage.
-      const userKeyResult = await borrow.limiter("specific-key", userId, {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const userKeyResult = await borrow.limiter(
+        { key: "specific-key", userId },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(userKeyResult).toMatchObject({
         success: true,
       });
-      const globalResult = await borrow.limiter(null, {
+      const globalResult = await borrow.limiter({
         limiters: [fixedLimiter],
         options: getCommonOptions(endpoint),
       });
@@ -254,10 +248,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         success: true,
       });
 
-      const secondUserResult = await borrow.limiter(null, userId, {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const secondUserResult = await borrow.limiter(
+        { key: null, userId },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(secondUserResult).toMatchObject({
         // First limiter call + second Limiter call > maxRequests, must block if storing by userId.
         success: false,
@@ -275,28 +272,37 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       const testKey = "test-unique-key";
 
       // Store per key
-      const keyResult = await borrow.limiter(testKey, {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const keyResult = await borrow.limiter(
+        { key: testKey, userId: null },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(keyResult).toMatchObject({
         success: true,
       });
 
       // Store per userId + key (different userId)
-      const userKeyResult = await borrow.limiter(testKey, "some-random-user", {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const userKeyResult = await borrow.limiter(
+        { key: testKey, userId: "some-random-user" },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(userKeyResult).toMatchObject({
         success: true,
       });
 
       // Check the per key stored usage is still the same (should increment once more)
-      const secondKeyResult = await borrow.limiter(testKey, {
-        limiters: [fixedLimiter],
-        options: getCommonOptions(endpoint),
-      });
+      const secondKeyResult = await borrow.limiter(
+        { key: testKey, userId: null },
+        {
+          limiters: [fixedLimiter],
+          options: getCommonOptions(endpoint),
+        },
+      );
       expect(secondKeyResult).toMatchObject({
         success: true,
       });
@@ -330,11 +336,14 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
             });
           }
 
-          const result = await borrow.limiter("test-key-duplicate", "test-user-duplicate", {
-            // @ts-ignore
-            limiters: duplicateLimiters,
-            options: getCommonOptions(endpoint),
-          });
+          // @ts-ignore
+          const result = await borrow.limiter(
+            { key: "test-key-duplicate", userId: "test-user-duplicate" },
+            {
+              limiters: duplicateLimiters as any,
+              options: getCommonOptions(endpoint),
+            },
+          );
 
           expect(result).toMatchObject({
             success: false,
@@ -358,19 +367,25 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-fixed-under";
 
         // First request
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
         });
 
         // Second request - still under limit
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: true,
         });
@@ -387,28 +402,37 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-fixed-over";
 
         // First request
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
         });
 
         // Second request - reached limit
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: true,
         });
 
         // Third request - over limit
-        const thirdResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const thirdResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(thirdResult).toMatchObject({
           success: false,
         });
@@ -439,19 +463,25 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(nearlyNextMinute);
 
         // First request - should pass
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
         });
 
         // Second request - should block (limit reached)
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: false,
         });
@@ -468,10 +498,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(nextMinute);
 
         // Third request - should pass (counter reset)
-        const thirdResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [fixedLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const thirdResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [fixedLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
 
         expect(thirdResult).toMatchObject({
           success: true,
@@ -491,19 +524,25 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-sliding-under";
 
         // First request
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
         });
 
         // Second request - still under limit
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: true,
         });
@@ -520,28 +559,37 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-sliding-over";
 
         // First request
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
         });
 
         // Second request - reached limit
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: true,
         });
 
         // Third request - over limit
-        const thirdResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const thirdResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(thirdResult).toMatchObject({
           success: false,
         });
@@ -563,10 +611,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(initialTime);
 
         // First request - should pass
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
         });
@@ -576,10 +627,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(halfwayTime);
 
         // Second request - should be blocked (within sliding window)
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: false,
         });
@@ -589,10 +643,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(fullIntervalTime);
 
         // Third request - should pass (sliding window has moved past first request)
-        const thirdResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [slidingLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const thirdResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [slidingLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
 
         expect(thirdResult).toMatchObject({
           success: true,
@@ -614,10 +671,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-token-under";
 
         // Request costs 3 tokens out of 10 available
-        const result = await borrow.limiter(testKey, testUserId, {
-          limiters: [tokenLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const result = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [tokenLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
 
         expect(result).toMatchObject({
           success: true,
@@ -638,10 +698,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-token-over";
 
         // Request costs 12 tokens but only 10 available
-        const result = await borrow.limiter(testKey, testUserId, {
-          limiters: [tokenLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const result = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [tokenLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
 
         expect(result).toMatchObject({
           success: false,
@@ -666,25 +729,31 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(initialTime);
 
         // First request - costs almost all tokens (9 out of 10)
-        const firstResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [
-            {
-              ...tokenLimiter,
-              tokensCost: 9,
-            },
-          ],
-          options: getCommonOptions(endpoint),
-        });
+        const firstResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [
+              {
+                ...tokenLimiter,
+                tokensCost: 9,
+              },
+            ],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(firstResult).toMatchObject({
           success: true,
           tokensLeft: 1,
         });
 
         // Second request - should be blocked (only 1 token left, cost is 2)
-        const secondResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [tokenLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [tokenLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondResult).toMatchObject({
           success: false,
         });
@@ -695,10 +764,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
         // Third request - should pass with replenished tokens
         // After replenish: 1 remaining + 5 replenished = 6, then 6 - 2 cost = 4
-        const thirdResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [tokenLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const thirdResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [tokenLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
 
         expect(thirdResult).toMatchObject({
           success: true,
@@ -725,28 +797,37 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-borrow-start-end";
 
         // Start a borrow - should pass
-        const startResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const startResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(startResult).toMatchObject({
           success: true,
         });
 
         // End the borrow - should pass
-        const endResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowEndLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const endResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowEndLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(endResult).toMatchObject({
           success: true,
         });
 
         // Start another borrow - should pass
-        const secondStartResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondStartResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondStartResult).toMatchObject({
           success: true,
         });
@@ -769,66 +850,87 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-borrow-multiple";
 
         // Start a borrow - should pass
-        const startResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const startResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(startResult).toMatchObject({
           success: true,
         });
 
         // Try to start another borrow - should be limited
-        const secondStartResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const secondStartResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(secondStartResult).toMatchObject({
           success: false,
         });
 
         // End the borrow - should pass
-        const endResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowEndLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const endResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowEndLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(endResult).toMatchObject({
           success: true,
         });
 
         // Start a new borrow - should pass
-        const thirdStartResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const thirdStartResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(thirdStartResult).toMatchObject({
           success: true,
         });
 
         // End the borrow multiple times - should pass
         for (let i = 0; i < 3; i++) {
-          const multiEndResult = await borrow.limiter(testKey, testUserId, {
-            limiters: [borrowEndLimiter],
-            options: getCommonOptions(endpoint),
-          });
+          const multiEndResult = await borrow.limiter(
+            { key: testKey, userId: testUserId },
+            {
+              limiters: [borrowEndLimiter],
+              options: getCommonOptions(endpoint),
+            },
+          );
           expect(multiEndResult).toMatchObject({
             success: true,
           });
         }
 
         // Start a new borrow - should pass
-        const finalStartResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const finalStartResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(finalStartResult).toMatchObject({
           success: true,
         });
 
         // Try to start another borrow - should be limited
-        const finalDuplicateStartResult = await borrow.limiter(testKey, testUserId, {
-          limiters: [borrowStartLimiter],
-          options: getCommonOptions(endpoint),
-        });
+        const finalDuplicateStartResult = await borrow.limiter(
+          { key: testKey, userId: testUserId },
+          {
+            limiters: [borrowStartLimiter],
+            options: getCommonOptions(endpoint),
+          },
+        );
         expect(finalDuplicateStartResult).toMatchObject({
           success: false,
         });
@@ -859,10 +961,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
           // Exhaust the limit with requests
           for (let j = 0; j < fixedLimiter.maxRequests; j++) {
-            const passResult = await borrow.limiter(testKey, testUserId, {
-              limiters: [fixedLimiter],
-              options: getCommonOptions(endpoint),
-            });
+            const passResult = await borrow.limiter(
+              { key: testKey, userId: testUserId },
+              {
+                limiters: [fixedLimiter],
+                options: getCommonOptions(endpoint),
+              },
+            );
 
             expect(passResult).toMatchObject({
               success: true,
@@ -870,10 +975,13 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
           }
 
           // Next request should be limited
-          const limitedResult = await borrow.limiter(testKey, testUserId, {
-            limiters: [fixedLimiter],
-            options: getCommonOptions(endpoint),
-          });
+          const limitedResult = await borrow.limiter(
+            { key: testKey, userId: testUserId },
+            {
+              limiters: [fixedLimiter],
+              options: getCommonOptions(endpoint),
+            },
+          );
 
           expect(limitedResult).toMatchObject({
             success: false,

@@ -3,6 +3,15 @@ import type { LiteralUnion, TaggedUnion, SimplifyDeep } from "type-fest";
 /** The interval in which requests are counted. If a number, treated as seconds. */
 export type Interval = LiteralUnion<"minute" | "hour" | "day", number>;
 
+/** Scope for limiter operations */
+export interface Key {
+  /** The unique identifier used to scope the limiter. */
+  key: string | null;
+
+  /** A unique user identifier (e.g., user ID or email). */
+  userId: string | null;
+}
+
 /** Configuration schema for a fixed-window limiter. */
 export interface FixedLimiter extends Record<string, unknown> {
   /** The type of limiter. */
@@ -136,22 +145,17 @@ export interface CommonLimiterOptions {
 }
 
 /**
- * Parameters accepted by the `limiter` function.
- *
- * Note: Because of overloads, the user identifier may be provided as either a
- * string (explicit identifier), a Supabase Request object (to auto-extract the
- * user), or omitted. In the two-parameter overload, the limiter object is
- * passed as the second argument.
+ * The final resolved parameters for the `limiter` function.
  */
-export type LimiterParams<T extends Limiters> = {
+export type ResolvedLimiterParams<T extends Limiters> = {
   /** The unique identifier used to scope the limiter (e.g., 'download_file'). */
-  id: string;
+  key: string | null;
 
-  /**
-   * A unique user identifier (e.g., user ID or email) or a Supabase Request
-   * object to extract the user ID from.
-   */
-  userIdentifier?: string | Request;
+  /** A unique user identifier (e.g., user ID or email). */
+  userId: string | null;
+
+  /** A Supabase Request object to automatically extract the user ID and use the request URL as the limiter key. */
+  request?: Request;
 
   /** An array of up to 4 limiter objects of unique types. */
   limiters: T;

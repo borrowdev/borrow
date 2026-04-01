@@ -41,15 +41,21 @@ Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-wi
 ```javascript
 import borrow from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      maxRequests: 10,
-      interval: "minute",
-      type: "fixed",
-    },
-  ],
-});
+const { success, timeLeft } = await borrow.limiter(
+  {
+    key: "my-limiter-id",
+    userId: "current-user-id",
+  },
+  {
+    limiters: [
+      {
+        maxRequests: 10,
+        interval: "minute",
+        type: "fixed",
+      },
+    ],
+  },
+);
 if (!success) {
   return {
     message:

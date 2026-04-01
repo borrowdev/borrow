@@ -34,15 +34,18 @@ Let's use the [fixed window](/limiter/algorithms#fixed-window) algorithm to rate
 ```ts ts2js
 import borrow from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      maxRequests: 10,
-      interval: "minute",
-      type: "fixed",
-    },
-  ],
-});
+const { success, timeLeft } = await borrow.limiter(
+  { key: "my-limiter-id", userId: "current-user-id" },
+  {
+    limiters: [
+      {
+        maxRequests: 10,
+        interval: "minute",
+        type: "fixed",
+      },
+    ],
+  },
+);
 if (!success) {
   return {
     message:
@@ -61,15 +64,18 @@ Let's use the [sliding window](/limiter/algorithms#sliding-window) algorithm to 
 ```ts ts2js
 import borrow from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      maxRequests: 10,
-      interval: "minute",
-      type: "sliding",
-    },
-  ],
-});
+const { success, timeLeft } = await borrow.limiter(
+  { key: "my-limiter-id", userId: "current-user-id" },
+  {
+    limiters: [
+      {
+        maxRequests: 10,
+        interval: "minute",
+        type: "sliding",
+      },
+    ],
+  },
+);
 if (!success) {
   return {
     message:
@@ -87,17 +93,20 @@ Let's use the [token bucket](/limiter/algorithms#token-bucket) algorithm to rate
 ```ts ts2js
 import borrow from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      maxTokens: 20,
-      tokensCost: 5,
-      tokensPerReplenish: 10,
-      interval: "minute",
-      type: "token",
-    },
-  ],
-});
+const { success, timeLeft } = await borrow.limiter(
+  { key: "my-limiter-id", userId: "current-user-id" },
+  {
+    limiters: [
+      {
+        maxTokens: 20,
+        tokensCost: 5,
+        tokensPerReplenish: 10,
+        interval: "minute",
+        type: "token",
+      },
+    ],
+  },
+);
 if (!success) {
   return {
     message:
@@ -121,15 +130,18 @@ Let's use the [borrow](/limiter/algorithms#borrow) algorithm to rate limit reque
 ```ts ts2js
 import borrow from "@borrowdev/node";
 
-const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      borrowAction: "start",
-      type: "borrow",
-      timeout: 10,
-    },
-  ],
-});
+const { success, timeLeft } = await borrow.limiter(
+  { key: "my-limiter-id", userId: "current-user-id" },
+  {
+    limiters: [
+      {
+        borrowAction: "start",
+        type: "borrow",
+        timeout: 10,
+      },
+    ],
+  },
+);
 if (!success) {
   return {
     message:
@@ -138,15 +150,18 @@ if (!success) {
   };
 }
 // ... Your expensive business logic
-const { success: endSuccess } = await borrow.limiter("my-limiter-id", "current-user-id", {
-  limiters: [
-    {
-      borrowAction: "end",
-      type: "borrow",
-      timeout: 10,
-    },
-  ],
-});
+const { success: endSuccess } = await borrow.limiter(
+  { key: "my-limiter-id", userId: "current-user-id" },
+  {
+    limiters: [
+      {
+        borrowAction: "end",
+        type: "borrow",
+        timeout: 10,
+      },
+    ],
+  },
+);
 if (!endSuccess) {
   return { message: "Failed to end borrow." };
 }
