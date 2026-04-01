@@ -37,8 +37,11 @@
   },
   "devDependencies": {
     "@borrowdev/config": "workspace:*",
+    "@borrowdev/node": "workspace:*",
     "@cloudflare/vitest-pool-workers": "catalog:",
+    "@types/express": "catalog:",
     "@types/node": "catalog:",
+    "express": "catalog:",
     "fast-check": "catalog:",
     "msw": "catalog:",
     "publint": "catalog:",

@@ -267,12 +267,21 @@ importers:
       '@borrowdev/config':
         specifier: workspace:*
         version: link:../../config
+      '@borrowdev/node':
+        specifier: workspace:*
+        version: 'link:'
       '@cloudflare/vitest-pool-workers':
         specifier: 'catalog:'
         version: 0.14.0(@vitest/runner@4.1.2)(@vitest/snapshot@4.1.2)(@voidzero-dev/vite-plus-test@0.1.14(@types/node@25.5.0)(@voidzero-dev/vite-plus-core@0.1.14(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(less@4.1.3)(publint@0.3.18)(sass-embedded@1.98.0)(sass@1.98.0)(stylus@0.64.0)(terser@5.46.1)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.3))(esbuild@0.27.4)(jiti@2.6.1)(less@4.1.3)(publint@0.3.18)(sass-embedded@1.98.0)(sass@1.98.0)(stylus@0.64.0)(terser@5.46.1)(tsx@4.21.0)(typescript@6.0.2)(yaml@2.8.3))
+      '@types/express':
+        specifier: 'catalog:'
+        version: 5.0.6
       '@types/node':
         specifier: 'catalog:'
         version: 25.5.0
+      express:
+        specifier: 'catalog:'
+        version: 5.2.1
       fast-check:
         specifier: 'catalog:'
         version: 4.6.0
@@ -306,35 +315,6 @@ importers:
       wrangler:
         specifier: 'catalog:'
         version: 4.77.0
-
-  packages/javascript/node/tests/fixtures/environments/cloudflare:
-    dependencies:
-      '@borrowdev/node':
-        specifier: workspace:*
-        version: link:../../../..
-    devDependencies:
-      '@upstash/redis':
-        specifier: 'catalog:'
-        version: 1.37.0
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.2
-      wrangler:
-        specifier: 'catalog:'
-        version: 4.77.0
-
-  packages/javascript/node/tests/fixtures/environments/express:
-    dependencies:
-      '@borrowdev/node':
-        specifier: workspace:*
-        version: link:../../../..
-      express:
-        specifier: 'catalog:'
-        version: 5.2.1
-    devDependencies:
-      '@types/express':
-        specifier: 'catalog:'
-        version: 5.0.6
 
 packages:
 

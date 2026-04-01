@@ -1,6 +1,7 @@
 packages:
   - apps/*
-  - packages/**
+  - packages/*
+  - packages/*/*
 catalog:
   "@cloudflare/vitest-pool-workers": ^0.14.0
   "@commitlint/cli": ^20.5.0
