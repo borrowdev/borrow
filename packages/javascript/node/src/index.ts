@@ -20,6 +20,7 @@ export type {
   CommonLimiterOptions,
   LimiterResult,
   ErrorCode,
+  Limiters,
 } from "@/lib/limiter/types";
 export { limiter };
 
