@@ -50,7 +50,7 @@ jobs:
         with:
           cache: true
           run-install: true
-      - name: Publish packages to NPM and JSR
+      - name: Publish packages to NPM
         if: ${{ steps.release.outputs.releases_created }}
         run: vp run publish -r
   deploy-docs:

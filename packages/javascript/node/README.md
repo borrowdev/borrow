@@ -1,10 +1,9 @@
 # Borrow Node.js SDK
 
-<p align="center">
+<div align="center">
   <a href="https://www.npmjs.com/package/@borrowdev/node"><img src="https://img.shields.io/npm/v/@borrowdev/node" alt="NPM version"></a>
-  <a href="https://jsr.io/@borrow/node"><img src="https://jsr.io/badges/@borrow/node" alt="JSR version"></a>
   <a href="https://github.com/borrowdev/borrow/blob/main/LICENSE"><img src="https://img.shields.io/github/license/borrowdev/borrow" alt="License"></a>
-</p>
+</div>
 
 ## Features
 

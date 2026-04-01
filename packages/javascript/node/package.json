@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "publish": "npx jsr publish && npm publish --access public",
+    "publish": "npm publish --access public",
     "test": "vp test"
   },
   "dependencies": {
