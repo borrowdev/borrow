@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/borrowdev/borrow/compare/@borrowdev/node-v1.0.0...@borrowdev/node-v1.1.0) (2026-04-01)
+
+
+### Features
+
+* Export ErrorCode TypeScript type ([94e117e](https://github.com/borrowdev/borrow/commit/94e117e6648b6a98d006afcaf2d4ee79bd3680e3))
+
 ## [1.0.0](https://github.com/borrowdev/borrow/compare/@borrowdev/node-v0.2.0...@borrowdev/node-v1.0.0) (2026-04-01)
 
 
