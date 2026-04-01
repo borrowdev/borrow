@@ -46,9 +46,8 @@ const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-use
 if (!success) {
   return {
     message:
-      "Rate limit exceeded." + timeLeft !== null
-        ? ` You can try again in ${timeLeft} seconds.`
-        : "",
+      "Rate limit exceeded." +
+      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
   };
 }
 
@@ -74,9 +73,8 @@ const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-use
 if (!success) {
   return {
     message:
-      "Rate limit exceeded." + timeLeft !== null
-        ? ` You can try again in ${timeLeft} seconds.`
-        : "",
+      "Rate limit exceeded." +
+      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
   };
 }
 // ... Your expensive business logic
@@ -103,9 +101,8 @@ const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-use
 if (!success) {
   return {
     message:
-      "Rate limit exceeded." + timeLeft !== null
-        ? ` You can try again in ${timeLeft} seconds.`
-        : "",
+      "Rate limit exceeded." +
+      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
   };
 }
 // ... Your expensive business logic
@@ -130,9 +127,8 @@ const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-use
 if (!success) {
   return {
     message:
-      "Rate limit exceeded." + timeLeft !== null
-        ? ` You can try again in ${timeLeft} seconds.`
-        : "",
+      "Rate limit exceeded." +
+      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
   };
 }
 // ... Your expensive business logic

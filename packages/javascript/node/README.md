@@ -44,7 +44,7 @@ bun add @borrowdev/node
 Let's use the [fixed window](https://borrow.dev/docs/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```javascript
-import { borrow } from "@borrowdev/node";
+import borrow from "@borrowdev/node";
 
 const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-user-id", {
   limiters: [
@@ -58,9 +58,8 @@ const { success, timeLeft } = await borrow.limiter("my-limiter-id", "current-use
 if (!success) {
   return {
     message:
-      "Rate limit exceeded." + timeLeft !== null
-        ? ` You can try again in ${timeLeft} seconds.`
-        : "",
+      "Rate limit exceeded." +
+      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
   };
 }
 ```
