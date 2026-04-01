@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": false,
   "description": "Borrow.dev: Open-Source Tools for Web Developers",
+  "keywords": [
+    "borrow.dev",
+    "limiter",
+    "ratelimiting"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
