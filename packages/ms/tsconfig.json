@@ -1,0 +1,14 @@
+{
+  "extends": ["@borrowdev/config/tsconfig.node.json"],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./*"]
+    },
+    "types": ["./worker-configuration.d.ts"]
+  },
+  "include": ["src/**/*.ts", "./package.json"]
+}

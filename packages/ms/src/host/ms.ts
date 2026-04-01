@@ -1,20 +1,23 @@
 import z from "zod";
 import { msParamsSchema } from "./validation";
+import { env } from "cloudflare:workers";
 import workersPlacementRegions from "@borrowdev/data/cloudflare-workers-placement-regions";
-
-const ITERATIONS = 10;
 
 type RegionKey = keyof typeof workersPlacementRegions;
 type MeasureResult = { amount: number; p50: number; p90: number; p99: number };
+type EnhancedMeasureResult = {
+  metadata: (typeof workersPlacementRegions)[RegionKey];
+  data: MeasureResult;
+};
 
-type ErrorCode = "INVALID_PARAMS" | "UNAUTHORIZED";
+type ErrorCode = "INVALID_PARAMS" | "UNAUTHORIZED" | "UPSTREAM";
 
 type MsResult =
   | { result: "error"; status: 400; error: ErrorCode; message: string; timeLeft: null }
   | {
       result: "success";
       status: 200;
-      data: { latency: Partial<Record<RegionKey, MeasureResult>> };
+      latency: Partial<Record<RegionKey, EnhancedMeasureResult>>;
     };
 
 async function ms(params: z.infer<typeof msParamsSchema>): Promise<MsResult> {
@@ -29,19 +32,9 @@ async function ms(params: z.infer<typeof msParamsSchema>): Promise<MsResult> {
     };
   }
 
-  if (data.workers.invokeSecret !== import.meta.env.WORKERS_INVOKE_SECRET) {
-    return {
-      result: "error" as const,
-      status: 400,
-      error: "UNAUTHORIZED" as const,
-      message: "Invalid invoke secret",
-      timeLeft: null,
-    };
-  }
-
-  const { measureRequest } = data;
+  const measureRequest = data.req.measureRequest;
   const workersDomain = data.workers.domain;
-  const regions = Object.keys(workersPlacementRegions) as RegionKey[];
+  const regions = data.regions ?? (Object.keys(workersPlacementRegions) as RegionKey[]);
 
   const results = await Promise.allSettled(
     regions.map(async (region) => {
@@ -51,32 +44,50 @@ async function ms(params: z.infer<typeof msParamsSchema>): Promise<MsResult> {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          invokeSecret: env.MS_INVOKE_SECRET,
           url: measureRequest.url,
           method: measureRequest.method,
           headers: measureRequest.headers,
           body: "body" in measureRequest ? measureRequest.body : undefined,
-          iterations: ITERATIONS,
+          iterations: env.ITERATIONS || 10,
         }),
       });
 
-      if (!res.ok) throw new Error(`${workerUrl}: ${res.status} ${await res.text()}`);
+      if (!res.ok) {
+        throw new Error(`${workerUrl}: ${res.status} ${await res.text()}`);
+      }
       return { region, ...((await res.json()) as MeasureResult) };
     }),
   );
 
-  const latency: Partial<Record<RegionKey, MeasureResult>> = {};
+  if (results.every((r) => r.status === "rejected")) {
+    return {
+      result: "error" as const,
+      status: 400,
+      error: "UPSTREAM" as const,
+      message:
+        "All requests to workers failed. Check if your API parameters are correct. Original errors: " +
+        results.map((r) => (r.status === "rejected" ? r.reason.message : "")),
+      timeLeft: null,
+    };
+  }
+
+  const latency: Partial<Record<RegionKey, EnhancedMeasureResult>> = {};
 
   for (const result of results) {
     if (result.status === "fulfilled") {
       const { region, ...data } = result.value;
-      latency[region] = data;
+      latency[region] = {
+        metadata: workersPlacementRegions[region],
+        data,
+      };
     }
   }
 
   return {
     result: "success" as const,
     status: 200,
-    data: { latency },
+    latency,
   };
 }
 

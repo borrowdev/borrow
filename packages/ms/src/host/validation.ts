@@ -7,36 +7,48 @@ const msParamsMeasureRequestCommonSchema = z.object({
   headers: z.record(z.string(), z.string()).optional(),
 });
 
+const regionsUnion = z.union(
+  Object.keys(workersPlacementRegions).map((region) =>
+    z.literal(region as keyof typeof workersPlacementRegions),
+  ),
+);
+
 const msParamsSchema = z.object({
-  action: z.literal("measure"),
+  /**
+   * An array of regions to measure against. If null, will measure against all regions.
+   */
+  regions: z.array(regionsUnion).nullable(),
   environment: z.union([z.literal("development"), z.literal("production")]),
   workers: z.object({
     domain: z.string(),
-    invokeSecret: z.string(),
   }),
-  measureRequest: z.discriminatedUnion("method", [
-    msParamsMeasureRequestCommonSchema.extend({
-      method: z.literal("GET"),
-    }),
-    msParamsMeasureRequestCommonSchema.extend({
-      method: z.union([z.literal("POST"), z.literal("PUT"), z.literal("DELETE")]),
-      body: z.string().optional(),
-    }),
-  ]),
+
+  req: z.object({
+    action: z.literal("measure"),
+    measureRequest: z.discriminatedUnion("method", [
+      msParamsMeasureRequestCommonSchema.extend({
+        method: z.literal("GET"),
+      }),
+      msParamsMeasureRequestCommonSchema.extend({
+        method: z.union([z.literal("POST"), z.literal("PUT"), z.literal("DELETE")]),
+        body: z.string().optional(),
+      }),
+    ]),
+  }),
 });
 
 const msResultSuccessSchema = z.object({
   result: z.literal("success"),
   status: z.number(),
-  data: z.object({
-    latency: z.record(
-      z.union(
-        Object.keys(workersPlacementRegions).map((region) => {
-          const typedRegion = region as keyof typeof workersPlacementRegions;
-          return z.literal(typedRegion);
-        }),
-      ),
-      z.object({
+  latency: z.record(
+    regionsUnion,
+    z.object({
+      metadata: z.object({
+        country: z.string(),
+        region: z.string(),
+        direction: z.string(),
+      }),
+      data: z.object({
         /**
          * The amount of requests made to the API
          */
@@ -54,8 +66,8 @@ const msResultSuccessSchema = z.object({
          */
         p99: z.number(),
       }),
-    ),
-  }),
+    }),
+  ),
 });
 
 export { msParamsSchema, msResultSuccessSchema };
