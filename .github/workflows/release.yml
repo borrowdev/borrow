@@ -40,18 +40,19 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
       - uses: actions/checkout@v5
-        if: ${{ steps.release.outputs.releases_created }}
+        # See https://github.com/googleapis/release-please-action/issues/912
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
       - uses: pnpm/action-setup@v5
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         with:
           version: 10.33.0
       - uses: voidzero-dev/setup-vp@v1
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         with:
           cache: true
           run-install: true
       - name: Publish packages to NPM
-        if: ${{ steps.release.outputs.releases_created }}
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
         run: vp run publish -r
   deploy-docs:
     runs-on: ubuntu-latest
