@@ -19,6 +19,7 @@ export type {
   TokenLimiter,
   CommonLimiterOptions,
   LimiterResult,
+  ErrorCode,
 } from "@/lib/limiter/types";
 export { limiter };
 
