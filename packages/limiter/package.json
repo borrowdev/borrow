@@ -28,6 +28,11 @@
       "import": "./dist/host.mjs",
       "default": "./dist/host.mjs"
     },
+    "./ms/host/worker": {
+      "types": "./dist/msHostWorker.d.mts",
+      "import": "./dist/msHostWorker.mjs",
+      "default": "./dist/msHostWorker.mjs"
+    },
     ".": {
       "types": "./dist/main.d.mts",
       "import": "./dist/main.mjs",
