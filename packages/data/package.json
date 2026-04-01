@@ -1,0 +1,19 @@
+{
+  "name": "@borrowdev/data",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Datasets collected and maintained by Borrow.dev",
+  "license": "MIT",
+  "author": "Lorenzo Bloedow <me@lorenzobloedow.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borrowdev/borrow.git"
+  },
+  "type": "module",
+  "exports": {
+    "./cloudflare-workers-placement-regions": "./cloudflare-workers-placement-regions.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
