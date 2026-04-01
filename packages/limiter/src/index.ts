@@ -24,8 +24,4 @@ export type {
 } from "@/lib/limiter/types";
 export { limiter };
 
-const defaultExport: { limiter: typeof limiter } = {
-  limiter,
-};
-
-export default defaultExport;
+export default limiter;

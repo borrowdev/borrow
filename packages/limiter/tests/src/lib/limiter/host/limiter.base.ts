@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, beforeAll, afterAll, vi, beforeEach } from "vitest";
 import type { it as baseIt } from "vitest";
-import borrow from "@/index";
+import { limiter } from "@/index";
 import type { Redis } from "@upstash/redis";
 import config from "~/tests/fixtures/environments/config";
 
@@ -29,7 +29,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
     it("should return 401 if the invoke secret is invalid", async ({ endpoint }) => {
       await fc.assert(
         fc.asyncProperty(fc.string({ minLength: 1 }), async (invalidSecret) => {
-          const result = await borrow.limiter(
+          const result = await limiter(
             { key: "test-key", userId: "test-user-id" },
             {
               limiters: [
@@ -66,14 +66,14 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       } as const;
 
       // Simulate the tokens being used globally
-      const a = await borrow.limiter({
+      const a = await limiter({
         limiters: [tokenLimiter],
         options: getCommonOptions(endpoint),
       });
 
       expect(a.tokensLeft).toBe(tokenLimiter.maxTokens - tokenLimiter.tokensCost);
 
-      const result = await borrow.limiter.tokens.refill(getCommonOptions(endpoint));
+      const result = await limiter.tokens.refill(getCommonOptions(endpoint));
       expect(result).toMatchObject({
         success: true,
       });
@@ -81,7 +81,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       expect(result).not.toHaveProperty("tokensLeft");
 
       const afterRefillCost = 1;
-      const afterResult = await borrow.limiter({
+      const afterResult = await limiter({
         limiters: [
           {
             ...tokenLimiter,
@@ -138,14 +138,14 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
       // Simulate the tokens being used
       for (const key of keys) {
-        const result = await borrow.limiter(key, {
+        const result = await limiter(key, {
           limiters: [tokenLimiter],
           options: getCommonOptions(endpoint),
         });
         expect(result.tokensLeft).toBe(tokenLimiter.maxTokens - tokenLimiter.tokensCost);
       }
 
-      const afterResult = await borrow.limiter.tokens.refill(keys, getCommonOptions(endpoint));
+      const afterResult = await limiter.tokens.refill(keys, getCommonOptions(endpoint));
       expect(afterResult).toMatchObject({
         success: true,
       });
@@ -154,7 +154,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
       // Check the tokens were actually refilled
       for (const k of keys) {
-        const result = await borrow.limiter(k, {
+        const result = await limiter(k, {
           limiters: [tokenLimiter],
           options: getCommonOptions(endpoint),
         });
@@ -176,7 +176,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       } as const;
 
       // Store globally
-      const globalResult = await borrow.limiter({
+      const globalResult = await limiter({
         limiters: [fixedLimiter],
         options: getCommonOptions(endpoint),
       });
@@ -185,7 +185,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       });
 
       // Store per userId + key
-      const userKeyResult = await borrow.limiter(
+      const userKeyResult = await limiter(
         { key: "specific-key", userId: "specific-user" },
         {
           limiters: [fixedLimiter],
@@ -197,7 +197,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       });
 
       // Check the globally stored usage is still the same (should increment once more)
-      const secondGlobalResult = await borrow.limiter({
+      const secondGlobalResult = await limiter({
         limiters: [fixedLimiter],
         options: getCommonOptions(endpoint),
       });
@@ -217,7 +217,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       const userId = "test-user-specific";
 
       // Store per userId
-      const userResult = await borrow.limiter(
+      const userResult = await limiter(
         { key: null, userId },
         {
           limiters: [fixedLimiter],
@@ -229,7 +229,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       });
 
       // Make sure userId isn't colliding with key or global storage.
-      const userKeyResult = await borrow.limiter(
+      const userKeyResult = await limiter(
         { key: "specific-key", userId },
         {
           limiters: [fixedLimiter],
@@ -239,7 +239,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       expect(userKeyResult).toMatchObject({
         success: true,
       });
-      const globalResult = await borrow.limiter({
+      const globalResult = await limiter({
         limiters: [fixedLimiter],
         options: getCommonOptions(endpoint),
       });
@@ -248,7 +248,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         success: true,
       });
 
-      const secondUserResult = await borrow.limiter(
+      const secondUserResult = await limiter(
         { key: null, userId },
         {
           limiters: [fixedLimiter],
@@ -272,7 +272,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       const testKey = "test-unique-key";
 
       // Store per key
-      const keyResult = await borrow.limiter(
+      const keyResult = await limiter(
         { key: testKey, userId: null },
         {
           limiters: [fixedLimiter],
@@ -284,7 +284,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       });
 
       // Store per userId + key (different userId)
-      const userKeyResult = await borrow.limiter(
+      const userKeyResult = await limiter(
         { key: testKey, userId: "some-random-user" },
         {
           limiters: [fixedLimiter],
@@ -296,7 +296,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
       });
 
       // Check the per key stored usage is still the same (should increment once more)
-      const secondKeyResult = await borrow.limiter(
+      const secondKeyResult = await limiter(
         { key: testKey, userId: null },
         {
           limiters: [fixedLimiter],
@@ -337,7 +337,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
           }
 
           // @ts-ignore
-          const result = await borrow.limiter(
+          const result = await limiter(
             { key: "test-key-duplicate", userId: "test-user-duplicate" },
             {
               limiters: duplicateLimiters as any,
@@ -367,7 +367,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-fixed-under";
 
         // First request
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -379,7 +379,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Second request - still under limit
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -402,7 +402,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-fixed-over";
 
         // First request
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -414,7 +414,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Second request - reached limit
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -426,7 +426,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Third request - over limit
-        const thirdResult = await borrow.limiter(
+        const thirdResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -463,7 +463,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(nearlyNextMinute);
 
         // First request - should pass
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -475,7 +475,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Second request - should block (limit reached)
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -498,7 +498,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(nextMinute);
 
         // Third request - should pass (counter reset)
-        const thirdResult = await borrow.limiter(
+        const thirdResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [fixedLimiter],
@@ -524,7 +524,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-sliding-under";
 
         // First request
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -536,7 +536,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Second request - still under limit
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -559,7 +559,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-sliding-over";
 
         // First request
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -571,7 +571,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Second request - reached limit
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -583,7 +583,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Third request - over limit
-        const thirdResult = await borrow.limiter(
+        const thirdResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -611,7 +611,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(initialTime);
 
         // First request - should pass
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -627,7 +627,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(halfwayTime);
 
         // Second request - should be blocked (within sliding window)
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -643,7 +643,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(fullIntervalTime);
 
         // Third request - should pass (sliding window has moved past first request)
-        const thirdResult = await borrow.limiter(
+        const thirdResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [slidingLimiter],
@@ -671,7 +671,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-token-under";
 
         // Request costs 3 tokens out of 10 available
-        const result = await borrow.limiter(
+        const result = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [tokenLimiter],
@@ -698,7 +698,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-token-over";
 
         // Request costs 12 tokens but only 10 available
-        const result = await borrow.limiter(
+        const result = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [tokenLimiter],
@@ -729,7 +729,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         vi.setSystemTime(initialTime);
 
         // First request - costs almost all tokens (9 out of 10)
-        const firstResult = await borrow.limiter(
+        const firstResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [
@@ -747,7 +747,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Second request - should be blocked (only 1 token left, cost is 2)
-        const secondResult = await borrow.limiter(
+        const secondResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [tokenLimiter],
@@ -764,7 +764,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
         // Third request - should pass with replenished tokens
         // After replenish: 1 remaining + 5 replenished = 6, then 6 - 2 cost = 4
-        const thirdResult = await borrow.limiter(
+        const thirdResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [tokenLimiter],
@@ -797,7 +797,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-borrow-start-end";
 
         // Start a borrow - should pass
-        const startResult = await borrow.limiter(
+        const startResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -809,7 +809,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // End the borrow - should pass
-        const endResult = await borrow.limiter(
+        const endResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowEndLimiter],
@@ -821,7 +821,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Start another borrow - should pass
-        const secondStartResult = await borrow.limiter(
+        const secondStartResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -850,7 +850,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         const testUserId = "user-borrow-multiple";
 
         // Start a borrow - should pass
-        const startResult = await borrow.limiter(
+        const startResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -862,7 +862,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Try to start another borrow - should be limited
-        const secondStartResult = await borrow.limiter(
+        const secondStartResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -874,7 +874,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // End the borrow - should pass
-        const endResult = await borrow.limiter(
+        const endResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowEndLimiter],
@@ -886,7 +886,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Start a new borrow - should pass
-        const thirdStartResult = await borrow.limiter(
+        const thirdStartResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -899,7 +899,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
         // End the borrow multiple times - should pass
         for (let i = 0; i < 3; i++) {
-          const multiEndResult = await borrow.limiter(
+          const multiEndResult = await limiter(
             { key: testKey, userId: testUserId },
             {
               limiters: [borrowEndLimiter],
@@ -912,7 +912,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         }
 
         // Start a new borrow - should pass
-        const finalStartResult = await borrow.limiter(
+        const finalStartResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -924,7 +924,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
         });
 
         // Try to start another borrow - should be limited
-        const finalDuplicateStartResult = await borrow.limiter(
+        const finalDuplicateStartResult = await limiter(
           { key: testKey, userId: testUserId },
           {
             limiters: [borrowStartLimiter],
@@ -961,7 +961,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
 
           // Exhaust the limit with requests
           for (let j = 0; j < fixedLimiter.maxRequests; j++) {
-            const passResult = await borrow.limiter(
+            const passResult = await limiter(
               { key: testKey, userId: testUserId },
               {
                 limiters: [fixedLimiter],
@@ -975,7 +975,7 @@ const limiterTests: (it: typeof baseIt<{ endpoint: string }>, redis: Redis) => v
           }
 
           // Next request should be limited
-          const limitedResult = await borrow.limiter(
+          const limitedResult = await limiter(
             { key: testKey, userId: testUserId },
             {
               limiters: [fixedLimiter],

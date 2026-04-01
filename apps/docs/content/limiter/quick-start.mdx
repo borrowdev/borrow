@@ -41,9 +41,9 @@ npm install @borrowdev/limiter
 Let's use the [fixed window](/limiter/algorithms#fixed-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```ts ts2js
-import borrow from "@borrowdev/limiter";
+import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await borrow.limiter(
+const { success, timeLeft } = await limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
   {
     limiters: [
@@ -71,9 +71,9 @@ if (!success) {
 Let's use the [sliding window](/limiter/algorithms#sliding-window) algorithm to rate limit our login endpoint to 10 requests per minute.
 
 ```ts ts2js
-import borrow from "@borrowdev/limiter";
+import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await borrow.limiter(
+const { success, timeLeft } = await limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
   {
     limiters: [
@@ -100,9 +100,9 @@ if (!success) {
 Let's use the [token bucket](/limiter/algorithms#token-bucket) algorithm to rate limit requests to 10 tokens per minute, with a maximum of 20 tokens.
 
 ```ts ts2js
-import borrow from "@borrowdev/limiter";
+import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await borrow.limiter(
+const { success, timeLeft } = await limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
   {
     limiters: [
@@ -125,7 +125,7 @@ if (!success) {
 }
 
 // Optionally, you can also manually refill tokens!
-await borrow.limiter.tokens.refill({
+await limiter.tokens.refill({
   key: "my-limiter-id",
   userId: "current-user-id",
 });
@@ -137,9 +137,9 @@ await borrow.limiter.tokens.refill({
 Let's use the [borrow](/limiter/algorithms#borrow) algorithm to rate limit requests to one request at a time.
 
 ```ts ts2js
-import borrow from "@borrowdev/limiter";
+import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await borrow.limiter(
+const { success, timeLeft } = await limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
   {
     limiters: [
@@ -159,7 +159,7 @@ if (!success) {
   };
 }
 // ... Your expensive business logic
-const { success: endSuccess } = await borrow.limiter(
+const { success: endSuccess } = await limiter(
   { key: "my-limiter-id", userId: "current-user-id" },
   {
     limiters: [

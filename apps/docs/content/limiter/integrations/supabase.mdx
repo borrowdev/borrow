@@ -19,10 +19,10 @@ without touching the user object, this greatly simplifies the whole process!
 Here's how it works:
 
 ```ts ts2js
-import borrow from "@borrowdev/limiter";
+import { limiter } from "@borrowdev/limiter";
 // ... Your Supabase Edge Function handler
 
-const { success, timeLeft } = await borrow.limiter(req, {
+const { success, timeLeft } = await limiter(req, {
   limiters: [
     {
       interval: 20,
