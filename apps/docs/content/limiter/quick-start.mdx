@@ -105,6 +105,12 @@ if (!success) {
       (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
   };
 }
+
+// Optionally, you can also manually refill tokens!
+await borrow.limiter.tokens.refill({
+  key: "my-limiter-id",
+  userId: "current-user-id",
+});
 // ... Your expensive business logic
 ```
 
@@ -149,6 +155,6 @@ if (!endSuccess) {
 ### Conclusion
 
 In this Quick Start guide, we've barely scratched the surface of what Borrow Limiter can do.
-You can do so much more such as refilling tokens on demand and creating different limiter combinations with up to 4 limiters of unique types.
+You can do so much more such as customizing the unexpected fail behavior and creating different limiter combinations with up to 4 limiters of unique types.
 
 If you want to learn more, the best way to do so is to just [install Borrow](/limiter/quick-start#installation) and read the in-editor comments (JSDoc for TS/JS).
