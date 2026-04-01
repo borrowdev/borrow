@@ -1,9 +1,13 @@
 {
   "name": "@borrowdev/node",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "private": false,
   "description": "Borrow.dev: Open-Source Tools for Web Developers",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/borrowdev/borrow.git"
+  },
   "files": [
     "dist",
     "package.json",
