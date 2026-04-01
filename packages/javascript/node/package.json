@@ -31,7 +31,6 @@
   },
   "scripts": {
     "build": "tsdown",
-    "publish": "npm publish --access public",
     "test": "vp test"
   },
   "dependencies": {

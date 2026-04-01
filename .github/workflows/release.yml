@@ -53,7 +53,8 @@ jobs:
           run-install: true
       - name: Publish packages to NPM
         if: ${{ steps.release.outputs.releases_created == 'true' }}
-        run: vp run publish -r
+        run: npm publish --access public
+        working-directory: packages/javascript/node
   deploy-docs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
