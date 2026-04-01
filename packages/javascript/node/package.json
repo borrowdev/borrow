@@ -25,7 +25,8 @@
     }
   },
   "scripts": {
-    "build": "tsdown && tsc --noEmit",
+    "build": "tsdown",
+    "publish": "npx jsr publish && npm publish --access public",
     "test": "vp test"
   },
   "dependencies": {
