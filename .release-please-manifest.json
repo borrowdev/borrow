@@ -1,4 +1,5 @@
 {
   "packages/limiter": "2.0.1",
-  "packages/ms": "0.1.1"
+  "packages/ms": "0.1.1",
+  "packages/data": "1.0.0"
 }
