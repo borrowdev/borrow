@@ -1,4 +1,4 @@
-import { limiter, UpstashRedisAdapter } from "@borrowdev/limiter/limiter/host";
+import { limiter, UpstashRedisAdapter } from "@borrowdev/limiter/host";
 import { Redis } from "@upstash/redis/cloudflare";
 import config from "../../config.js";
 
