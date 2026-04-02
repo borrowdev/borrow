@@ -38,7 +38,7 @@
     "build": "vp pack",
     "test": "vp test",
     "cf-typegen": "wrangler types --config ./tests/fixtures/environments/cloudflare/wrangler.jsonc ./tests/fixtures/environments/cloudflare/worker-configuration.d.ts",
-    "postinstall": "vp run cf-typegen"
+    "prepare": "vp run cf-typegen"
   },
   "dependencies": {
     "@supabase/supabase-js": "catalog:",
