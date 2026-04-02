@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="200" height="100" />
+  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="500" height="250" />
 </div>
 
 <h3 align="center">⇀ DX-First Tools for 10x Developers ⇀</h3>
