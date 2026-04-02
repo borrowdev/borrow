@@ -1,6 +1,6 @@
 [package]
 name = "borrow-dev"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Lorenzo Bloedow <dev@lorenzobloedow.com>"]
 license = "MIT"
 edition = "2024"
@@ -15,8 +15,12 @@ name = "borrow"
 path = "src/main.rs"
 
 [dependencies]
-clap = { version = "4.5.37", features = ["derive", "unicode", "wrap_help"] }
+clap = { version = "4.5.37", features = ["derive", "unicode", "wrap_help", "env"] }
 inquire = "0.7.5"
 walkdir = "2"
 dirs = "6"
 git2 = "0.20.2"
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+serde_json = "1"
+emojic = "0.5.1"
+md5 = "0.8.0"
