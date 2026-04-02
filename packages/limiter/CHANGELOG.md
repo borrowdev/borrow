@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v2.0.0...@borrowdev/limiter-v2.0.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* **limiter:** Remove ghost dependency ([f8c24a6](https://github.com/borrowdev/borrow/commit/f8c24a68dcfd7a0061b2787f09225b53ef844227))
+
 ## [2.0.0](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v1.2.0...@borrowdev/limiter-v2.0.0) (2026-04-02)
 
 
