@@ -1,15 +1,5 @@
-<div style="display:flex; flex-direction:row; gap:16px; justify-content:center; align-items:center; flex-wrap:wrap;">
-
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/borrowdev/borrow/release.yml)
-
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/borrowdev/borrow)
-
-![Crates.io Total Downloads](https://img.shields.io/crates/d/borrow-dev)
-
-</div>
-
 <div align="center">
-  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="800" height="400" />
+  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="200" height="100" />
 </div>
 
 <h3 align="center">⇀ DX-First Tools for 10x Developers ⇀</h3>
