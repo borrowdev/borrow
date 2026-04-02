@@ -2,7 +2,7 @@
   "name": "@borrowdev/limiter",
   "version": "1.2.0",
   "private": false,
-  "description": "Borrow.dev: Open-Source Tools for Web Developers",
+  "description": "Self-hostable rate limiting API for serverless environments",
   "keywords": [
     "borrow.dev",
     "limiter",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/borrowdev/borrow.git"
+    "url": "git+https://github.com/borrowdev/borrow.git"
   },
   "files": [
     "dist",
@@ -23,10 +23,10 @@
   "module": "./dist/main.mjs",
   "types": "./dist/main.d.mts",
   "exports": {
-    "./limiter/host": {
-      "types": "./dist/limiterHost.d.mts",
-      "import": "./dist/limiterHost.mjs",
-      "default": "./dist/limiterHost.mjs"
+    "./host": {
+      "types": "./dist/host.d.mts",
+      "import": "./dist/host.mjs",
+      "default": "./dist/host.mjs"
     },
     ".": {
       "types": "./dist/main.d.mts",
@@ -36,9 +36,12 @@
   },
   "scripts": {
     "build": "vp pack",
-    "test": "vp test"
+    "test": "vp test",
+    "cf-typegen": "wrangler types --config ./tests/fixtures/environments/cloudflare/wrangler.jsonc ./tests/fixtures/environments/cloudflare/worker-configuration.d.ts",
+    "postinstall": "vp run cf-typegen"
   },
   "dependencies": {
+    "@borrowdev/data": "workspace:*",
     "@supabase/supabase-js": "catalog:",
     "@upstash/redis": "catalog:",
     "zod": "catalog:"

@@ -1,0 +1,66 @@
+---
+title: CLI
+description: Measure API latency across the world using the Borrow CLI.
+icon: Terminal
+---
+
+# CLI
+
+Use the `borrow ms` command to measure the latency of any API endpoint from multiple regions around the world.
+
+## Plans
+
+On the **free plan**, results are limited to the `us-east-1` and `eu-west-1` AWS regions. The **paid plan** returns results for all available regions worldwide. Visit the [pricing page](https://borrow.dev/pricing) to learn more about the limits and available plans.
+
+## Authentication
+
+1. [Create a Borrow account.](https://borrow.dev/sign-up)
+2. [Create a new project.](https://borrow.dev/dashboard)
+3. Inside your project, go to the Settings tab.
+4. In the Authentication section, click Show API Key.
+5. Wait for the API key to be decrypted and copy it.
+6. Set the `BORROW_API_KEY` environment variable, or pass it directly with the `--api-key` flag.
+
+## Installation
+
+Install the CLI from [crates.io](https://crates.io/crates/borrow-dev):
+
+```bash
+cargo install borrow-dev
+```
+
+## Usage
+
+```bash
+borrow ms <URL> [OPTIONS]
+```
+
+### Examples
+
+Simple GET request:
+
+```bash
+borrow ms https://api.example.com/health
+```
+
+POST request with headers and body:
+
+```bash
+borrow ms https://api.example.com/data \
+  -m POST \
+  --header "Authorization: Bearer token" \
+  --header "Content-Type: application/json" \
+  -d '{"key": "value"}'
+```
+
+Using an API key directly instead of the environment variable:
+
+```bash
+borrow ms https://api.example.com/health -k borrow_sk_your_api_key
+```
+
+Verbose output with region codes:
+
+```bash
+borrow ms https://api.example.com/health -v
+```

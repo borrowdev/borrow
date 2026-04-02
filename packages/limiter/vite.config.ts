@@ -5,7 +5,7 @@ export default defineConfig({
   pack: {
     entry: {
       main: "./src/index.ts",
-      limiterHost: "./src/lib/limiter/host/index.ts",
+      host: "./src/lib/limiter/host/index.ts",
     },
     dts: {
       tsgo: true,

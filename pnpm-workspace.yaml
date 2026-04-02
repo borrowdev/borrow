@@ -21,6 +21,7 @@ catalog:
   "@typescript/native-preview": 7.0.0-dev.20260401.1
   "@upstash/redis": "^1.37.0"
   "@vitest/coverage-v8": "^4.1.2"
+  cloudflare: 6.0.0-beta.1
   dotenv: ^17.3.1
   express: ^5.2.1
   fast-check: "^4.6.0"

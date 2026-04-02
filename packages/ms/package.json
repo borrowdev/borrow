@@ -1,0 +1,58 @@
+{
+  "name": "@borrowdev/ms",
+  "version": "0.1.0",
+  "description": "Measure the latency of your API around the world",
+  "keywords": [
+    "api",
+    "latency",
+    "measure"
+  ],
+  "license": "MIT",
+  "author": "Lorenzo Bloedow <me@lorenzobloedow.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borrowdev/borrow.git"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "type": "module",
+  "exports": {
+    "./host": {
+      "types": "./dist/host.d.mts",
+      "import": "./dist/host.mjs",
+      "default": "./dist/host.mjs"
+    },
+    "./host/worker": {
+      "types": "./dist/hostWorker.d.mts",
+      "import": "./dist/hostWorker.mjs",
+      "default": "./dist/hostWorker.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check",
+    "prepublishOnly": "vp run build",
+    "cf-typegen": "wrangler types",
+    "postinstall": "vp run cf-typegen"
+  },
+  "dependencies": {
+    "@borrowdev/data": "workspace:*"
+  },
+  "devDependencies": {
+    "@borrowdev/config": "workspace:*",
+    "@types/node": "^25.5.0",
+    "@typescript/native-preview": "7.0.0-dev.20260328.1",
+    "bumpp": "^11.0.1",
+    "typescript": "^6.0.2",
+    "vite-plus": "^0.1.14",
+    "wrangler": "catalog:",
+    "zod": "catalog:"
+  }
+}

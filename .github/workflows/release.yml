@@ -21,7 +21,7 @@ jobs:
           cache: true
           run-install: true
       - name: Build packages
-        run: vp run -F @borrowdev/limiter build
+        run: vp run -F limiter -F ms build
       - name: Run @borrowdev/limiter tests
         # TODO: Fix 'vp run test -r' breaking on Cloudflare tests and use it instead.
         working-directory: packages/limiter

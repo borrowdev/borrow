@@ -1,0 +1,172 @@
+{
+  "aws:us-east-1": {
+    "country": "US",
+    "region": "Northern Virginia",
+    "direction": "east"
+  },
+  "aws:us-east-2": {
+    "country": "US",
+    "region": "Ohio",
+    "direction": "east"
+  },
+  "aws:us-west-1": {
+    "country": "US",
+    "region": "Northern California",
+    "direction": "west"
+  },
+  "aws:us-west-2": {
+    "country": "US",
+    "region": "Oregon",
+    "direction": "west"
+  },
+  "aws:af-south-1": {
+    "country": "ZA",
+    "region": "Cape Town",
+    "direction": "south"
+  },
+  "aws:ap-east-1": {
+    "country": "HK",
+    "region": "Hong Kong",
+    "direction": "east"
+  },
+  "aws:ap-east-2": {
+    "country": "TW",
+    "region": "Taipei",
+    "direction": "east"
+  },
+  "aws:ap-south-1": {
+    "country": "IN",
+    "region": "Mumbai",
+    "direction": "south"
+  },
+  "aws:ap-south-2": {
+    "country": "IN",
+    "region": "Hyderabad",
+    "direction": "south"
+  },
+  "aws:ap-southeast-1": {
+    "country": "SG",
+    "region": "Singapore",
+    "direction": "southeast"
+  },
+  "aws:ap-southeast-2": {
+    "country": "AU",
+    "region": "Sydney",
+    "direction": "southeast"
+  },
+  "aws:ap-southeast-3": {
+    "country": "ID",
+    "region": "Jakarta",
+    "direction": "southeast"
+  },
+  "aws:ap-southeast-4": {
+    "country": "AU",
+    "region": "Melbourne",
+    "direction": "southeast"
+  },
+  "aws:ap-southeast-5": {
+    "country": "MY",
+    "region": "Malaysia",
+    "direction": "southeast"
+  },
+  "aws:ap-southeast-6": {
+    "country": "NZ",
+    "region": "New Zealand",
+    "direction": "southeast"
+  },
+  "aws:ap-southeast-7": {
+    "country": "TH",
+    "region": "Thailand",
+    "direction": "southeast"
+  },
+  "aws:ap-northeast-1": {
+    "country": "JP",
+    "region": "Tokyo",
+    "direction": "northeast"
+  },
+  "aws:ap-northeast-2": {
+    "country": "KR",
+    "region": "Seoul",
+    "direction": "northeast"
+  },
+  "aws:ap-northeast-3": {
+    "country": "JP",
+    "region": "Osaka",
+    "direction": "northeast"
+  },
+  "aws:ca-central-1": {
+    "country": "CA",
+    "region": "Central",
+    "direction": "central"
+  },
+  "aws:ca-west-1": {
+    "country": "CA",
+    "region": "Calgary",
+    "direction": "west"
+  },
+  "aws:eu-central-1": {
+    "country": "DE",
+    "region": "Frankfurt",
+    "direction": "central"
+  },
+  "aws:eu-central-2": {
+    "country": "CH",
+    "region": "Zurich",
+    "direction": "central"
+  },
+  "aws:eu-north-1": {
+    "country": "SE",
+    "region": "Stockholm",
+    "direction": "north"
+  },
+  "aws:eu-south-1": {
+    "country": "IT",
+    "region": "Milan",
+    "direction": "south"
+  },
+  "aws:eu-south-2": {
+    "country": "ES",
+    "region": "Spain",
+    "direction": "south"
+  },
+  "aws:eu-west-1": {
+    "country": "IE",
+    "region": "Ireland",
+    "direction": "west"
+  },
+  "aws:eu-west-2": {
+    "country": "GB",
+    "region": "London",
+    "direction": "west"
+  },
+  "aws:eu-west-3": {
+    "country": "FR",
+    "region": "Paris",
+    "direction": "west"
+  },
+  "aws:il-central-1": {
+    "country": "IL",
+    "region": "Tel Aviv",
+    "direction": "central"
+  },
+  "aws:me-central-1": {
+    "country": "AE",
+    "region": "UAE",
+    "direction": "central"
+  },
+  "aws:me-south-1": {
+    "country": "BH",
+    "region": "Bahrain",
+    "direction": "south"
+  },
+  "aws:mx-central-1": {
+    "country": "MX",
+    "region": "Central",
+    "direction": "central"
+  },
+  "aws:sa-east-1": {
+    "country": "BR",
+    "region": "São Paulo",
+    "direction": "east"
+  }
+}
