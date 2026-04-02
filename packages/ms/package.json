@@ -43,7 +43,8 @@
     "postinstall": "vp run cf-typegen"
   },
   "dependencies": {
-    "@borrowdev/data": "workspace:*"
+    "@borrowdev/data": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@borrowdev/config": "workspace:*",
@@ -52,7 +53,6 @@
     "bumpp": "^11.0.1",
     "typescript": "^6.0.2",
     "vite-plus": "^0.1.14",
-    "wrangler": "catalog:",
-    "zod": "catalog:"
+    "wrangler": "catalog:"
   }
 }
