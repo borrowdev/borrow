@@ -60,12 +60,6 @@ catalogs:
     '@upstash/redis':
       specifier: ^1.37.0
       version: 1.37.0
-    cloudflare:
-      specifier: 6.0.0-beta.1
-      version: 6.0.0-beta.1
-    dotenv:
-      specifier: ^17.3.1
-      version: 17.3.1
     express:
       specifier: ^5.2.1
       version: 5.2.1
@@ -120,9 +114,6 @@ catalogs:
     tslib:
       specifier: ^2.8.1
       version: 2.8.1
-    tsx:
-      specifier: ^4.21.0
-      version: 4.21.0
     type-fest:
       specifier: ^5.5.0
       version: 5.5.0
@@ -265,9 +256,6 @@ importers:
 
   packages/limiter:
     dependencies:
-      '@borrowdev/data':
-        specifier: workspace:*
-        version: link:../data
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.101.1
@@ -360,25 +348,6 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 4.3.6
-
-  scripts:
-    dependencies:
-      '@borrowdev/data':
-        specifier: workspace:*
-        version: link:../packages/data
-      '@borrowdev/ms':
-        specifier: workspace:*
-        version: link:../packages/ms
-      cloudflare:
-        specifier: 'catalog:'
-        version: 6.0.0-beta.1
-    devDependencies:
-      dotenv:
-        specifier: 'catalog:'
-        version: 17.3.1
-      tsx:
-        specifier: 'catalog:'
-        version: 4.21.0
 
 packages:
 
@@ -4133,9 +4102,6 @@ packages:
   cloudflare@4.5.0:
     resolution: {integrity: sha512-fPcbPKx4zF45jBvQ0z7PCdgejVAPBBCZxwqk1k7krQNfpM07Cfj97/Q6wBzvYqlWXx/zt1S9+m8vnfCe06umbQ==}
 
-  cloudflare@6.0.0-beta.1:
-    resolution: {integrity: sha512-InmLa6sp9My56kn+78FnULprK4VGZnUzkSwuwxgKY3ojIemTPfQf6ZtKE6Tj27xJ8AbIgJZlo0PTXn9ih+g0WA==}
-
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
@@ -4294,10 +4260,6 @@ packages:
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
-    engines: {node: '>=12'}
-
-  dotenv@17.3.1:
-    resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -10127,18 +10089,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  cloudflare@6.0.0-beta.1:
-    dependencies:
-      '@types/node': 18.19.130
-      '@types/node-fetch': 2.6.13
-      abort-controller: 3.0.0
-      agentkeepalive: 4.6.0
-      form-data-encoder: 1.7.2
-      formdata-node: 4.4.1
-      node-fetch: 2.7.0
-    transitivePeerDependencies:
-      - encoding
-
   clsx@2.1.1: {}
 
   collapse-white-space@2.1.0: {}
@@ -10264,8 +10214,6 @@ snapshots:
       is-obj: 2.0.0
 
   dotenv@16.6.1: {}
-
-  dotenv@17.3.1: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -10813,6 +10761,7 @@ snapshots:
   get-tsconfig@4.13.7:
     dependencies:
       resolve-pkg-maps: 1.0.0
+    optional: true
 
   git-raw-commits@5.0.1(conventional-commits-parser@6.4.0):
     dependencies:
@@ -12284,7 +12233,8 @@ snapshots:
 
   resolve-from@5.0.0: {}
 
-  resolve-pkg-maps@1.0.0: {}
+  resolve-pkg-maps@1.0.0:
+    optional: true
 
   rettime@0.10.1: {}
 
@@ -12730,6 +12680,7 @@ snapshots:
       get-tsconfig: 4.13.7
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   type-fest@5.5.0:
     dependencies:
