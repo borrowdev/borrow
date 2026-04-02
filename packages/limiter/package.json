@@ -1,6 +1,6 @@
 {
   "name": "@borrowdev/limiter",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": false,
   "description": "Self-hostable rate limiting API for serverless environments",
   "keywords": [

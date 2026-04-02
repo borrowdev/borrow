@@ -1,6 +1,6 @@
 {
   "name": "@borrowdev/ms",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Measure the latency of your API around the world",
   "keywords": [
     "api",
