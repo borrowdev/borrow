@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.0.0](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v1.2.0...@borrowdev/limiter-v2.0.0) (2026-04-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **limiter:** Deprecate @borrowdev/node & create tool-scoped package instead (@borrowdev/limiter)
+* **limiter:** Remove "borrow" wrapper from default export
+* **limiter:** Deprecate @borrowdev/node & create tool-scoped package instead (@borrowdev/limiter)
+
+### Features
+
+* **ms:** Create Cloudflare Worker orchestrator ([7983c1b](https://github.com/borrowdev/borrow/commit/7983c1b6074c0d2e7a4de03cc2f288a3fb803459))
+* **ms:** Create input/output data shape with zod ([e70ad74](https://github.com/borrowdev/borrow/commit/e70ad74fb0c924bc7702c3ebfeffc2a87eed1020))
+* **ms:** Create measure Worker and Workers deploy script to deploy on every region ([af4c69f](https://github.com/borrowdev/borrow/commit/af4c69f4b94e76ab9a2222c8a7d83ad01ce3195b))
+
+
+### Code Refactoring
+
+* **limiter:** Remove "borrow" wrapper from default export ([49f9ec4](https://github.com/borrowdev/borrow/commit/49f9ec4db07f5e69201c740711cd9d2d411185dc))
+
+
+### Build System
+
+* **limiter:** Deprecate @borrowdev/node & create tool-scoped package instead (@borrowdev/limiter) ([c741db6](https://github.com/borrowdev/borrow/commit/c741db6cb34a5a02c3f924014322d5d43f526eab))
+* **limiter:** Deprecate @borrowdev/node & create tool-scoped package instead (@borrowdev/limiter) ([58a93de](https://github.com/borrowdev/borrow/commit/58a93de9ac89be6835a9d6aeb494c1b2840a9f48))
+
 ## [1.2.0](https://github.com/borrowdev/borrow/compare/@borrowdev/node-v1.1.0...@borrowdev/node-v1.2.0) (2026-04-01)
 
 ### Features
