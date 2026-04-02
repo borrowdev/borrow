@@ -323,6 +323,9 @@ importers:
       '@borrowdev/data':
         specifier: workspace:*
         version: link:../data
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@borrowdev/config':
         specifier: workspace:*
@@ -345,9 +348,6 @@ importers:
       wrangler:
         specifier: 'catalog:'
         version: 4.77.0
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.6
 
 packages:
 
