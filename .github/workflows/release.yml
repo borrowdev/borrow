@@ -59,6 +59,10 @@ jobs:
         if: ${{ steps.release.outputs.releases_created == 'true' }}
         run: vp run build && pnpm publish --access public --provenance
         working-directory: packages/ms
+      - name: Publish Data to NPM
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: pnpm publish --access public --provenance
+        working-directory: packages/data
   deploy-docs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
