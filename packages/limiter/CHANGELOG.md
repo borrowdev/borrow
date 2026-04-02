@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.0.0](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v1.2.0...@borrowdev/limiter-v2.0.0) (2026-04-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **limiter:** Remove "borrow" wrapper from default export
+* **limiter:** Deprecate @borrowdev/node & create tool-scoped package instead (@borrowdev/limiter)
+
+### Code Refactoring
+
+* **limiter:** Remove "borrow" wrapper from default export ([49f9ec4](https://github.com/borrowdev/borrow/commit/49f9ec4db07f5e69201c740711cd9d2d411185dc))
+
+
+### Build System
+
+* **limiter:** Deprecate @borrowdev/node & create tool-scoped package instead (@borrowdev/limiter) ([58a93de](https://github.com/borrowdev/borrow/commit/58a93de9ac89be6835a9d6aeb494c1b2840a9f48))
+
 ## [1.2.0](https://github.com/borrowdev/borrow/compare/@borrowdev/node-v1.1.0...@borrowdev/node-v1.2.0) (2026-04-01)
 
 ### Features
