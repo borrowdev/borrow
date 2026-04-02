@@ -51,10 +51,14 @@ jobs:
         with:
           cache: true
           run-install: true
-      - name: Publish packages to NPM
+      - name: Publish Limiter to NPM
         if: ${{ steps.release.outputs.releases_created == 'true' }}
         run: vp run build && pnpm publish --access public --provenance
         working-directory: packages/limiter
+      - name: Publish Ms to NPM
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: vp run build && pnpm publish --access public --provenance
+        working-directory: packages/ms
   deploy-docs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
