@@ -6,7 +6,18 @@
 cargo install borrow-dev
 ```
 
-## Start
+## 🌎 Ms
+
+Borrow Ms is a command-line tool to quickly measure your API latency around the world with 1 command.
+
+### Usage
+
+```bash
+export BORROW_API_KEY=your_api_key_here
+borrow ms <URL> [OPTIONS]
+```
+
+## 🏗 Start
 
 Borrow Start is a command-line tool that helps you quickly set up common boilerplate code with pre-defined templates and placeholders.
 

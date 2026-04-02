@@ -1,4 +1,4 @@
-# Borrow Node.js SDK
+# Borrow Limiter
 
 <div align="center">
   <a href="https://www.npmjs.com/package/@borrowdev/limiter"><img src="https://img.shields.io/npm/v/@borrowdev/limiter" alt="NPM version"></a>
@@ -10,7 +10,7 @@
 - **Self-hostable** - Easily deploy on your own infrastructure
 - **Minimal dependencies** - Lightweight and secure
 - **Fully typed** - Complete TypeScript + JSDoc support
-- **Simple API** - Intuitive interfaces for all tools
+- **Simple API** - Intuitive interface for defining rate limits
 - **Serverless-first** - [Integration](https://borrow.dev/docs/limiter/integrations/supabase) with modern cloud environments
 
 ## Installation

@@ -1,32 +1,38 @@
-<div align="center">
-  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="600" height="300" />
+<div style="display:flex; flex-direction:row; gap:16px; justify-content:center; align-items:center; flex-wrap:wrap;">
+
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/borrowdev/borrow/release.yml)
+
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/borrowdev/borrow)
+
+![Crates.io Total Downloads](https://img.shields.io/crates/d/borrow-dev)
+
 </div>
 
 <div align="center">
-  <img src="https://img.shields.io/github/actions/workflow/status/borrowdev/borrow/release.yml" alt="Release Status" />
+  <img src="https://borrow.dev/opengraph.png" alt="Borrow OpenGraph Image" width="800" height="400" />
 </div>
 
-<h3 align="center">We automate the boring stuff for you</h3>
+<h3 align="center">⇀ DX-First Tools for 10x Developers ⇀</h3>
 
 <p align="center">
-  <b>Simple, open-source, powerful tools for modern applications</b><br>
+  <b>Simple, open-source, self-hostable</b><br>
 </p>
 
 <p align="center" style="font-size:12px">
-  All tools are easily self-hostable, fully typed, and designed for serverless-first environments.
+  MIT license, 0 lock-in and built with ❤️ by <a href="https://borrow.dev">Borrow</a>
 </p>
 
-## Authentication
+## 🔑 Authentication
 
 [Follow this guide to authenticate if using our managed service.](https://borrow.dev/docs/limiter/quick-start#authentication)
 
-## Documentation
+## 📚 Documentation
 
 [Read the full documentation for Borrow.](https://borrow.dev/docs)
 
-## Borrow Ms
+## 🌎 Borrow Ms
 
-🌎 Measure the latency of your API around the world in 1 command.
+Measure the latency of your API around the world in 1 command.
 
 ### Usage
 
@@ -42,7 +48,7 @@ borrow ms https://api.example.com/data \
   -d '{"key": "value"}'
 ```
 
-## Borrow Limiter
+## 🚪 Borrow Limiter
 
 Self-hostable rate limiting API for protecting regular service usage.
 
@@ -78,11 +84,11 @@ if (!success) {
 }
 ```
 
-### Self host
+### Self-host
 
 To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev/docs/limiter/self-hosting).
 
-## Borrow CLI
+## 🛠 Borrow CLI
 
 ### Install
 
@@ -90,7 +96,7 @@ To self-host the Limiter API, follow the [self-hosting guide](https://borrow.dev
 cargo install borrow-dev
 ```
 
-### Start
+### Borrow Start
 
 Borrow Start is a command-line tool that helps you quickly set up common boilerplate code with pre-defined templates and placeholders.
 
