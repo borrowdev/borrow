@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v2.0.1...@borrowdev/limiter-v2.0.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* Use prepare instead of postinstall in packages ([481d27f](https://github.com/borrowdev/borrow/commit/481d27f99f2e87131a7710f45318d25b63f4a2ea))
+
 ## [2.0.1](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v2.0.0...@borrowdev/limiter-v2.0.1) (2026-04-02)
 
 
