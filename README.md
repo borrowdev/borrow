@@ -24,6 +24,24 @@
 
 [Read the full documentation for Borrow.](https://borrow.dev/docs)
 
+## Borrow Ms
+
+🌎 Measure the latency of your API around the world in 1 command.
+
+### Usage
+
+```bash
+cargo install borrow-dev
+
+export BORROW_API_KEY=your_borrow_api_key
+
+borrow ms https://api.example.com/data \
+  -m POST \
+  --header "Authorization: Bearer token" \
+  --header "Content-Type: application/json" \
+  -d '{"key": "value"}'
+```
+
 ## Borrow Limiter
 
 Self-hostable rate limiting API for protecting regular service usage.
