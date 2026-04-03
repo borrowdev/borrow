@@ -1,6 +1,6 @@
 use clap::Parser;
 use emojic::country_flag;
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 #[cfg(not(debug_assertions))]
 static ENDPOINT: &str = "https://api.borrow.dev";
@@ -27,6 +27,18 @@ pub struct MsCommand {
     /// Request body (for POST, PUT, DELETE)
     #[arg(short = 'd', long = "body")]
     pub body: Option<String>,
+
+    /// Publish parts of the request (comma-separated: body,query)
+    #[arg(short = 'p', long = "publish", value_delimiter = ',')]
+    pub publish: Vec<String>,
+
+    /// Scope of the published measurement (public or private)
+    #[arg(short = 's', long = "scope", default_value = "private")]
+    pub scope: String,
+
+    /// Whether to disable video generation when 'publish' is used
+    #[arg(long = "no-video", default_value_t = false)]
+    pub no_video: bool,
 
     /// Show region codes in output
     #[arg(short = 'v', long = "verbose")]
@@ -68,13 +80,15 @@ pub fn handle_ms_command(cmd: MsCommand) {
         "method".to_string(),
         serde_json::Value::String(method.clone()),
     );
-
-    if !headers.is_empty() {
-        measure_request.insert(
-            "headers".to_string(),
-            serde_json::to_value(&headers).unwrap(),
-        );
-    }
+    measure_request.insert(
+        "headers".to_string(),
+        serde_json::Value::Object(
+            headers
+                .into_iter()
+                .map(|(k, v)| (k, serde_json::Value::String(v)))
+                .collect(),
+        ),
+    );
 
     if let Some(body) = &cmd.body {
         if method == "GET" {
@@ -84,16 +98,33 @@ pub fn handle_ms_command(cmd: MsCommand) {
         measure_request.insert("body".to_string(), serde_json::Value::String(body.clone()));
     }
 
-    let payload = serde_json::json!({
+    let mut payload = serde_json::json!({
         "action": "measure",
+        "enableVideo": !cmd.no_video,
         "measureRequest": measure_request,
     });
+
+    if !cmd.publish.is_empty() {
+        let valid_parts = ["body", "headers", "query"];
+        for part in &cmd.publish {
+            if !valid_parts.contains(&part.as_str()) {
+                eprintln!(
+                    "Error: invalid publish part '{}'. Valid options: body, headers, query.",
+                    part
+                );
+                std::process::exit(1);
+            }
+        }
+        payload["publish"] = serde_json::to_value(&cmd.publish).unwrap();
+        payload["scope"] = serde_json::Value::String(cmd.scope.clone());
+    }
 
     let client = reqwest::blocking::Client::new();
     let res = client
         .post(&format!("{ENDPOINT}/v1/ms"))
         .header("Content-Type", "application/json")
         .header("X-Borrow-Api-Key", &cmd.api_key)
+        .timeout(Duration::from_mins(3))
         .json(&payload)
         .send();
 
@@ -197,6 +228,15 @@ pub fn handle_ms_command(cmd: MsCommand) {
             println!(
                 "================================================================================="
             );
+
+            if let Some(video_url) = parsed["videoUrl"].as_str() {
+                println!("🎬 Share the video: {}", video_url);
+            } else if parsed["videoStatus"].as_str() == Some("rendering") {
+                if let Some(video_id) = parsed["videoId"].as_str() {
+                    println!("🎬 Video rendering (id: {})", video_id);
+                }
+            }
+
             println!("By Borrow.dev \u{21C0} Open-Source Tools for Web Developers");
             println!();
         }
