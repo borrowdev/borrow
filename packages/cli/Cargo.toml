@@ -1,13 +1,13 @@
 [package]
 name = "borrow-dev"
 version = "0.1.1"
-authors = ["Lorenzo Bloedow <dev@lorenzobloedow.com>"]
+authors = ["Lorenzo Bloedow <me@lorenzobloedow.com>"]
 license = "MIT"
 edition = "2024"
-description = "Official CLI for Borrow tools"
+description = "Official CLI for Borrow.dev Tools"
 homepage = "https://github.com/borrowdev/borrow"
 repository = "https://github.com/borrowdev/borrow"
-keywords = ["cli", "toolkit", "template", "boilerplate"]
+keywords = ["cli", "borrow", "template", "boilerplate"]
 categories = ["command-line-utilities"]
 
 [[bin]]
