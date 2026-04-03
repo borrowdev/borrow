@@ -9,7 +9,7 @@ homepage = "https://borrow.dev"
 documentation = "https://borrow.dev/docs"
 repository = "https://github.com/borrowdev/borrow"
 keywords = ["cli", "borrow-dev", "template", "boilerplate", "api-latency"]
-categories = ["command-line-utilities"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "borrow"
