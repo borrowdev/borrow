@@ -229,15 +229,27 @@ pub fn handle_ms_command(cmd: MsCommand) {
                 "================================================================================="
             );
 
-            if let Some(video_url) = parsed["videoUrl"].as_str() {
-                println!("🎬 Share the video: {}", video_url);
-            } else if parsed["videoStatus"].as_str() == Some("rendering") {
-                if let Some(video_id) = parsed["videoId"].as_str() {
-                    println!("🎬 Video rendering (id: {})", video_id);
-                }
+            let mut has_extra_data = false;
+
+            if let Some(url) = parsed["url"].as_str()
+                && cmd.scope == "public"
+            {
+                println!("🏎️  Share the results: {url}");
+                has_extra_data = true;
             }
 
-            println!("By Borrow.dev \u{21C0} Open-Source Tools for Web Developers");
+            if let Some(video_url) = parsed["videoUrl"].as_str() {
+                println!("🎬 Share the video: {}", video_url);
+                has_extra_data = true;
+            }
+
+            if has_extra_data {
+                println!(
+                    "================================================================================="
+                );
+            }
+
+            println!("❤️  By Borrow.dev \u{21C0} Open-Source Tools for Web Developers");
             println!();
         }
         Err(e) => {
