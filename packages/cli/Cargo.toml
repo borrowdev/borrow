@@ -1,10 +1,10 @@
 [package]
 name = "borrow-dev"
-version = "0.1.2"
+version = "0.1.1"
 authors = ["Lorenzo Bloedow <me@lorenzobloedow.com>"]
 license = "MIT"
 edition = "2024"
-description = "Official CLI for Borrow.dev Tools"
+description = "Official CLI for Borrow.dev Open-Source Web Development Tools"
 homepage = "https://borrow.dev"
 documentation = "https://borrow.dev/docs"
 repository = "https://github.com/borrowdev/borrow"
