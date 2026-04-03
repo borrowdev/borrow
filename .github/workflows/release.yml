@@ -63,11 +63,12 @@ jobs:
         if: ${{ steps.release.outputs.releases_created == 'true' }}
         run: pnpm publish --access public --provenance
         working-directory: packages/data
-      - name: Publish CLI to Crates.io
-        uses: rust-lang/crates-io-auth-action@v1
-        id: auth
+      - uses: rust-lang/crates-io-auth-action@v1
         if: ${{ steps.release.outputs.releases_created == 'true' }}
-        run: cargo publish
+        id: auth
+      - name: Publish CLI to Crates.io
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: cargo publish -p borrow-dev
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
   deploy-docs:
