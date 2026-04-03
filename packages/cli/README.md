@@ -10,6 +10,8 @@ cargo install borrow-dev
 
 Borrow Ms is a command-line tool to quickly measure your API latency around the world with 1 command.
 
+You can also share the results publicly, [see public queries](https://borrow.dev/ms).
+
 ### Usage
 
 ```bash
