@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/borrowdev/borrow/compare/CLI-v0.1.2...CLI-v0.1.3) (2026-04-04)
+
+
+### Bug Fixes
+
+* **cli:** Fix incomplete help messages ([598559e](https://github.com/borrowdev/borrow/commit/598559e4987bcd80b81c5c3e5a4582ac8e554e5d))
+
 ## [0.1.2](https://github.com/borrowdev/borrow/compare/CLI-v0.1.2...CLI-v0.1.2) (2026-04-03)
 
 
