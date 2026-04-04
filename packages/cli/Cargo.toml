@@ -1,6 +1,6 @@
 [package]
 name = "borrow-dev"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Lorenzo Bloedow <me@lorenzobloedow.com>"]
 license = "MIT"
 edition = "2024"
