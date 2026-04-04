@@ -12,7 +12,7 @@ pub struct MsCommand {
     /// The API URL to measure latency for
     pub url: String,
 
-    /// HTTP method (GET, POST, PUT, DELETE)
+    /// HTTP method (GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD)
     #[arg(short = 'm', long = "method", default_value = "GET")]
     pub method: String,
 
@@ -28,7 +28,7 @@ pub struct MsCommand {
     #[arg(short = 'd', long = "body")]
     pub body: Option<String>,
 
-    /// Publish parts of the request (comma-separated: body,query)
+    /// Publish parts of the request (comma-separated: body,query,headers)
     #[arg(short = 'p', long = "publish", value_delimiter = ',')]
     pub publish: Vec<String>,
 
@@ -36,7 +36,7 @@ pub struct MsCommand {
     #[arg(short = 's', long = "scope", default_value = "private")]
     pub scope: String,
 
-    /// Whether to disable video generation when 'publish' is used
+    /// Whether to disable video generation when 'publish' is used or 'scope' is set to 'public'
     #[arg(long = "no-video", default_value_t = false)]
     pub no_video: bool,
 
