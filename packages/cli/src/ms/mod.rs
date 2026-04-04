@@ -48,10 +48,10 @@ pub struct MsCommand {
 pub fn handle_ms_command(cmd: MsCommand) {
     let method = cmd.method.to_uppercase();
     match method.as_str() {
-        "GET" | "POST" | "PUT" | "DELETE" => {}
+        "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD" => {}
         _ => {
             eprintln!(
-                "Error: unsupported HTTP method '{}'. Use GET, POST, PUT, or DELETE.",
+                "Error: unsupported HTTP method '{}'. Use GET, POST, PUT, DELETE, PATCH, OPTIONS, or HEAD.",
                 method
             );
             std::process::exit(1);
@@ -116,8 +116,9 @@ pub fn handle_ms_command(cmd: MsCommand) {
             }
         }
         payload["publish"] = serde_json::to_value(&cmd.publish).unwrap();
-        payload["scope"] = serde_json::Value::String(cmd.scope.clone());
     }
+
+    payload["scope"] = serde_json::Value::String(cmd.scope.clone());
 
     let client = reqwest::blocking::Client::new();
     let res = client
