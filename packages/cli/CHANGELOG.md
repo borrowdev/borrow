@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/borrowdev/borrow/compare/CLI-v0.1.3...CLI-v0.1.4) (2026-04-04)
+
+
+### Bug Fixes
+
+* **cli:** Fix 'scope' not being sent when 'publish' isn't included ([98b6418](https://github.com/borrowdev/borrow/commit/98b6418611ac18782feee308ba7a6fb13892cf16))
+
 ## [0.1.3](https://github.com/borrowdev/borrow/compare/CLI-v0.1.2...CLI-v0.1.3) (2026-04-04)
 
 
