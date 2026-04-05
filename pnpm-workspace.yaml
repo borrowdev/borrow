@@ -46,9 +46,9 @@ catalog:
   tsx: ^4.21.0
   type-fest: "^5.5.0"
   typescript: "~6.0.2"
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@^0.1.15
   vite-plus: latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
+  vitest: npm:@voidzero-dev/vite-plus-test@^0.1.15
   wrangler: ^4.77.0
   zod: "^4.3.6"
 catalogMode: "strict"
