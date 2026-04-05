@@ -35,3 +35,11 @@ equal(process.env.FOO, "BAR");
 const x = 42;
 console.log(x);
 ```
+
+## Package manager
+
+### pnpm
+
+```typescript docval installCommand=pnpm,install
+import { limiter } from "@borrowdev/limiter";
+```
