@@ -4,6 +4,10 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  test: {
+    // Packages are installed in the import tests, so we need to increase the timeout
+    testTimeout: 120000,
+  },
   pack: {
     entry: {
       main: "./src/index.ts",
