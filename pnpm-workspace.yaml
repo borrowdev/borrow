@@ -37,6 +37,7 @@ catalog:
   msw: ^2.12.14
   next: "^16.2.1"
   oxc-parser: ^0.123.0
+  oxc-transform: ^0.123.0
   oxfmt: ^0.42.0
   postcss: "^8.5.8"
   publint: ^0.3.18

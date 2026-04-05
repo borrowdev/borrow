@@ -30,7 +30,8 @@
     "prepublishOnly": "vp run build"
   },
   "dependencies": {
-    "oxc-parser": "catalog:"
+    "oxc-parser": "catalog:",
+    "oxc-transform": "catalog:"
   },
   "devDependencies": {
     "@types/mdast": "catalog:",

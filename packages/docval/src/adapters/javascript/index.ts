@@ -10,6 +10,7 @@ import {
 import { readFile } from "fs/promises";
 import { ADAPTER_OPTIONS } from "./constants";
 import { existsSync } from "fs";
+import { transform } from "oxc-transform";
 
 type AdapterOptions = {
   env: string;
@@ -27,7 +28,15 @@ async function adapterJavaScript(
     ? await readFile(options.env, { encoding: "utf-8" })
     : undefined;
   const imports = await getImports(code, filename, type);
-  const environmentPath = await createEnvironment(code, imports, dotenv, {
+  const parsedCode =
+    type !== "js"
+      ? (
+          await transform(filename, code, {
+            lang: type,
+          })
+        ).code
+      : code;
+  const environmentPath = await createEnvironment(parsedCode, imports, dotenv, {
     environmentPath: options.environmentPath,
     installCommand: options.installCommand,
   });
