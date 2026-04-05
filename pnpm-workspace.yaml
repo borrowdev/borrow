@@ -14,6 +14,7 @@ catalog:
   "@tailwindcss/postcss": "^4.2.2"
   "@takumi-rs/image-response": ^0.73.1
   "@types/express": ^5.0.6
+  "@types/mdast": ^4.0.4
   "@types/mdx": ^2.0.13
   "@types/node": "^25.5.0"
   "@types/react": "19.2.14"
@@ -31,14 +32,17 @@ catalog:
   fumadocs-openapi: ^10.5.0
   fumadocs-ui: ^16.7.6
   lucide-react: ^1.7.0
+  mdast: ^3.0.0
   mockttp: ^4.3.0
   msw: ^2.12.14
   next: "^16.2.1"
+  oxc-parser: ^0.123.0
   oxfmt: ^0.42.0
   postcss: "^8.5.8"
   publint: ^0.3.18
   react: "19.2.4"
   react-dom: "19.2.4"
+  remark: ^15.0.1
   resolve-tspaths: "^0.8.23"
   tailwind-merge: ^3.5.0
   tailwindcss: "^4.2.2"

@@ -7,7 +7,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./*"]
-    }
+    },
+    "types": ["node"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "./package.json"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "./package.json", "assets/*.json"]
 }

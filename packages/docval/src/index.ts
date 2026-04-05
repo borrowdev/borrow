@@ -1,3 +1,3 @@
-export function fn() {
-  return "Hello, tsdown!";
-}
+import pluginRemark from "./remark/plugin";
+
+export { pluginRemark };

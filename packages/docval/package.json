@@ -29,12 +29,20 @@
     "check": "vp check",
     "prepublishOnly": "vp run build"
   },
+  "dependencies": {
+    "oxc-parser": "catalog:"
+  },
   "devDependencies": {
+    "@types/mdast": "catalog:",
     "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "mdast": "catalog:",
+    "remark": "catalog:"
   }
 }
