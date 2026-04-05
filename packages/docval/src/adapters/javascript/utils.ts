@@ -57,6 +57,8 @@ async function createEnvironment(
   );
   if (options.environmentPath) {
     console.log("Using explicit environment at", options.environmentPath);
+    await mkdir(`${options.environmentPath}/dist`, { recursive: true });
+    await writeFile(`${options.environmentPath}/dist/index.js`, code);
     return options.environmentPath;
   }
 

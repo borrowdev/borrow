@@ -15,7 +15,7 @@ import { transform } from "oxc-transform";
 type AdapterOptions = {
   env: string;
   installCommand: string[];
-  environmentPath?: string;
+  environment?: string;
 };
 
 async function adapterJavaScript(
@@ -37,7 +37,7 @@ async function adapterJavaScript(
         ).code
       : code;
   const environmentPath = await createEnvironment(parsedCode, imports, dotenv, {
-    environmentPath: options.environmentPath,
+    environmentPath: options.environment,
     installCommand: options.installCommand,
   });
 
@@ -45,7 +45,9 @@ async function adapterJavaScript(
     const envFlag = dotenv ? `--env-file=${environmentPath}/.env` : "";
     await execUntilExit(`node ${envFlag} ${getEntryPath(environmentPath)}`, process.cwd());
   } finally {
-    await cleanupEnvironment(environmentPath);
+    if (!options.environment) {
+      await cleanupEnvironment(environmentPath);
+    }
   }
 }
 

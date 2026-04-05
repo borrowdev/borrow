@@ -43,3 +43,10 @@ console.log(x);
 ```typescript docval installCommand=pnpm,install
 import { limiter } from "@borrowdev/limiter";
 ```
+
+## Environment
+
+```typescript docval environment=tests/fixtures/environments/typescript
+const greeting: string = "Hello from custom environment!";
+console.log(greeting);
+```

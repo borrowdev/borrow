@@ -27,7 +27,8 @@
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
-    "prepublishOnly": "vp run build"
+    "prepublishOnly": "vp run build",
+    "prepare": "cd tests/fixtures/environments/typescript && npm install && npm run prepare"
   },
   "dependencies": {
     "oxc-parser": "catalog:",
