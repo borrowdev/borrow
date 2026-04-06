@@ -33,3 +33,30 @@ fn main() {
     syntax error!
 }
 ```
+
+### Internal import - crate
+
+```rust docval
+use crate::my_module;
+fn main() {
+    my_module::my_function();
+}
+```
+
+### Internal import - super
+
+```rust docval
+use super::my_module;
+fn main() {
+    my_module::my_function();
+}
+```
+
+### Internal import - self
+
+```rust docval
+use self::my_module;
+fn main() {
+    my_module::my_function();
+}
+```

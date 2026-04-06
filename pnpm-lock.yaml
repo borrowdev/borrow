@@ -120,6 +120,12 @@ catalogs:
     tailwindcss:
       specifier: ^4.2.2
       version: 4.2.2
+    tree-sitter:
+      specifier: ^0.25.0
+      version: 0.25.0
+    tree-sitter-rust:
+      specifier: ^0.24.0
+      version: 0.24.0
     tslib:
       specifier: ^2.8.1
       version: 2.8.1
@@ -277,6 +283,12 @@ importers:
       remark:
         specifier: 'catalog:'
         version: 15.0.1
+      tree-sitter:
+        specifier: 'catalog:'
+        version: 0.25.0
+      tree-sitter-rust:
+        specifier: 'catalog:'
+        version: 0.24.0(tree-sitter@0.25.0)
     devDependencies:
       '@types/mdast':
         specifier: 'catalog:'
@@ -5695,6 +5707,10 @@ packages:
   node-addon-api@7.1.1:
     resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
 
+  node-addon-api@8.7.0:
+    resolution: {integrity: sha512-9MdFxmkKaOYVTV+XVRG8ArDwwQ77XIgIPyKASB1k3JPq3M8fGQQQE3YpMOrKm6g//Ktx8ivZr8xo1Qmtqub+GA==}
+    engines: {node: ^18 || ^20 || >= 21}
+
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
@@ -5708,6 +5724,10 @@ packages:
     peerDependenciesMeta:
       encoding:
         optional: true
+
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -6452,6 +6472,17 @@ packages:
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+
+  tree-sitter-rust@0.24.0:
+    resolution: {integrity: sha512-NWemUDf629Tfc90Y0Z55zuwPCAHkLxWnMf2RznYu4iBkkrQl2o/CHGB7Cr52TyN5F1DAx8FmUnDtCy9iUkXZEQ==}
+    peerDependencies:
+      tree-sitter: ^0.22.1
+    peerDependenciesMeta:
+      tree-sitter:
+        optional: true
+
+  tree-sitter@0.25.0:
+    resolution: {integrity: sha512-PGZZzFW63eElZJDe/b/R/LbsjDDYJa5UEjLZJB59RQsMX+fo0j54fqBPn1MGKav/QNa0JR0zBiVaikYDWCj5KQ==}
 
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
@@ -12210,11 +12241,15 @@ snapshots:
   node-addon-api@7.1.1:
     optional: true
 
+  node-addon-api@8.7.0: {}
+
   node-domexception@1.0.0: {}
 
   node-fetch@2.7.0:
     dependencies:
       whatwg-url: 5.0.0
+
+  node-gyp-build@4.8.4: {}
 
   npm-run-path@4.0.1:
     dependencies:
@@ -13168,6 +13203,18 @@ snapshots:
       tldts: 7.0.27
 
   tr46@0.0.3: {}
+
+  tree-sitter-rust@0.24.0(tree-sitter@0.25.0):
+    dependencies:
+      node-addon-api: 8.7.0
+      node-gyp-build: 4.8.4
+    optionalDependencies:
+      tree-sitter: 0.25.0
+
+  tree-sitter@0.25.0:
+    dependencies:
+      node-addon-api: 8.7.0
+      node-gyp-build: 4.8.4
 
   trim-lines@3.0.1: {}
 

@@ -32,7 +32,9 @@
   },
   "dependencies": {
     "oxc-parser": "catalog:",
-    "oxc-transform": "catalog:"
+    "oxc-transform": "catalog:",
+    "tree-sitter": "catalog:",
+    "tree-sitter-rust": "catalog:"
   },
   "devDependencies": {
     "@types/mdast": "catalog:",

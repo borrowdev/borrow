@@ -17,10 +17,47 @@ fn main() {
 }
 ```
 
-## Environment
+### Environment
 
 ```rust docval environment=tests/fixtures/environments/rust
 fn main() {
-    println!("Hello from custom environment!");
+    println!("Hello world!");
+}
+```
+
+### Import
+
+```rust docval
+use rand::RngExt;
+
+fn main() {
+    let mut rng = rand::rng();
+    let n: u32 = rng.random();
+    println!("{}", n);
+}
+```
+
+### Scoped import
+
+```rust docval
+fn main() {
+    use std::collections::HashMap;
+    let mut map = HashMap::new();
+    map.insert("key", "value");
+    println!("{:?}", map);
+}
+```
+
+### Multiple imports
+
+```rust docval
+use std::collections::HashMap;
+use rand::RngExt;
+
+fn main() -> std::io::Result<()> {
+    let mut rng = rand::rng();
+    let n: u32 = rng.random();
+    println!("Random number: {}", n);
+    Ok(())
 }
 ```

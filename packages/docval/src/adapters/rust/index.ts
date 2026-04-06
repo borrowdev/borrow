@@ -1,5 +1,5 @@
 import { getOptions } from "@/remark/utils";
-import { createEnvironment } from "./utils";
+import { createEnvironment, getImports } from "./utils";
 import { ADAPTER_OPTIONS } from "./constants";
 import { cleanupEnvironment, execUntilExit } from "@/utils";
 
@@ -8,7 +8,8 @@ type AdapterOptions = {
 };
 
 async function adapterRust(code: string, options: AdapterOptions): Promise<void> {
-  const environmentPath = await createEnvironment(code, {
+  const imports = getImports(code);
+  const environmentPath = await createEnvironment(code, imports, {
     environmentPath: options.environment,
   });
 
