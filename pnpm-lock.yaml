@@ -90,6 +90,9 @@ catalogs:
     lucide-react:
       specifier: ^1.7.0
       version: 1.7.0
+    mdast:
+      specifier: ^3.0.0
+      version: 3.0.0
     msw:
       specifier: ^2.12.14
       version: 2.12.14
@@ -114,6 +117,9 @@ catalogs:
     react-dom:
       specifier: 19.2.4
       version: 19.2.4
+    remark:
+      specifier: ^15.0.1
+      version: 15.0.1
     tailwind-merge:
       specifier: ^3.5.0
       version: 3.5.0
@@ -179,8 +185,8 @@ importers:
   apps/docs:
     dependencies:
       '@borrowdev/docval':
-        specifier: workspace:*
-        version: link:../../packages/docval
+        specifier: ~0.1.0
+        version: 0.1.0(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(mdast@3.0.0)(remark@15.0.1)
       '@fontsource-variable/jetbrains-mono':
         specifier: 'catalog:'
         version: 5.2.8
@@ -683,6 +689,12 @@ packages:
   '@babel/helper-validator-identifier@7.28.5':
     resolution: {integrity: sha512-qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==}
     engines: {node: '>=6.9.0'}
+
+  '@borrowdev/docval@0.1.0':
+    resolution: {integrity: sha512-AO21P79pV2UwGCO7rxOGXuE8t1GkNX4YtLksYBBSDT3j/JPNn1zfmJYPERIXwQ/Asfy4FFiWQ0+CAYMpnqmnyw==}
+    peerDependencies:
+      mdast: ^3.0.0
+      remark: ^15.0.1
 
   '@bufbuild/protobuf@2.11.0':
     resolution: {integrity: sha512-sBXGT13cpmPR5BMgHE6UEEfEaShh5Ror6rfN3yEK5si7QVrtZg8LEPQb0VVhiLRUslD2yLnXtnRzG035J/mZXQ==}
@@ -7367,6 +7379,19 @@ snapshots:
       picocolors: 1.1.1
 
   '@babel/helper-validator-identifier@7.28.5': {}
+
+  '@borrowdev/docval@0.1.0(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(mdast@3.0.0)(remark@15.0.1)':
+    dependencies:
+      consola: 3.4.2
+      mdast: 3.0.0
+      oxc-parser: 0.123.0(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)
+      remark: 15.0.1
+      tree-sitter: 0.25.0
+      tree-sitter-rust: 0.24.0(tree-sitter@0.25.0)
+      typescript: 6.0.2
+    transitivePeerDependencies:
+      - '@emnapi/core'
+      - '@emnapi/runtime'
 
   '@bufbuild/protobuf@2.11.0':
     optional: true
