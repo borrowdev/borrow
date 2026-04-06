@@ -26,6 +26,9 @@ jobs:
         # TODO: Fix 'vp run test -r' breaking on Cloudflare tests and use it instead.
         working-directory: packages/limiter
         run: vp test
+      - name: Run @borrowdev/docval tests
+        working-directory: packages/docval
+        run: vp test
   release-packages:
     permissions:
       contents: write
