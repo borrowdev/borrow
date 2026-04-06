@@ -1,4 +1,7 @@
 import { spawn } from "child_process";
+import consola from "consola";
+
+const logger = consola.withTag("Borrow").withTag("DocVal");
 
 function execUntilExit(command: string, cwd: string): Promise<void> {
   let error = "";
@@ -6,7 +9,7 @@ function execUntilExit(command: string, cwd: string): Promise<void> {
     const process = spawn(command, { cwd, shell: true });
 
     process.stdout.on("data", (data) => {
-      console.log(data.toString());
+      logger.debug(data.toString());
     });
 
     process.stderr.on("data", (data) => {
@@ -27,4 +30,4 @@ async function cleanupEnvironment(path: string) {
   await execUntilExit(`rm -rf ${path}`, process.cwd());
 }
 
-export { execUntilExit, cleanupEnvironment };
+export { execUntilExit, cleanupEnvironment, logger };

@@ -31,6 +31,7 @@
     "prepare": "cd tests/fixtures/environments/typescript && npm install && npm run prepare"
   },
   "dependencies": {
+    "consola": "catalog:",
     "oxc-parser": "catalog:",
     "tree-sitter": "catalog:",
     "tree-sitter-rust": "catalog:",

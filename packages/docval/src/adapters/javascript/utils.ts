@@ -5,7 +5,7 @@ import manifest from "~/assets/package.json";
 import { join } from "path";
 import { randomUUID } from "crypto";
 import { isBuiltin } from "module";
-import { cleanupEnvironment, execUntilExit } from "@/utils";
+import { cleanupEnvironment, execUntilExit, logger } from "@/utils";
 
 type Import = {
   isExternal: boolean;
@@ -59,12 +59,12 @@ async function createEnvironment(
     installCommand: ["npm", "install"],
   },
 ) {
-  console.log(
+  logger.info(
     "Creating environment with imports",
     imports.map((i) => i.package),
   );
   if (options.environmentPath) {
-    console.log("Using explicit environment at", options.environmentPath);
+    logger.info("Using explicit environment at", options.environmentPath);
     await mkdir(`${options.environmentPath}/dist`, { recursive: true });
     await writeFile(`${options.environmentPath}/dist/index.js`, code);
     return options.environmentPath;
@@ -77,12 +77,12 @@ async function createEnvironment(
     writeFile(`${path}/dist/index.js`, code),
     env ? writeFile(`${path}/.env`, env) : Promise.resolve(),
   ]);
-  console.log("Created environment at", path);
+  logger.info("Created environment at", path);
   const cmd = options.installCommand
     .concat(imports.filter((i) => i.isExternal).map((i) => i.package))
     .join(" ");
   if (imports.length > 0) {
-    console.log("Installing dependencies with command:", cmd);
+    logger.info("Installing dependencies with command:", cmd);
     await execUntilExit(cmd, path);
   }
   return path;

@@ -4,7 +4,7 @@ import { tmpdir } from "os";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
-import { execUntilExit } from "@/utils";
+import { execUntilExit, logger } from "@/utils";
 
 const BUILTIN_CRATES = new Set(["std", "core", "alloc", "crate"]);
 const ERROR_CRATES = new Set(["crate", "super", "self"]);
@@ -64,13 +64,13 @@ async function createEnvironment(
   imports: Import[],
   options: EnvironmentOptions = {},
 ) {
-  console.log(
+  logger.info(
     "Creating Rust environment with crates",
     imports.map((i) => i.package),
   );
 
   if (options.environmentPath) {
-    console.log("Using explicit environment at", options.environmentPath);
+    logger.info("Using explicit environment at", options.environmentPath);
     await mkdir(`${options.environmentPath}/src`, { recursive: true });
     await writeFile(getEntryPath(options.environmentPath), code);
     return options.environmentPath;
@@ -85,10 +85,10 @@ async function createEnvironment(
   ]);
   if (imports.length > 0) {
     const crates = imports.filter((i) => i.isExternal).map((i) => i.package);
-    console.log("Installing crates", crates);
+    logger.info("Installing crates", crates);
     await execUntilExit(`cargo add ${crates.join(" ")}`, path);
   }
-  console.log("Created Rust environment at", path);
+  logger.info("Created Rust environment at", path);
   return path;
 }
 
