@@ -1,10 +1,11 @@
 import { hash } from "crypto";
 
-function getFilename(metadata: string[], code: string): string {
-  const filenameIndex = metadata.findIndex((item) => item.startsWith("filename="));
-  if (filenameIndex !== -1) {
-    return metadata[filenameIndex].split("=")[1];
-  }
+function getFilename(_metadata: string[], code: string): string {
+  // TODO: Use filename metadata to provide better error messages pointing to the exact codeblock.
+  // const filenameIndex = metadata.findIndex((item) => item.startsWith("filename="));
+  // if (filenameIndex !== -1) {
+  //   return metadata[filenameIndex].split("=")[1];
+  // }
   return hash("sha1", code);
 }
 
