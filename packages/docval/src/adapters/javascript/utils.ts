@@ -2,10 +2,10 @@ import { parse } from "oxc-parser";
 import { tmpdir } from "os";
 import { mkdir, writeFile } from "fs/promises";
 import manifest from "~/assets/package.json";
-import { spawn } from "child_process";
 import { join } from "path";
 import { randomUUID } from "crypto";
 import { isBuiltin } from "module";
+import { cleanupEnvironment, execUntilExit } from "@/utils";
 
 type Imports = {
   isExternal: boolean;
@@ -78,33 +78,6 @@ async function createEnvironment(
     await execUntilExit(cmd, path);
   }
   return path;
-}
-
-function execUntilExit(command: string, cwd: string): Promise<void> {
-  let error = "";
-  return new Promise((resolve, reject) => {
-    const process = spawn(command, { cwd, shell: true });
-
-    process.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-    });
-
-    process.stderr.on("data", (data) => {
-      error += data;
-    });
-
-    process.on("close", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(`Command failed with exit code ${code}\n${error})`);
-      }
-    });
-  });
-}
-
-async function cleanupEnvironment(path: string) {
-  await execUntilExit(`rm -rf ${path}`, process.cwd());
 }
 
 type JavaScriptType = "js" | "ts" | "tsx" | "jsx";
