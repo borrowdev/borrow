@@ -1,0 +1,52 @@
+{
+  "name": "@borrowdev/docval",
+  "version": "0.1.0",
+  "description": "Validate your documentation codeblocks at build-time",
+  "homepage": "https://borrow.dev",
+  "license": "MIT",
+  "author": "Lorenzo Bloedow <me@lorenzobloedow.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borrowdev/borrow.git"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/main.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check",
+    "prepublishOnly": "vp run build",
+    "prepare": "cd tests/fixtures/environments/typescript && npm install && npm run prepare"
+  },
+  "dependencies": {
+    "consola": "catalog:",
+    "oxc-parser": "catalog:",
+    "tree-sitter": "catalog:",
+    "tree-sitter-rust": "catalog:",
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@types/mdast": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "mdast": "catalog:",
+    "remark": "catalog:"
+  }
+}

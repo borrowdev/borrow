@@ -1,0 +1,12 @@
+{
+  "name": "docval-env-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare": "tsc src.ts --ignoreConfig --outDir dist"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2"
+  }
+}

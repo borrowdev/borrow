@@ -3,6 +3,7 @@ import { remarkTypeScriptToJavaScript } from "fumadocs-docgen/remark-ts2js";
 import { pageSchema, metaSchema } from "fumadocs-core/source/schema";
 import { docsRoute } from "./lib/shared";
 import { remarkNpm } from "fumadocs-core/mdx-plugins";
+import { remarkDocVal } from "@borrowdev/docval";
 
 export const docs = defineDocs({
   dir: "content",
@@ -27,6 +28,10 @@ export default defineConfig({
       parseMdx: true,
     },
     remarkPlugins: [
+      () =>
+        remarkDocVal({
+          include: true,
+        }),
       () =>
         remarkTypeScriptToJavaScript({
           persist: {

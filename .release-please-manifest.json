@@ -2,5 +2,6 @@
   "packages/limiter": "2.0.2",
   "packages/ms": "0.1.2",
   "packages/data": "1.1.0",
-  "packages/cli": "0.1.4"
+  "packages/cli": "0.1.4",
+  "packages/docval": "0.1.0"
 }

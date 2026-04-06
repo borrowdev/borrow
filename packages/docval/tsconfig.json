@@ -1,0 +1,14 @@
+{
+  "extends": ["@borrowdev/config/tsconfig.node.json", "@borrowdev/config/tsconfig.test.json"],
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./*"]
+    },
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "tests/**/*.ts", "./package.json", "assets/*.json"]
+}

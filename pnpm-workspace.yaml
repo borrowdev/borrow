@@ -14,6 +14,7 @@ catalog:
   "@tailwindcss/postcss": "^4.2.2"
   "@takumi-rs/image-response": ^0.73.1
   "@types/express": ^5.0.6
+  "@types/mdast": ^4.0.4
   "@types/mdx": ^2.0.13
   "@types/node": "^25.5.0"
   "@types/react": "19.2.14"
@@ -22,6 +23,7 @@ catalog:
   "@upstash/redis": "^1.37.0"
   "@vitest/coverage-v8": "^4.1.2"
   cloudflare: 6.0.0-beta.1
+  consola: ^3.4.2
   dotenv: ^17.3.1
   express: ^5.2.1
   fast-check: "^4.6.0"
@@ -31,24 +33,30 @@ catalog:
   fumadocs-openapi: ^10.5.0
   fumadocs-ui: ^16.7.6
   lucide-react: ^1.7.0
+  mdast: ^3.0.0
   mockttp: ^4.3.0
   msw: ^2.12.14
   next: "^16.2.1"
+  oxc-parser: ^0.123.0
+  oxc-transform: ^0.123.0
   oxfmt: ^0.42.0
   postcss: "^8.5.8"
   publint: ^0.3.18
   react: "19.2.4"
   react-dom: "19.2.4"
+  remark: ^15.0.1
   resolve-tspaths: "^0.8.23"
   tailwind-merge: ^3.5.0
   tailwindcss: "^4.2.2"
+  tree-sitter: ^0.25.0
+  tree-sitter-rust: ^0.24.0
   tslib: "^2.8.1"
   tsx: ^4.21.0
   type-fest: "^5.5.0"
   typescript: "~6.0.2"
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@^0.1.15
   vite-plus: latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
+  vitest: npm:@voidzero-dev/vite-plus-test@^0.1.15
   wrangler: ^4.77.0
   zod: "^4.3.6"
 catalogMode: "strict"
