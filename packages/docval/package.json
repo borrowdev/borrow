@@ -1,7 +1,7 @@
 {
   "name": "@borrowdev/docval",
   "version": "0.1.1",
-  "description": "Validate your documentation codeblocks at build-time",
+  "description": "Validate your documentation codeblocks at build-time, find bugs in record-time",
   "homepage": "https://borrow.dev",
   "license": "MIT",
   "author": "Lorenzo Bloedow <me@lorenzobloedow.com>",
