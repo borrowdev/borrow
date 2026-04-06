@@ -4,13 +4,14 @@ import { resolve } from "path";
 import { remark } from "remark";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const validMdFixtures = readdirSync(resolve(__dirname, "fixtures/md/valid")).map((file) =>
+const validMdFixtures = readdirSync(resolve(__dirname, "fixtures/md/valid")).map((file) => [
+  file,
   readFileSync(resolve(__dirname, "fixtures/md/valid", file), "utf-8"),
-);
-const invalidMdFixtures = readdirSync(resolve(__dirname, "fixtures/md/invalid")).map((file) =>
+]);
+const invalidMdFixtures = readdirSync(resolve(__dirname, "fixtures/md/invalid")).map((file) => [
+  file,
   readFileSync(resolve(__dirname, "fixtures/md/invalid", file), "utf-8"),
-);
-const INVALID_MD_FIXTURES_AMOUNT = 4;
+]);
 
 beforeEach(() => {
   vi.stubEnv("DOCVAL_TEST_NO_SKIP", "true");
@@ -21,19 +22,29 @@ afterEach(() => {
 });
 
 describe("pluginRemark", () => {
-  validMdFixtures.map((md) => {
-    it("Should not throw an error for valid markdown", async () => {
-      await expect(remark().use(pluginRemark).process(md)).resolves.not.toThrow();
-    });
+  validMdFixtures.forEach(([file, md]) => {
+    const codeblocks = md.match(/```[\s\S]*?```/g) || [];
+    for (let i = 0; i < codeblocks.length; i++) {
+      const block = codeblocks[i];
+      it(`Should not throw an error for valid markdown: ${file} - ${i + 1}`, async () => {
+        try {
+          const result = await remark().use(pluginRemark).process(block);
+          expect(result.value.toString().trim()).toEqual(block.trim());
+        } catch (err: any) {
+          console.error("Original results", err.originalResults);
+          throw err;
+        }
+      });
+    }
   });
 
-  invalidMdFixtures.map((md) => {
-    it("Should throw an error for invalid markdown", async () => {
-      const result = await remark()
-        .use(pluginRemark)
-        .process(md)
-        .catch((err) => err);
-      expect(result.originalResults.length).toBe(INVALID_MD_FIXTURES_AMOUNT);
-    });
+  invalidMdFixtures.forEach(([file, md]) => {
+    const codeblocks = md.match(/```[\s\S]*?```/g) || [];
+    for (let i = 0; i < codeblocks.length; i++) {
+      const block = codeblocks[i];
+      it(`Should throw an error for invalid markdown: ${file} - ${i + 1}`, async () => {
+        await expect(remark().use(pluginRemark).process(block)).rejects.toThrow();
+      });
+    }
   });
 });
