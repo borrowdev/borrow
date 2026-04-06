@@ -12,7 +12,8 @@ export default function remarkDocval({ include }: DocValOptions = {}) {
       if (node.type === "code" && node.lang && node.lang in adapters) {
         const metadata = node.meta?.split(" ") ?? [];
         const docValIndex = metadata.findIndex((item) => item === "docval");
-        if (include || docValIndex !== -1) {
+        const noDocValIndex = metadata.findIndex((item) => item === "no-docval");
+        if ((include && noDocValIndex === -1) || docValIndex !== -1) {
           promises.push(adapters[node.lang as keyof typeof adapters](node.value, metadata));
         }
       } else if (node.type === "code" && process.env.DOCVAL_TEST_NO_SKIP === "true") {
