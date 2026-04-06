@@ -7,16 +7,12 @@ import { randomUUID } from "crypto";
 import { isBuiltin } from "module";
 import { cleanupEnvironment, execUntilExit } from "@/utils";
 
-type Imports = {
+type Import = {
   isExternal: boolean;
   package: string;
 };
 
-async function getImports(
-  code: string,
-  filename: string,
-  type: JavaScriptType,
-): Promise<Imports[]> {
+async function getImports(code: string, filename: string, type: JavaScriptType): Promise<Import[]> {
   const ast = await parse(filename, code, {
     lang: type,
   });
@@ -45,7 +41,7 @@ function getEntryPath(environmentPath: string) {
 
 async function createEnvironment(
   code: string,
-  imports: Imports[],
+  imports: Import[],
   env: string | undefined,
   options: EnvironmentOptions = {
     installCommand: ["npm", "install"],

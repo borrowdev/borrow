@@ -47,6 +47,6 @@ import { limiter } from "@borrowdev/limiter";
 ## Environment
 
 ```typescript docval environment=tests/fixtures/environments/typescript
-const greeting: string = "Hello from custom environment!";
+const greeting: string = "Hello world!";
 console.log(greeting);
 ```
