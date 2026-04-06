@@ -10,7 +10,7 @@ import {
 import { readFile } from "fs/promises";
 import { ADAPTER_OPTIONS } from "./constants";
 import { existsSync } from "fs";
-import { transform } from "oxc-transform";
+import { JsxEmit, transpileModule } from "typescript";
 
 type AdapterOptions = {
   env: string;
@@ -30,11 +30,12 @@ async function adapterJavaScript(
   const imports = await getImports(code, filename, type);
   const parsedCode =
     type !== "js"
-      ? (
-          await transform(filename, code, {
-            lang: type,
-          })
-        ).code
+      ? transpileModule(code, {
+          fileName: filename + `.${type}`,
+          compilerOptions: {
+            jsx: JsxEmit.React,
+          },
+        }).outputText
       : code;
   const environmentPath = await createEnvironment(parsedCode, imports, dotenv, {
     environmentPath: options.environment,

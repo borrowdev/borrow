@@ -32,15 +32,14 @@
   },
   "dependencies": {
     "oxc-parser": "catalog:",
-    "oxc-transform": "catalog:",
     "tree-sitter": "catalog:",
-    "tree-sitter-rust": "catalog:"
+    "tree-sitter-rust": "catalog:",
+    "typescript": "catalog:"
   },
   "devDependencies": {
     "@types/mdast": "catalog:",
     "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
-    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
