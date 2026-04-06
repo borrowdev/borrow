@@ -1,0 +1,78 @@
+---
+title: Fumadocs
+description: How to integrate DocVal with Fumadocs.
+icon: Book
+---
+
+# Fumadocs
+
+[Fumadocs](https://fumadocs.vercel.app/) is a documentation framework built on Next.js.
+
+Since Fumadocs supports remark plugins, integrating DocVal is straightforward.
+
+## Setup
+
+### 1. Install DocVal
+
+```npm
+npm install @borrowdev/docval
+```
+
+### 2. Add the plugin
+
+In your `source.config.ts`, add `remarkDocVal` to the `remarkPlugins` array:
+
+```ts
+import { defineConfig, defineDocs } from "fumadocs-mdx/config";
+import { remarkDocVal } from "@borrowdev/docval";
+
+export const docs = defineDocs({
+  dir: "content",
+});
+
+export default defineConfig({
+  mdxOptions: {
+    remarkPlugins: [() => remarkDocVal()],
+  },
+});
+```
+
+### 3. Mark codeblocks for validation
+
+Add the `docval` keyword to any codeblock you want to validate:
+
+````md
+```ts docval
+import { something } from "some-package";
+
+console.log(something());
+```
+````
+
+## Enabling `include` mode
+
+Once you're ready to validate all codeblocks automatically, pass the `include` option:
+
+```ts
+import { defineConfig, defineDocs } from "fumadocs-mdx/config";
+import { remarkDocVal } from "@borrowdev/docval";
+
+export const docs = defineDocs({
+  dir: "content",
+});
+
+export default defineConfig({
+  mdxOptions: {
+    remarkPlugins: [
+      () =>
+        remarkDocVal({
+          include: true,
+        }),
+    ],
+  },
+});
+```
+
+## Example: Borrow Documentation
+
+The Borrow documentation itself uses DocVal with Fumadocs. You can see the full configuration in the [Borrow source code](https://github.com/borrowdev/borrow/blob/main/apps/docs/source.config.ts).

@@ -1,0 +1,77 @@
+---
+title: Limitations
+description: Known limitations of DocVal.
+icon: TriangleAlert
+---
+
+# Limitations
+
+DocVal supports a broad range of use cases, but there are some limitations to be aware of depending on the language.
+
+## Rust
+
+### No internal crate imports
+
+Rust codeblocks must use external crates only. Currently DocVal cannot resolve internal imports.
+
+```rust
+// @docval-cargo-add-options tokio --features full
+// ✅ Supported: Fully-qualified imports
+use serde::Serialize;
+use tokio::runtime::Runtime;
+
+fn main() {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        println!("Hello, world!");
+    });
+}
+```
+
+```rust no-docval
+// ❌ Not supported: Relative imports
+use self::my_module;
+use super::parent_module;
+use crate::internal_module;
+```
+
+## JavaScript / TypeScript / JSX / TSX
+
+### Only NPM package imports
+
+DocVal only supports imports from NPM packages and Node.js built-in modules.
+
+This should cover the vast majority of documentation codeblocks, since docs typically demonstrate how to use published packages.
+
+Additionally, because we support Node.js, you can easily use `assert` in your codeblocks. This means you can write documentation tests!.
+
+```ts
+// ✅ Supported
+import express from "express";
+import { readFile } from "fs/promises";
+import assert from "assert";
+```
+
+```text
+// ❌ Not supported
+import { helper } from "./utils";
+import { config } from "@/lib/config";
+```
+
+### No relative or alias imports
+
+Relative imports (`./`, `../`) and TypeScript path aliases (`@/`, `~/`) are not supported. If your codeblock depends on local modules, consider using the `environment` option to point to a pre-configured directory with those modules available.
+
+### No CommonJS
+
+Only ESM (`import`/`export`) syntax is supported. CommonJS (`require`/`module.exports`) is not supported.
+
+```ts
+// ✅ Supported
+import express from "express";
+```
+
+```text
+// ❌ Not supported
+const express = require("express");
+```

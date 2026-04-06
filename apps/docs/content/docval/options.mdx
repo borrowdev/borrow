@@ -1,0 +1,148 @@
+---
+title: Options
+description: Configuration reference for DocVal.
+icon: Settings
+---
+
+# Options
+
+## Plugin Options
+
+These options are passed to the `remarkDocVal` function.
+
+### `include`
+
+- **Type:** `boolean`
+- **Default:** `false`
+
+When `true`, all codeblocks with a supported language are validated automatically without needing the `docval` keyword. You can opt out individual codeblocks with the [`no-docval`](#no-docval) keyword.
+
+```ts
+import { remarkDocVal } from "@borrowdev/docval";
+
+// Validate all supported codeblocks
+remarkDocVal({ include: true });
+```
+
+When `false` (default), only codeblocks with the `docval` keyword in their metadata are validated.
+
+### `cache`
+
+- **Type:** `boolean`
+- **Default:** `true` locally, `false` in CI and test environments
+
+Enables content-level caching of validation results. When enabled, DocVal hashes each codeblock's content, language, and metadata, and stores the result on disk. On subsequent builds, codeblocks that haven't changed are skipped entirely.
+
+The cache is stored in `node_modules` inside the DocVal package.
+
+If you need to clear it, just delete the package and install again.
+
+```ts
+import { remarkDocVal } from "@borrowdev/docval";
+
+// Explicitly disable caching
+remarkDocVal({ cache: false });
+```
+
+## Codeblock Metadata Options
+
+These options are set directly on the codeblock's metadata string (the part after the language identifier).
+
+### `docval`
+
+Marks a codeblock for validation when `include` is not enabled.
+
+````md
+```ts docval
+console.log("This will be validated");
+```
+````
+
+### `no-docval`
+
+Excludes a codeblock from validation when [`include`](#include) is enabled. This is useful for codeblocks that are intentionally incomplete, illustrative, or demonstrate incorrect usage.
+
+````md
+```ts no-docval
+// This won't be validated even with include: true
+const result = someUndefinedFunction();
+```
+````
+
+### `env`
+
+- **Type:** `string`
+- **Default:** `".env.docs"`
+
+Path to a `.env` file to load environment variables from when executing the codeblock. Applies to JavaScript, TypeScript, JSX, and TSX codeblocks.
+
+````md
+```ts docval env=".env.production"
+console.log(process.env.MY_SECRET);
+```
+````
+
+### `installCommand`
+
+- **Type:** `string`
+- **Default:** `"npm,install"`
+
+The command used to install dependencies, specified as a comma-separated string.
+
+````md
+```ts docval installCommand="pnpm,install"
+import express from "express";
+```
+````
+
+### `environment`
+
+- **Type:** `string`
+- **Default:** `undefined`
+
+Path to an existing directory to use as the execution environment instead of creating a temporary one. When set, DocVal writes the codeblock code into this directory and runs it there. The environment is **not** cleaned up after execution.
+
+This is useful when you need a pre-configured environment, for example one with a `tsconfig.json` or pre-installed dependencies.
+
+````md
+```ts docval environment="docval/environments/typescript"
+import { something } from "some-preconfigured-package";
+```
+````
+
+## Comment Directives
+
+Comment directives are special comments inside codeblocks that configure DocVal behavior. They use the `@docval-` prefix.
+
+### Rust-specific directives
+
+#### `@docval-cargo-add-options`
+
+Passes additional options to the `cargo add` command when installing a specific crate. This is useful when a crate requires feature flags or other `cargo add` arguments to compile.
+
+The format is `@docval-cargo-add-options <package> <options...>`.
+
+````md
+```rust
+// @docval-cargo-add-options tokio --features full
+use tokio::runtime::Runtime;
+
+fn main() {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        println!("Hello from tokio!");
+    });
+}
+```
+````
+
+You can use multiple directives for different crates:
+
+````md
+```rust
+// @docval-cargo-add-options serde --features derive
+// @docval-cargo-add-options tokio --features full
+use serde::Serialize;
+use tokio::runtime::Runtime;
+```
+````

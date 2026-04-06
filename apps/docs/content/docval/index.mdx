@@ -1,0 +1,31 @@
+---
+title: DocVal
+description: Validate your documentation codeblocks at build-time.
+icon: FileCheck
+---
+
+# DocVal
+
+DocVal validates documentation codeblocks at build-time by creating an isolated environment, installing referenced dependencies, and executing the code to make sure it actually works.
+
+It supports **JavaScript**, **TypeScript**, **JSX**, **TSX**, and **Rust** codeblocks out of the box.
+
+More languages will be added in the future based on feature requests.
+
+## How It Works
+
+When DocVal encounters a codeblock marked for validation, it:
+
+1. Parses the code to extract its imports.
+2. Creates a temporary environment with the necessary dependencies and configuration.
+3. Executes the code and reports any errors.
+
+This ensures that every code example in your documentation compiles and runs successfully, catching broken examples before your users do.
+
+<Callout title="Borrow uses DocVal" type="info">
+  We use DocVal to validate most of our own documentation code with validation included by default.
+</Callout>
+
+## Getting Started
+
+Check out the [Quick Start](/docval/quick-start) guide to start validating your documentation codeblocks.

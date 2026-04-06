@@ -1,0 +1,92 @@
+---
+title: Quick Start
+description: Get started with DocVal and validate your documentation codeblocks.
+icon: Rabbit
+---
+
+# Quick Start
+
+## Installation
+
+Install Borrow DocVal using your preferred package manager:
+
+```npm
+npm install @borrowdev/docval
+```
+
+## Usage
+
+DocVal ships as a [remark](https://github.com/remarkjs/remark) plugin, so it works with any tool that supports remark (most documentation tools).
+
+We've really enjoyed using [Fumadocs](https://fumadocs.vercel.app/) so we put together an [integration guide](https://borrow.dev/docs/docval/fumadocs).
+
+### Opt-in with the `docval` keyword
+
+The recommended way to get started is to add the `docval` keyword to individual codeblocks you want to validate. This lets you gradually adopt DocVal without having to fix every codeblock at once.
+
+Add the remark plugin to your configuration:
+
+```ts
+import { remarkDocVal } from "@borrowdev/docval";
+
+// In your remark plugin configuration:
+// (Optionally, you may pass some configuration options here, keep reading for details)
+remarkDocVal();
+```
+
+Then, add the `docval` keyword to any codeblock you want to validate:
+
+````md
+```ts docval
+import { somePackage } from "some-package";
+
+console.log(somePackage());
+```
+````
+
+DocVal will create an environment, install `some-package`, and execute the code. If the code fails, your build fails with a descriptive error.
+
+### Validate all codeblocks with `include`
+
+If you want to ensure all your codeblocks are always validated by default, you can enable the `include` option to validate every codeblock automatically:
+
+```ts
+import { remarkDocVal } from "@borrowdev/docval";
+
+remarkDocVal({ include: true });
+```
+
+With `include` enabled, you can still opt out individual codeblocks using the `no-docval` keyword:
+
+````md
+```ts no-docval
+// This codeblock is intentionally incomplete
+const result = someIllustration();
+```
+````
+
+<Callout title="Gradual migration" type="info">
+  We recommend starting with the `docval` keyword approach and progressively marking more codeblocks
+  until you're confident enough to enable `include` for all codeblocks. See the
+  [Options](/docval/options) reference for more details.
+</Callout>
+
+## Supported Languages
+
+DocVal supports the following codeblock languages:
+
+| Language   | Identifiers        |
+| ---------- | ------------------ |
+| JavaScript | `js`, `javascript` |
+| TypeScript | `ts`, `typescript` |
+| JSX        | `jsx`              |
+| TSX        | `tsx`              |
+| Rust       | `rs`, `rust`       |
+
+Codeblocks with unsupported languages are silently skipped.
+
+## Next Steps
+
+- [Options Reference](/docval/options) — Learn about all available configuration options.
+- [Fumadocs Integration](/docval/fumadocs) — Set up DocVal with Fumadocs.
+- [Limitations](/docval/limitations) — Understand what DocVal can and can't do.
