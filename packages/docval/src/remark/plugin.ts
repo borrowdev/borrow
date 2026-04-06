@@ -21,10 +21,10 @@ export default function remarkDocval({ include }: DocValOptions = {}) {
     });
     const res = await Promise.allSettled(promises);
     if (res.some((r) => r.status === "rejected")) {
-      throw {
+      throw JSON.stringify({
         message: "One or more code blocks failed validation.",
         originalResults: res,
-      };
+      });
     }
 
     return tree;

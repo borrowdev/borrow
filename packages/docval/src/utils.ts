@@ -6,7 +6,7 @@ function execUntilExit(command: string, cwd: string): Promise<void> {
     const process = spawn(command, { cwd, shell: true });
 
     process.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
+      console.log(data.toString());
     });
 
     process.stderr.on("data", (data) => {
