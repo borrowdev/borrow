@@ -12,19 +12,31 @@ type Import = {
   package: string;
 };
 
+function getPackage(importSpec: string): string {
+  let packageSpec = importSpec;
+  // Deno environment
+  if (packageSpec.startsWith("npm:")) {
+    packageSpec = packageSpec.slice(4);
+  }
+  if (packageSpec.startsWith("@")) {
+    return packageSpec.split("/").slice(0, 2).join("/");
+  }
+  return packageSpec.split("/")[0];
+}
+
 async function getImports(code: string, filename: string, type: JavaScriptType): Promise<Import[]> {
   const ast = await parse(filename, code, {
     lang: type,
   });
   return [
     ...ast.module.dynamicImports.map((d) => {
-      const packageSpec = code
-        .slice(d.moduleRequest.start, d.moduleRequest.end)
-        .replaceAll(/['"]/g, "");
+      const packageSpec = getPackage(
+        code.slice(d.moduleRequest.start, d.moduleRequest.end).replaceAll(/['"]/g, ""),
+      );
       return { package: packageSpec, isExternal: !isBuiltin(packageSpec) };
     }),
     ...ast.module.staticImports.map((s) => ({
-      package: s.moduleRequest.value,
+      package: getPackage(s.moduleRequest.value),
       isExternal: !isBuiltin(s.moduleRequest.value),
     })),
   ];
