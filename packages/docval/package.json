@@ -1,6 +1,6 @@
 {
   "name": "@borrowdev/docval",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Validate your documentation codeblocks at build-time",
   "homepage": "https://borrow.dev",
   "license": "MIT",
