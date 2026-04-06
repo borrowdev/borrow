@@ -8,7 +8,7 @@ type AdapterOptions = {
 };
 
 async function adapterRust(code: string, options: AdapterOptions): Promise<void> {
-  const imports = getImports(code);
+  const imports = await getImports(code);
   const environmentPath = await createEnvironment(code, imports, {
     environmentPath: options.environment,
   });

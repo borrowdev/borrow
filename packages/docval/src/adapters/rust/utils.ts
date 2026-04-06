@@ -1,10 +1,23 @@
-import Parser from "tree-sitter";
-import Rust from "tree-sitter-rust";
+import { Language, Parser } from "web-tree-sitter";
+import { createRequire } from "module";
 import { tmpdir } from "os";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
 import { execUntilExit, logger } from "@/utils";
+
+const require = createRequire(import.meta.url);
+const RUST_WASM_PATH = require.resolve("tree-sitter-rust/tree-sitter-rust.wasm");
+
+let rustLanguage: Language | undefined;
+
+async function getRustLanguage(): Promise<Language> {
+  if (!rustLanguage) {
+    await Parser.init();
+    rustLanguage = await Language.load(RUST_WASM_PATH);
+  }
+  return rustLanguage!;
+}
 
 const BUILTIN_CRATES = new Set(["std", "core", "alloc", "crate"]);
 const ERROR_CRATES = new Set(["crate", "super", "self"]);
@@ -14,13 +27,14 @@ type Import = {
   package: string;
 };
 
-function getImports(code: string): Import[] {
+async function getImports(code: string): Promise<Import[]> {
+  const language = await getRustLanguage();
   const parser = new Parser();
-  parser.setLanguage(Rust as unknown as Parser.Language);
+  parser.setLanguage(language);
   const tree = parser.parse(code);
   const imports: Import[] = [];
 
-  for (const node of tree.rootNode.children) {
+  for (const node of tree!.rootNode.children) {
     let crateName: string | undefined;
 
     if (node.type === "use_declaration") {

@@ -48,8 +48,8 @@ catalog:
   resolve-tspaths: "^0.8.23"
   tailwind-merge: ^3.5.0
   tailwindcss: "^4.2.2"
-  tree-sitter: ^0.25.0
   tree-sitter-rust: ^0.24.0
+  web-tree-sitter: ^0.26.8
   tslib: "^2.8.1"
   tsx: ^4.21.0
   type-fest: "^5.5.0"

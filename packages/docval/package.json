@@ -33,9 +33,9 @@
   "dependencies": {
     "consola": "catalog:",
     "oxc-parser": "catalog:",
-    "tree-sitter": "catalog:",
     "tree-sitter-rust": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "web-tree-sitter": "catalog:"
   },
   "devDependencies": {
     "@types/mdast": "catalog:",
