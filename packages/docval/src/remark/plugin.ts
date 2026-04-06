@@ -14,7 +14,7 @@ export type DocValOptions = {
 mkdirSync(CONTENT_CACHE_DIR, { recursive: true });
 
 const defaultOptions: DocValOptions = {
-  cache: true,
+  cache: process.env.CI !== "true" && process.env.NODE_ENV !== "test",
   include: false,
 };
 
