@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.3](https://github.com/borrowdev/borrow/compare/DocVal-v0.1.2...DocVal-v0.1.3) (2026-04-06)
+
+
+### Features
+
+* **docval:** Add support for 'no-docval' keyword for excluding codeblocks when using 'include' ([ca56542](https://github.com/borrowdev/borrow/commit/ca5654252ea871353d5dee3053fcc541bb47d130))
+* **docval:** Implement immutable content-level cache ([10f2f63](https://github.com/borrowdev/borrow/commit/10f2f63f3b12f02ab9ea4faa2ad9464880342eda))
+* **docval:** Implement support for comment directives and 'cargo-add-options' directive ([f3de61c](https://github.com/borrowdev/borrow/commit/f3de61c4210ebae56cf0b7e8c5eb54bf7f19c65a))
+
+
+### Bug Fixes
+
+* **docval:** Disable cache in CI and 'test' environment by default ([d671db1](https://github.com/borrowdev/borrow/commit/d671db1e8fccbb274c253347d4e2cc3b57aa331a))
+* **docval:** Include missing 'assets' folder in published package ([b0130d9](https://github.com/borrowdev/borrow/commit/b0130d9ba60d52b2d760cb833f8329b9bdedd27f))
+
 ## [0.1.2](https://github.com/borrowdev/borrow/compare/DocVal-v0.1.1...DocVal-v0.1.2) (2026-04-06)
 
 
