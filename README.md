@@ -20,6 +20,30 @@
 
 [Read the full documentation for Borrow.](https://borrow.dev/docs)
 
+## ✅ Borrow DocVal
+
+Validate your documentation codeblocks at build-time.
+
+### Usage
+
+Add the remark plugin to your documentation build and mark codeblocks with `docval` to validate them:
+
+```ts
+import { remarkDocVal } from "@borrowdev/docval";
+
+remarkDocVal({ include: true });
+```
+
+````md
+```ts docval
+import { something } from "some-package";
+
+console.log(something());
+```
+````
+
+[Read the full DocVal documentation.](https://borrow.dev/docs/docval)
+
 ## 🌎 Borrow Ms
 
 Measure the latency of your API around the world in 1 command.
