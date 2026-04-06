@@ -43,26 +43,27 @@ Let's use the [fixed window](/limiter/algorithms#fixed-window) algorithm to rate
 ```ts ts2js
 import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await limiter(
-  { key: "my-limiter-id", userId: "current-user-id" },
-  {
-    limiters: [
-      {
-        maxRequests: 10,
-        interval: "minute",
-        type: "fixed",
-      },
-    ],
-  },
-);
-if (!success) {
-  return {
-    message:
-      "Rate limit exceeded." +
-      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
-  };
+async function callLimiter() {
+  const { success, timeLeft } = await limiter(
+    { key: "my-limiter-id", userId: "current-user-id" },
+    {
+      limiters: [
+        {
+          maxRequests: 10,
+          interval: "minute",
+          type: "fixed",
+        },
+      ],
+    },
+  );
+  if (!success) {
+    return {
+      message:
+        "Rate limit exceeded." +
+        (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
+    };
+  }
 }
-
 // ... Your expensive business logic
 ```
 
@@ -73,26 +74,29 @@ Let's use the [sliding window](/limiter/algorithms#sliding-window) algorithm to 
 ```ts ts2js
 import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await limiter(
-  { key: "my-limiter-id", userId: "current-user-id" },
-  {
-    limiters: [
-      {
-        maxRequests: 10,
-        interval: "minute",
-        type: "sliding",
-      },
-    ],
-  },
-);
-if (!success) {
-  return {
-    message:
-      "Rate limit exceeded." +
-      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
-  };
+async function callLimiter() {
+  const { success, timeLeft } = await limiter(
+    { key: "my-limiter-id", userId: "current-user-id" },
+    {
+      limiters: [
+        {
+          maxRequests: 10,
+          interval: "minute",
+          type: "sliding",
+        },
+      ],
+    },
+  );
+  if (!success) {
+    return {
+      message:
+        "Rate limit exceeded." +
+        (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
+    };
+  }
+
+  // ... Your expensive business logic
 }
-// ... Your expensive business logic
 ```
 
 ### Rate limiting with the token bucket algorithm
@@ -102,34 +106,36 @@ Let's use the [token bucket](/limiter/algorithms#token-bucket) algorithm to rate
 ```ts ts2js
 import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await limiter(
-  { key: "my-limiter-id", userId: "current-user-id" },
-  {
-    limiters: [
-      {
-        maxTokens: 20,
-        tokensCost: 5,
-        tokensPerReplenish: 10,
-        interval: "minute",
-        type: "token",
-      },
-    ],
-  },
-);
-if (!success) {
-  return {
-    message:
-      "Rate limit exceeded." +
-      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
-  };
-}
+async function callLimiter() {
+  const { success, timeLeft } = await limiter(
+    { key: "my-limiter-id", userId: "current-user-id" },
+    {
+      limiters: [
+        {
+          maxTokens: 20,
+          tokensCost: 5,
+          tokensPerReplenish: 10,
+          interval: "minute",
+          type: "token",
+        },
+      ],
+    },
+  );
+  if (!success) {
+    return {
+      message:
+        "Rate limit exceeded." +
+        (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
+    };
+  }
 
-// Optionally, you can also manually refill tokens!
-await limiter.tokens.refill({
-  key: "my-limiter-id",
-  userId: "current-user-id",
-});
-// ... Your expensive business logic
+  // Optionally, you can also manually refill tokens!
+  await limiter.tokens.refill({
+    key: "my-limiter-id",
+    userId: "current-user-id",
+  });
+  // ... Your expensive business logic
+}
 ```
 
 ### Limiting with the borrow algorithm
@@ -139,40 +145,42 @@ Let's use the [borrow](/limiter/algorithms#borrow) algorithm to rate limit reque
 ```ts ts2js
 import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await limiter(
-  { key: "my-limiter-id", userId: "current-user-id" },
-  {
-    limiters: [
-      {
-        borrowAction: "start",
-        type: "borrow",
-        timeout: 10,
-      },
-    ],
-  },
-);
-if (!success) {
-  return {
-    message:
-      "Rate limit exceeded." +
-      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
-  };
-}
-// ... Your expensive business logic
-const { success: endSuccess } = await limiter(
-  { key: "my-limiter-id", userId: "current-user-id" },
-  {
-    limiters: [
-      {
-        borrowAction: "end",
-        type: "borrow",
-        timeout: 10,
-      },
-    ],
-  },
-);
-if (!endSuccess) {
-  return { message: "Failed to end borrow." };
+async function callLimiter() {
+  const { success, timeLeft } = await limiter(
+    { key: "my-limiter-id", userId: "current-user-id" },
+    {
+      limiters: [
+        {
+          borrowAction: "start",
+          type: "borrow",
+          timeout: 10,
+        },
+      ],
+    },
+  );
+  if (!success) {
+    return {
+      message:
+        "Rate limit exceeded." +
+        (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
+    };
+  }
+  // ... Your expensive business logic
+  const { success: endSuccess } = await limiter(
+    { key: "my-limiter-id", userId: "current-user-id" },
+    {
+      limiters: [
+        {
+          borrowAction: "end",
+          type: "borrow",
+          timeout: 10,
+        },
+      ],
+    },
+  );
+  if (!endSuccess) {
+    return { message: "Failed to end borrow." };
+  }
 }
 ```
 

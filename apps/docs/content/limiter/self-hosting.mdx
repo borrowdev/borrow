@@ -50,7 +50,7 @@ UPSTASH_REDIS_REST_URL="https://your-upstash-redis-url"
 ### 4. Create the src/index.ts file
 
 ```ts ts2js
-import { limiter, UpstashRedisAdapter } from "@borrowdev/limiter/limiter/host";
+import { limiter, UpstashRedisAdapter } from "@borrowdev/limiter/host";
 import { Redis } from "@upstash/redis/cloudflare";
 
 export default {
@@ -101,38 +101,45 @@ export default {
 Now you can call the Limiter API by using our client library or by making an HTTP request.
 
 ```ts ts2js
+import assert from "assert";
 import { limiter } from "@borrowdev/limiter";
 
-const { success, timeLeft } = await limiter(
-  { key: "my-limiter-id", userId: "current-user-id" },
-  {
-    limiters: [
-      {
-        maxTokens: 20,
-        tokensCost: 5,
-        tokensPerReplenish: 10,
-        interval: "minute",
-        type: "token",
-      },
-    ],
-    options: {
-      // Use for testing or if you want to fail closed.
-      failBehavior: "fail",
-      apiKey: "random-secure-string",
-      endpoint: {
-        baseUrl: "http://localhost:8787",
+async function callLimiter() {
+  const { success, timeLeft } = await limiter(
+    { key: "my-limiter-id", userId: "current-user-id" },
+    {
+      limiters: [
+        {
+          maxTokens: 20,
+          tokensCost: 5,
+          tokensPerReplenish: 10,
+          interval: "minute",
+          type: "token",
+        },
+      ],
+      options: {
+        // Use for testing or if you want to fail closed.
+        failBehavior: "fail",
+        apiKey: "random-secure-string",
+        endpoint: {
+          baseUrl:
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:8787"
+              : "https://your-production-url.com",
+        },
       },
     },
-  },
-);
-if (!success) {
-  return {
-    message:
-      "Rate limit exceeded." +
-      (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
-  };
+  );
+  if (!success) {
+    return {
+      message:
+        "Rate limit exceeded." +
+        (timeLeft !== null ? ` You can try again in ${timeLeft} seconds.` : ""),
+    };
+  }
+
+  // ... Your expensive business logic
 }
-// ... Your expensive business logic
 ```
 
 ### 6. Use another database (optional)
@@ -141,7 +148,7 @@ If you want to use a different database than Upstash Redis, you can write your o
 You just need to extend the `StorageAdapter` class and implement the required methods.
 
 ```ts ts2js
-import { StorageAdapter } from "@borrowdev/limiter/limiter/host";
+import { StorageAdapter } from "@borrowdev/limiter/host";
 
 class MyCustomAdapter extends StorageAdapter {
   private db: DbType;

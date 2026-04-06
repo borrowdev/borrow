@@ -20,17 +20,18 @@ Here's how it works:
 
 ```ts ts2js
 import { limiter } from "@borrowdev/limiter";
-// ... Your Supabase Edge Function handler
 
-const { success, timeLeft } = await limiter(req, {
-  limiters: [
-    {
-      interval: 20,
-      maxRequests: 10,
-      type: "fixed",
-    },
-  ],
-});
+async function handler(req: Request) {
+  const { success, timeLeft } = await limiter(req, {
+    limiters: [
+      {
+        interval: 20,
+        maxRequests: 10,
+        type: "fixed",
+      },
+    ],
+  });
+}
 
 // ... Your expensive business logic
 ```

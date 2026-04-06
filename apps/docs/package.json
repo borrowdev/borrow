@@ -14,6 +14,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@borrowdev/docval": "workspace:*",
     "@fontsource-variable/jetbrains-mono": "catalog:",
     "@fontsource-variable/raleway": "catalog:",
     "@opennextjs/cloudflare": "catalog:",
