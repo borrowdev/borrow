@@ -16,6 +16,7 @@
   },
   "files": [
     "dist",
+    "assets",
     "package.json",
     "README.md"
   ],
