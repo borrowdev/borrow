@@ -14,7 +14,7 @@ async function adapterRust(code: string, options: AdapterOptions): Promise<void>
   });
 
   try {
-    await execUntilExit("cargo run", environmentPath);
+    await execUntilExit(`cargo run`, environmentPath);
   } finally {
     if (!options.environment) {
       await cleanupEnvironment(environmentPath);

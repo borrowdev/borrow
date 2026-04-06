@@ -3,4 +3,4 @@ name = "docval-env"
 version = "0.0.0"
 edition = "2024"
 
-[workspace]
+[dependencies]

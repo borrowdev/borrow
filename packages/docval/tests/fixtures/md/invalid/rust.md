@@ -60,3 +60,21 @@ fn main() {
     my_module::my_function();
 }
 ```
+
+### Directive - cargo-add-options
+
+```rust docval
+// @docval-cargo-add-options serde nonexistent_feature
+use serde::Serialize;
+
+#[derive(Serialize)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let point = Point { x: 1, y: 2 };
+    println!("Created point with x={}, y={}", point.x, point.y);
+}
+```

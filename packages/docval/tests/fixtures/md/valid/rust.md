@@ -61,3 +61,64 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 ```
+
+### Multiple imports of the same crate
+
+```rust docval
+use rand::RngExt;
+use rand::SeedableRng;
+
+fn main() {
+    let mut rng = rand::rng();
+    let n: u32 = rng.random();
+    println!("{}", n);
+}
+```
+
+### Cargo add options
+
+```rust docval
+// @docval-cargo-add-options serde --features derive,std
+use serde::Serialize;
+
+#[derive(Serialize)]
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let point = Point { x: 1, y: 2 };
+    println!("Created point with x={}, y={}", point.x, point.y);
+}
+```
+
+```rust docval
+// @docval-cargo-add-options tokio --features full
+// Test comment
+use serde::Serialize;
+use tokio::runtime::Runtime;
+
+fn main() {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        println!("Hello, world!");
+    });
+}
+```
+
+### Multiple directives of the same type
+
+```rust docval
+// @docval-cargo-add-options serde --features derive,std
+// @docval-cargo-add-options tokio --features full
+use serde::Serialize;
+use tokio::runtime::Runtime;
+
+fn main() {
+    let rt = Runtime::new().unwrap();
+    rt.block_on(async {
+        println!("Hello, world!");
+    });
+}
+```

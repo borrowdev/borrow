@@ -4,7 +4,7 @@ import { tmpdir } from "os";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
-import { execUntilExit, logger } from "@/utils";
+import { execUntilExit, logger, parseDirectives } from "@/utils";
 
 const require = createRequire(import.meta.url);
 const RUST_WASM_PATH = require.resolve("tree-sitter-rust/tree-sitter-rust.wasm");
@@ -25,6 +25,7 @@ const ERROR_CRATES = new Set(["crate", "super", "self"]);
 type Import = {
   isExternal: boolean;
   package: string;
+  cargoAddOptions?: string;
 };
 
 async function getImports(code: string): Promise<Import[]> {
@@ -33,6 +34,13 @@ async function getImports(code: string): Promise<Import[]> {
   parser.setLanguage(language);
   const tree = parser.parse(code);
   const imports: Import[] = [];
+  const comments = tree?.rootNode.descendantsOfType("line_comment").map((n) => n.text) ?? [];
+  const directives = parseDirectives(comments);
+
+  for (const directive of directives["cargo-add-options"] ?? []) {
+    const [packageSpec, ...options] = directive;
+    imports.push({ package: packageSpec, cargoAddOptions: options.join(" "), isExternal: true });
+  }
 
   for (const node of tree!.rootNode.children) {
     let crateName: string | undefined;
@@ -54,6 +62,9 @@ async function getImports(code: string): Promise<Import[]> {
               .join(", ")} are not supported.`,
         );
       }
+      if (imports.some((i) => i.package === crateName)) {
+        continue;
+      }
 
       imports.push({
         package: crateName,
@@ -61,7 +72,6 @@ async function getImports(code: string): Promise<Import[]> {
       });
     }
   }
-
   return imports;
 }
 
@@ -98,10 +108,16 @@ async function createEnvironment(
     writeFile(`${path}/src/main.rs`, code),
   ]);
   if (imports.length > 0) {
-    const crates = imports.filter((i) => i.isExternal).map((i) => i.package);
+    const crates = imports.filter((i) => i.isExternal);
     logger.info("Installing crates", crates);
-    await execUntilExit(`cargo add ${crates.join(" ")}`, path);
+    for (const crate of crates) {
+      await execUntilExit(
+        `cargo add ${crate.package}${crate.cargoAddOptions ? ` ${crate.cargoAddOptions}` : ""}`,
+        path,
+      );
+    }
   }
+
   logger.info("Created Rust environment at", path);
   return path;
 }

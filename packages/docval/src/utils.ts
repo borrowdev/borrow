@@ -30,4 +30,34 @@ async function cleanupEnvironment(path: string) {
   await execUntilExit(`rm -rf ${path}`, process.cwd());
 }
 
-export { execUntilExit, cleanupEnvironment, logger };
+type DocvalDirectives = Record<string, string[][]> & {
+  "cargo-add-options"?: string[][];
+};
+
+function parseDirectives(comments: string[]): DocvalDirectives {
+  const directives: DocvalDirectives = {};
+  const prefix = "@docval-";
+  for (const line of comments) {
+    const trimmed = line.trim();
+    const prefixIndex = trimmed.indexOf(prefix);
+    if (prefixIndex === -1) continue;
+    const content = trimmed.slice(prefixIndex + prefix.length);
+    const spaceIdx = content.indexOf(" ");
+    const directive = spaceIdx === -1 ? content : content.slice(0, spaceIdx);
+    const args =
+      spaceIdx === -1
+        ? []
+        : content
+            .slice(spaceIdx + 1)
+            .split(" ")
+            .filter(Boolean);
+    if (!Array.isArray(directives[directive])) {
+      directives[directive] = [];
+    }
+    directives[directive].push(args);
+  }
+  return directives;
+}
+
+export { execUntilExit, cleanupEnvironment, logger, parseDirectives };
+export type { DocvalDirectives };
