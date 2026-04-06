@@ -1,4 +1,4 @@
-import { pluginRemark } from "@/index";
+import { remarkDocVal } from "@/index";
 import { readdirSync, readFileSync } from "fs";
 import { resolve } from "path";
 import { remark } from "remark";
@@ -28,7 +28,7 @@ describe("pluginRemark", () => {
       const block = codeblocks[i];
       it(`Should not throw an error for valid markdown: ${file} - ${i + 1}`, async () => {
         try {
-          const result = await remark().use(pluginRemark).process(block);
+          const result = await remark().use(remarkDocVal).process(block);
           expect(result.value.toString().trim()).toEqual(block.trim());
         } catch (err: any) {
           console.error("Original results", err.originalResults);
@@ -43,7 +43,7 @@ describe("pluginRemark", () => {
     for (let i = 0; i < codeblocks.length; i++) {
       const block = codeblocks[i];
       it(`Should throw an error for invalid markdown: ${file} - ${i + 1}`, async () => {
-        await expect(remark().use(pluginRemark).process(block)).rejects.toThrow();
+        await expect(remark().use(remarkDocVal).process(block)).rejects.toThrow();
       });
     }
   });

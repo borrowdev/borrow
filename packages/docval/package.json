@@ -16,7 +16,7 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/main.mjs",
     "./package.json": "./package.json"
   },
   "publishConfig": {

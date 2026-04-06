@@ -1,3 +1,3 @@
-import pluginRemark from "./remark/plugin";
+import remarkDocVal from "./remark/plugin";
 
-export { pluginRemark };
+export { remarkDocVal };
