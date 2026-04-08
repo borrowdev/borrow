@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v2.0.2...@borrowdev/limiter-v2.1.0) (2026-04-08)
+
+
+### Features
+
+* **limiter:** Fall back to client IP when userId is unavailable ([8d6f841](https://github.com/borrowdev/borrow/commit/8d6f841c593a16c6ea402497c36763f099f3c6dc))
+
 ## [2.0.2](https://github.com/borrowdev/borrow/compare/@borrowdev/limiter-v2.0.1...@borrowdev/limiter-v2.0.2) (2026-04-02)
 
 
