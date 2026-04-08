@@ -16,6 +16,13 @@ You can also pass only the request object to the limiter function and it'll auto
 This might have diminishing returns for when you already need the user object anyway, but for simple use cases where you just want to protect an endpoint and return a response
 without touching the user object, this greatly simplifies the whole process!
 
+<Callout title="IP address fallback" type="info">
+  If the user ID can't be determined, for example, when running outside a Supabase environment or
+  when the user isn't logged in, Limiter automatically falls back to using the client's IP address
+  as the user identifier. It checks headers such as `X-Forwarded-For`, `CF-Connecting-IP`, and
+  `X-Real-IP`.
+</Callout>
+
 Here's how it works:
 
 ```ts ts2js
