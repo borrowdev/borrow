@@ -71,26 +71,37 @@ export async function getRequestInfo(
         }
       }
     }
+  }
 
-    // Extract URL from request if available
-    if (req.url) {
-      try {
-        const urlObj = new URL(req.url);
-        result.url = `${urlObj.hostname}${urlObj.pathname}`;
+  // Fall back to client IP address as userId if not available
+  if (!result.userId) {
+    const ip =
+      req.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() ||
+      req.headers.get("CF-Connecting-IP") ||
+      req.headers.get("X-Real-IP");
 
-        if (debug) {
-          console.log("Extracted URL from request: ", result.url);
-        }
-      } catch {
-        if (debug) {
-          console.warn("Failed to parse URL from request: ", req.url);
-        }
+    if (ip) {
+      result.userId = ip;
+      if (debug) {
+        console.log("Using client IP as userId: ", result.userId);
       }
     }
-  } else {
-    throw new Error(
-      "You passed a Request object but we're not in a Supabase Edge Function environment",
-    );
+  }
+
+  // Extract URL from request if available
+  if (req.url) {
+    try {
+      const urlObj = new URL(req.url);
+      result.url = `${urlObj.hostname}${urlObj.pathname}`;
+
+      if (debug) {
+        console.log("Extracted URL from request: ", result.url);
+      }
+    } catch {
+      if (debug) {
+        console.warn("Failed to parse URL from request: ", req.url);
+      }
+    }
   }
 
   return result;
