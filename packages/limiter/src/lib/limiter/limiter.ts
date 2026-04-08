@@ -15,7 +15,7 @@ import {
   // oxlint-disable-next-line no-unused-vars
   LimiterError,
 } from "@/lib/limiter/utils";
-import { getSupabaseRequestInfo } from "@/lib/utils";
+import { getRequestInfo } from "@/lib/utils";
 
 /**
  * @typedef {Object} Params This type represents the parameters object for the
@@ -71,10 +71,10 @@ function limiter<T extends Limiters>(
 ): Promise<LimiterResult<T, boolean>>;
 
 /**
- * Checks the rate limit linked to this Supabase edge function endpoint and user
- * identifier who made the request.
+ * Checks the rate limit linked to this endpoint and user identifier who made
+ * the request.
  *
- * @param {Request} request - A Supabase Request object.
+ * @param {Request} request - A Request object.
  * @param {Params<T>} params - The parameters object containing all limiter
  *   configuration.
  * @returns {LimiterResultPromise<T, R>}
@@ -107,13 +107,13 @@ async function limiter<T extends Limiters>(
 
   const params: ResolvedLimiterParams<T> = finalParams;
 
-  // If a Supabase Request was provided, extract userId and key from it
+  // If a Request was provided, extract userId and key from it
   if (params.request) {
-    const requestInfo = await getSupabaseRequestInfo(params.request, params.options?.debug);
+    const requestInfo = await getRequestInfo(params.request, params.options?.debug);
     if (requestInfo.userId) {
       params.userId = requestInfo.userId;
     } else if (params.options?.debug) {
-      console.warn("No user identifier found in Supabase Request object.");
+      console.warn("No user identifier found in Request object.");
     }
     if (requestInfo.url) {
       params.key = requestInfo.url;

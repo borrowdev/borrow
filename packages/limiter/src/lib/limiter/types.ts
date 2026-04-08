@@ -154,7 +154,7 @@ export type ResolvedLimiterParams<T extends Limiters> = {
   /** A unique user identifier (e.g., user ID or email). */
   userId: string | null;
 
-  /** A Supabase Request object to automatically extract the user ID and use the request URL as the limiter key. */
+  /** A Request object to automatically extract the user ID and use the request URL as the limiter key. */
   request?: Request;
 
   /** An array of up to 4 limiter objects of unique types. */

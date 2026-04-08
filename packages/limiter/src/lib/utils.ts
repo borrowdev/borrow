@@ -33,14 +33,14 @@ export function getIsomorphicEnvVariable(variableName: string, env: any): string
 }
 
 /**
- * Extracts relevant information from a Supabase request object. Returns both
- * the user ID (if available) and the request URL (if available).
+ * Extracts relevant information from a request object. Returns both the user ID
+ * (if available) and the request URL (if available).
  *
- * @param {Request} req - The Supabase request object
+ * @param {Request} req - The request object
  * @param {boolean} debug - Whether to log debug information
  * @returns {Promise<{ userId: string | null; url: string | null }>}
  */
-export async function getSupabaseRequestInfo(
+export async function getRequestInfo(
   req: Request,
   debug?: boolean,
 ): Promise<{ userId: string | null; url: string | null }> {
