@@ -1,10 +1,11 @@
-import { Language, Parser } from "web-tree-sitter";
+import { Language, Parser, Tree } from "web-tree-sitter";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { randomUUID } from "crypto";
-import { execUntilExit, logger, parseDirectives } from "@/utils";
+import { execUntilExit, logger, getDirectives } from "@/utils";
+import type { Comment } from "@/utils";
 
 const require = createRequire(import.meta.url);
 const RUST_WASM_PATH = require.resolve("tree-sitter-rust/tree-sitter-rust.wasm");
@@ -28,17 +29,35 @@ type Import = {
   cargoAddOptions?: string;
 };
 
-async function getImports(code: string): Promise<Import[]> {
+async function getTree(code: string): Promise<Tree | null> {
   const language = await getRustLanguage();
   const parser = new Parser();
   parser.setLanguage(language);
-  const tree = parser.parse(code);
+  return parser.parse(code);
+}
+
+async function getComments(input: string | Tree): Promise<Comment[]> {
+  const tree = typeof input === "string" ? await getTree(input) : input;
+  return tree
+    ? tree.rootNode.descendantsOfType("line_comment").map((comment) => ({
+        value: comment.text,
+        start: comment.startIndex,
+        end: comment.endIndex,
+      }))
+    : [];
+}
+
+async function getImports(code: string): Promise<Import[]> {
+  const tree = await getTree(code);
+  const directives = await getDirectives(code, "rust");
   const imports: Import[] = [];
-  const comments = tree?.rootNode.descendantsOfType("line_comment").map((n) => n.text) ?? [];
-  const directives = parseDirectives(comments);
 
   for (const directive of directives["cargo-add-options"] ?? []) {
-    const [packageSpec, ...options] = directive;
+    const [packageSpec, ...options] = directive.args;
+    if (!packageSpec) {
+      continue;
+    }
+
     imports.push({ package: packageSpec, cargoAddOptions: options.join(" "), isExternal: true });
   }
 
@@ -78,6 +97,8 @@ async function getImports(code: string): Promise<Import[]> {
 type EnvironmentOptions = {
   environmentPath?: string;
 };
+
+type Directive = "cargo-add-options";
 
 function getEntryPath(environmentPath: string) {
   return `${environmentPath}/src/main.rs`;
@@ -122,5 +143,5 @@ async function createEnvironment(
   return path;
 }
 
-export { getImports, createEnvironment, getEntryPath };
-export type { Import };
+export { getImports, createEnvironment, getEntryPath, getComments };
+export type { Import, Directive };

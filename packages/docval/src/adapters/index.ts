@@ -4,7 +4,7 @@ import adapterRust from "./rust";
 import adapterTSX from "./tsx";
 import adapterTypeScript from "./typescript";
 
-const map: { [key: string]: (code: string, metadata: string[]) => Promise<void> } = {
+const map = {
   javascript: adapterJavaScript,
   js: adapterJavaScript,
   typescript: adapterTypeScript,
@@ -13,6 +13,9 @@ const map: { [key: string]: (code: string, metadata: string[]) => Promise<void> 
   tsx: adapterTSX,
   rust: adapterRust,
   rs: adapterRust,
-};
+} as const;
 
+type Language = keyof typeof map;
+
+export { Language };
 export default map;

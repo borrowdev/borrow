@@ -47,4 +47,21 @@ describe("pluginRemark", () => {
       });
     }
   });
+
+  it("Should remove hidden directives from rendered output", async () => {
+    const block = `\`\`\`rust docval
+fn main() {
+    // @docval-hidden
+    let secret = 42;
+    println!("Hello, world!");
+}
+\`\`\``;
+
+    const result = await remark().use(remarkDocVal).process(block);
+    const output = result.value.toString().trim();
+
+    expect(output).toContain('println!("Hello, world!");');
+    expect(output).not.toContain("@docval-hidden");
+    expect(output).not.toContain("let secret = 42;");
+  });
 });

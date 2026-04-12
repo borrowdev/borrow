@@ -6,11 +6,27 @@ import { join } from "path";
 import { randomUUID } from "crypto";
 import { isBuiltin } from "module";
 import { cleanupEnvironment, execUntilExit, logger } from "@/utils";
+import type { Comment } from "@/utils";
 
 type Import = {
   isExternal: boolean;
   package: string;
 };
+
+function getTree(code: string, type: JavaScriptType, filename?: string) {
+  return parse(filename ?? "unknown", code, {
+    lang: type,
+  });
+}
+
+async function getComments(code: string, type: JavaScriptType): Promise<Comment[]> {
+  const ast = await getTree(code, type);
+  return ast.comments.map((comment) => ({
+    value: comment.value,
+    start: comment.start,
+    end: comment.end,
+  }));
+}
 
 function getPackage(importSpec: string): string {
   let packageSpec = importSpec;
@@ -25,9 +41,7 @@ function getPackage(importSpec: string): string {
 }
 
 async function getImports(code: string, filename: string, type: JavaScriptType): Promise<Import[]> {
-  const ast = await parse(filename, code, {
-    lang: type,
-  });
+  const ast = await getTree(code, type, filename);
   return [
     ...ast.module.dynamicImports.map((d) => {
       const packageSpec = getPackage(
@@ -91,4 +105,11 @@ async function createEnvironment(
 type JavaScriptType = "js" | "ts" | "tsx" | "jsx";
 
 export type { JavaScriptType };
-export { getImports, createEnvironment, cleanupEnvironment, execUntilExit, getEntryPath };
+export {
+  getImports,
+  createEnvironment,
+  cleanupEnvironment,
+  execUntilExit,
+  getEntryPath,
+  getComments,
+};

@@ -78,3 +78,12 @@ fn main() {
     println!("Created point with x={}, y={}", point.x, point.y);
 }
 ```
+
+### Directive - hidden code still validates
+
+```rust docval
+fn main() {
+    // @docval-hidden
+    nonexistent_function();
+}
+```

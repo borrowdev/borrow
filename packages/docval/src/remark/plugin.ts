@@ -1,6 +1,6 @@
-import adapters from "@/adapters";
+import adapters, { Language } from "@/adapters";
 import { CONTENT_CACHE_DIR } from "@/constants";
-import { logger } from "@/utils";
+import { filterHiddenCode, logger } from "@/utils";
 import { hash } from "crypto";
 import { existsSync, mkdirSync } from "fs";
 import { readFile, writeFile } from "fs/promises";
@@ -26,10 +26,14 @@ export default function remarkDocval(options: Partial<DocValOptions> = defaultOp
       result: any;
       contentHash: string;
     }>[] = [];
-    await Promise.all(
+    const newTree = structuredClone(tree);
+
+    newTree.children = await Promise.all(
       tree.children.map(async (node) => {
         if (node.type === "code" && node.lang && node.lang in adapters) {
-          const contentHash = hash("sha1", JSON.stringify([node.value, node.lang, node.meta]));
+          let newNode = node;
+          const lang: Language = node.lang as Language;
+          const contentHash = hash("sha1", JSON.stringify([node.value, lang, node.meta]));
           if (cache) {
             const [success, originalResults]: [boolean | null, any] = await readFile(
               `${CONTENT_CACHE_DIR}/${contentHash}.txt`,
@@ -54,7 +58,7 @@ export default function remarkDocval(options: Partial<DocValOptions> = defaultOp
                   originalResults: originalResults,
                 });
               } else {
-                return;
+                return node;
               }
             }
           }
@@ -66,7 +70,7 @@ export default function remarkDocval(options: Partial<DocValOptions> = defaultOp
             promises.push(
               (async () => {
                 try {
-                  const result = await adapters[node.lang as keyof typeof adapters](
+                  const result = await adapters[lang as keyof typeof adapters](
                     node.value,
                     metadata,
                   );
@@ -83,9 +87,14 @@ export default function remarkDocval(options: Partial<DocValOptions> = defaultOp
               })(),
             );
           }
+
+          newNode.value = await filterHiddenCode(node.value, lang);
+          return newNode;
         } else if (node.type === "code" && process.env.DOCVAL_TEST_NO_SKIP === "true") {
           throw new Error(`Skipped code block: ${JSON.stringify(node)}`);
         }
+
+        return node;
       }),
     );
     const res = await Promise.allSettled(promises);
@@ -113,6 +122,6 @@ export default function remarkDocval(options: Partial<DocValOptions> = defaultOp
       });
     }
 
-    return tree;
+    return newTree;
   };
 }
