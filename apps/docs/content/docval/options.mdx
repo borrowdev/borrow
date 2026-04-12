@@ -114,6 +114,24 @@ import { something } from "some-preconfigured-package";
 
 Comment directives are special comments inside codeblocks that configure DocVal behavior. They use the `@docval-` prefix.
 
+### `@docval-hidden`
+
+Hides a line from the rendered output while still validating it. Put the directive on the line immediately before the line you want to hide.
+
+DocVal removes both the `@docval-hidden` comment and the next line from the output codeblock, but still executes the full code during validation.
+
+````md
+```ts
+import assert from "node:assert";
+
+// @docval-hidden
+const apiKey = process.env.MY_API_KEY;
+
+assert(apiKey);
+console.log("Configured");
+```
+````
+
 ### Rust-specific directives
 
 #### `@docval-cargo-add-options`
