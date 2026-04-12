@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/borrowdev/borrow/compare/DocVal-v0.1.3...DocVal-v0.1.4) (2026-04-12)
+
+
+### Features
+
+* **docval:** Implement 'hidden' directive to hide code from the output but still validate it ([205922c](https://github.com/borrowdev/borrow/commit/205922c831f46c62140b502464929913d55fa39e))
+
 ## [0.1.3](https://github.com/borrowdev/borrow/compare/DocVal-v0.1.2...DocVal-v0.1.3) (2026-04-06)
 
 
