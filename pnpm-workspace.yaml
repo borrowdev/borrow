@@ -55,7 +55,7 @@ catalog:
   type-fest: "^5.5.0"
   typescript: "~6.0.2"
   vite: npm:@voidzero-dev/vite-plus-core@^0.1.15
-  vite-plus: latest
+  vite-plus: ^0.1.24
   vitest: npm:@voidzero-dev/vite-plus-test@^0.1.15
   web-tree-sitter: ^0.26.8
   wrangler: ^4.77.0
